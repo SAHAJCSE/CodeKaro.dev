@@ -196,8 +196,10 @@ async function selectProblem(problemId) {
     const description = document.querySelector("#problem-description");
     description.innerHTML = renderMarkdown(problem.readme);
     description.hidden = false;
-    editor.value = problem.solution;
-    savedCode = problem.solution;
+    const localSaved = localStorage.getItem(`oops_code_${problemId}`);
+    const codeToShow = (localSaved !== null) ? localSaved : problem.solution;
+    editor.value = codeToShow;
+    savedCode = codeToShow;
     editor.disabled = false;
     updateDirtyState();
     updateLineNumbers();
@@ -223,6 +225,7 @@ async function saveSolution(runAfterSave = false) {
     document.querySelector("#run-duration").textContent = "";
   }
   try {
+    localStorage.setItem(`oops_code_${problemId}`, source);
     const result = await requestJson(`/api/problems/${encodeURIComponent(problemId)}/${runAfterSave ? "run" : "save"}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

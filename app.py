@@ -10,7 +10,7 @@ from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 ROOT = Path(__file__).resolve().parent
-WEB = ROOT / "web"
+WEB = ROOT / "public" if (ROOT / "public").is_dir() else ROOT / "web"
 PROBLEMS = ROOT / "problems"
 PROBLEM_ID = re.compile(r"^[a-z0-9-]+$")
 MAX_REQUEST_BYTES = 1_000_000
