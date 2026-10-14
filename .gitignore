@@ -1,0 +1,27 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# Java compiled class files & build artifacts
+*.class
+out/
+bin/
+build/
+target/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE configuration
+.vscode/
+.idea/
+*.iml
