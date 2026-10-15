@@ -233,7 +233,7 @@ function animateSaveDot() {
   }
 }
 
-function renderMarkdown(markdown) {
+function renderMarkdown(markdown, problemTitle = "") {
   const lines = markdown.split(/\r?\n/);
   const html = [];
   let paragraph = [];
@@ -362,6 +362,13 @@ function renderMarkdown(markdown) {
       flushParagraph();
       flushList();
       const level = heading[1].length;
+      const headingText = heading[2].trim().toLowerCase();
+      const cleanTitle = (problemTitle || "").trim().toLowerCase();
+      // Skip top-level # Title or any heading matching the problem title
+      // because the problem header component already displays the title.
+      if (level === 1 || (cleanTitle && headingText === cleanTitle)) {
+        continue;
+      }
       html.push(`<h${level}>${inlineMarkdown(heading[2])}</h${level}>`);
       continue;
     }
@@ -2023,7 +2030,7 @@ async function selectProblem(problemId, pushState = true) {
 
     // 3. Description body
     if (problemDescription) {
-      problemDescription.innerHTML = renderMarkdown(problem.readme);
+      problemDescription.innerHTML = renderMarkdown(problem.readme, problem.title);
       problemDescription.hidden = false;
     }
 
