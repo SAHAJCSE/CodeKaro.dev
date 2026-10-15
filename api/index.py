@@ -1,5 +1,6 @@
 """Vercel Serverless Function entry point for OOPS Judge API."""
 import json
+import os
 import re
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, unquote, urlparse
@@ -112,6 +113,31 @@ class handler(BaseHTTPRequestHandler):
                 return
             self.send_json(200, problem)
             return
+
+        # Fallback static file serving if a static request reaches the serverless function
+        clean = path.strip("/")
+        if clean.startswith("web/"):
+            clean = clean[4:]
+        if clean.startswith("public/"):
+            clean = clean[7:]
+        if clean in ("", "index.html", "app.css", "app.js", "config.js"):
+            file_name = clean or "index.html"
+            content_types = {
+                "index.html": "text/html; charset=utf-8",
+                "app.css": "text/css; charset=utf-8",
+                "app.js": "application/javascript; charset=utf-8",
+                "config.js": "application/javascript; charset=utf-8",
+            }
+            base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            for folder in ("public", "web"):
+                file_path = os.path.join(base_dir, folder, file_name)
+                if os.path.isfile(file_path):
+                    try:
+                        with open(file_path, "rb") as f:
+                            self.send_bytes(200, f.read(), content_types.get(file_name, "text/plain"))
+                        return
+                    except Exception:
+                        pass
 
         self.send_json(404, {
             "error": "Endpoint not found.",
