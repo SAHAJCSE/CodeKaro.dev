@@ -65,7 +65,13 @@ const mobileTabBtns = document.querySelectorAll(".mobile-tab-btn");
 function getRunnerUrl() {
   try {
     const param = new URLSearchParams(window.location.search).get("runner_url");
-    if (param) return param.replace(/\/+$/, "");
+    if (param) {
+      const clean = param.replace(/\/+$/, "");
+      localStorage.setItem("oops_runner_url", clean);
+      return clean;
+    }
+    const stored = localStorage.getItem("oops_runner_url");
+    if (stored) return stored.replace(/\/+$/, "");
   } catch (e) {}
   return ((window.CONFIG && window.CONFIG.RUNNER_URL) ? window.CONFIG.RUNNER_URL : "http://localhost:8000").replace(/\/+$/, "");
 }
@@ -1893,7 +1899,27 @@ function initPanelActions() {
 
   if (settingsBtn) {
     settingsBtn.addEventListener("click", () => {
-      alert("OOPS.judge Settings\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Indentation: 4 spaces\n• Hotkeys:\n  - Run: Ctrl+Enter\n  - Submit: Ctrl+Shift+Enter\n  - Save: Ctrl+S\n  - Search Problems: /");
+      const currentUrl = getRunnerUrl();
+      const entered = prompt(
+        "⚙ OOPS.judge Settings\n\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Hotkeys: Run (Ctrl+Enter), Submit (Ctrl+Shift+Enter), Save (Ctrl+S)\n\nExecution Runner URL (leave blank to reset to default):",
+        currentUrl
+      );
+      if (entered !== null) {
+        const trimmed = entered.trim().replace(/\/+$/, "");
+        if (trimmed) {
+          localStorage.setItem("oops_runner_url", trimmed);
+          if (window.CONFIG) window.CONFIG.RUNNER_URL = trimmed;
+          showToast(`Runner URL set to: ${trimmed}`, "info", 3000);
+        } else {
+          localStorage.removeItem("oops_runner_url");
+          if (window.CONFIG) {
+            const isLocal = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1";
+            window.CONFIG.RUNNER_URL = isLocal ? window.CONFIG.LOCAL_RUNNER_URL : window.CONFIG.PROD_RUNNER_URL;
+          }
+          showToast("Runner URL reset to default", "info", 3000);
+        }
+        checkRunnerHealthOnStartup();
+      }
     });
   }
 
@@ -2226,14 +2252,33 @@ async function executeCode(mode = "run") {
         </div>
       `;
     } else if (isNetworkError) {
+      const currentRunner = getRunnerUrl();
       errHtml = `
         <div class="result-container">
           <div class="verdict-header">
             <div class="verdict-row"><h2 class="verdict-title wrong-answer">⚠ Connection Error</h2></div>
-            <div class="verdict-meta-row"><span class="meta-notice">Cannot connect to the runner at <strong>${escapeHtml(getRunnerUrl())}</strong>.</span></div>
+            <div class="verdict-meta-row"><span class="meta-notice">Cannot connect to the runner at <strong>${escapeHtml(currentRunner)}</strong></span></div>
           </div>
-          <div class="detail-card-body" style="padding: 0; margin-top: 6px;">Make sure the runner server is running (e.g. <code>py runner/server.py</code>) and reachable.</div>
-          <button id="retry-button" class="button button-retry">↻ Retry</button>
+          <div class="detail-card-body" style="padding: 12px; margin-top: 8px; background: rgba(255,255,255,0.03); border-radius: 8px; font-size: 13px; line-height: 1.6;">
+            <p style="margin: 0 0 10px 0; color: var(--text-secondary);">
+              The Java execution runner is offline or unreachable. Java compilation requires a running backend container.
+            </p>
+            <div style="margin-bottom: 12px;">
+              <label for="runner-url-input" style="display:block; font-weight:600; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px;">Update Runner URL:</label>
+              <div style="display:flex; gap: 6px;">
+                <input id="runner-url-input" type="url" value="${escapeHtml(currentRunner)}" style="flex:1; background: var(--surface-bg-alt, #1e222b); border: 1px solid var(--border-color, #30363d); border-radius: 6px; padding: 6px 10px; color: var(--text-primary); font-size: 12px; font-family: monospace;" placeholder="https://your-service.onrender.com">
+                <button id="save-runner-url-btn" class="button button-primary" style="padding: 6px 14px; font-size: 12px;" type="button">Save & Retry</button>
+              </div>
+            </div>
+            <div style="border-top: 1px solid var(--border-color, #30363d); padding-top: 8px; font-size: 12px; color: var(--text-muted);">
+              <strong>How to fix:</strong>
+              <ul style="margin: 6px 0 0 18px; padding: 0;">
+                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #38bdf8);">http://127.0.0.1:8000</a> in your browser.</li>
+                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #38bdf8);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
+              </ul>
+            </div>
+          </div>
+          <button id="retry-button" class="button button-retry" style="margin-top: 8px;">↻ Retry</button>
         </div>
       `;
     } else {
@@ -2252,6 +2297,20 @@ async function executeCode(mode = "run") {
     const retryBtn = document.querySelector("#retry-button");
     if (retryBtn) {
       retryBtn.addEventListener("click", () => executeCode(lastExecutionMode));
+    }
+    const saveRunnerBtn = document.querySelector("#save-runner-url-btn");
+    const runnerUrlInput = document.querySelector("#runner-url-input");
+    if (saveRunnerBtn && runnerUrlInput) {
+      saveRunnerBtn.addEventListener("click", () => {
+        const newUrl = runnerUrlInput.value.trim().replace(/\/+$/, "");
+        if (newUrl) {
+          localStorage.setItem("oops_runner_url", newUrl);
+          if (window.CONFIG) window.CONFIG.RUNNER_URL = newUrl;
+          showToast(`Runner URL updated to ${newUrl}`, "info", 3000);
+          checkRunnerHealthOnStartup();
+          executeCode(lastExecutionMode);
+        }
+      });
     }
   } finally {
     if (version === requestVersion && currentProblem === problemId) {
@@ -2545,6 +2604,16 @@ async function checkRunnerHealthOnStartup() {
 
   const runnerUrl = getRunnerUrl();
   const isLocal = runnerUrl.includes("localhost") || runnerUrl.includes("127.0.0.1");
+  const indicator = document.querySelector(".runner-indicator-wrap");
+
+  if (indicator && !indicator.dataset.hasClickListener) {
+    indicator.dataset.hasClickListener = "true";
+    indicator.style.cursor = "pointer";
+    indicator.title = "Click to configure runner URL or check status";
+    indicator.addEventListener("click", () => {
+      if (settingsBtn) settingsBtn.click();
+    });
+  }
 
   const wakeTimer = setTimeout(() => {
     dot.className = "status-dot waking";
@@ -2557,7 +2626,7 @@ async function checkRunnerHealthOnStartup() {
     clearTimeout(wakeTimer);
     if (res.ok) {
       dot.className = "status-dot";
-      text.textContent = isLocal ? "Local runner ready" : "Render runner ready";
+      text.textContent = isLocal ? "Local runner ready" : "Cloud runner ready";
     } else {
       dot.className = "status-dot waking";
       text.textContent = `Runner status ${res.status}`;
@@ -2565,7 +2634,7 @@ async function checkRunnerHealthOnStartup() {
   } catch (err) {
     clearTimeout(wakeTimer);
     dot.className = "status-dot offline";
-    text.textContent = "Runner offline (click Run to wake)";
+    text.textContent = "Runner offline (click to configure)";
   }
 }
 
