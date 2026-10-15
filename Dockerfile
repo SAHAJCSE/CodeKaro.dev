@@ -11,8 +11,10 @@ WORKDIR /app
 # Create a non-root user for secure code execution
 RUN useradd -m -u 1000 runneruser
 
-# Copy common Java judge harness
+# Copy common Java judge harness and precompile it
 COPY common/Judge.java /app/common/Judge.java
+RUN javac -J-XX:TieredStopAtLevel=1 -J-Xmx128m /app/common/Judge.java
+
 
 # Copy problem test suites and ensure ONLY Test.java files are retained
 # Solutions and statements are stripped; reference/ is excluded via .dockerignore

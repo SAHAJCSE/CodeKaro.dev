@@ -24,8 +24,8 @@ MAX_REQUEST_BYTES = 100 * 1024  # 100 KB max HTTP request payload
 MAX_CODE_BYTES = 20 * 1024      # 20 KB max code size
 MAX_OUTPUT_BYTES = 64 * 1024    # 64 KB max captured output
 
-JAVAC_TIMEOUT_SECONDS = 10
-JAVA_TIMEOUT_SECONDS = 5
+JAVAC_TIMEOUT_SECONDS = int(os.environ.get("JAVAC_TIMEOUT_SECONDS", "30"))
+JAVA_TIMEOUT_SECONDS = int(os.environ.get("JAVA_TIMEOUT_SECONDS", "10"))
 
 
 def get_problem_ids():
@@ -176,14 +176,31 @@ def run_solution(problem_id: str, source: str, mode: str = "run") -> dict:
         # Write submitted solution and copy test harness files
         (tmp / "Solution.java").write_text(source, encoding="utf-8")
         shutil.copy(test_src, tmp / "Test.java")
-        shutil.copy(judge_src, tmp / "Judge.java")
+
+        # Reuse precompiled Judge class files if available to speed up compilation
+        judge_classes = list(judge_src.parent.glob("Judge*.class"))
+        if judge_classes:
+            for jc in judge_classes:
+                shutil.copy(jc, tmp / jc.name)
+        else:
+            shutil.copy(judge_src, tmp / "Judge.java")
 
         java_files = [str(f) for f in tmp.glob("*.java")]
 
-        # Step 1: Compilation with javac (10s timeout)
+        # Step 1: Compilation with javac (speed-optimized for container environments)
+        javac_cmd = [
+            "javac",
+            "-J-XX:TieredStopAtLevel=1",
+            "-J-Xmx128m",
+            "-cp",
+            str(tmp),
+            "-d",
+            str(tmp),
+        ] + java_files
+
         try:
             compile_res = subprocess.run(
-                ["javac", "-d", str(tmp)] + java_files,
+                javac_cmd,
                 capture_output=True,
                 text=True,
                 timeout=JAVAC_TIMEOUT_SECONDS,
@@ -240,6 +257,7 @@ def run_solution(problem_id: str, source: str, mode: str = "run") -> dict:
         marker = f"__OJ_RESULT_{uuid.uuid4().hex}__"
         java_cmd = [
             "java",
+            "-XX:TieredStopAtLevel=1",
             "-Xmx128m",
             "-Xss512k",
             "-XX:ActiveProcessorCount=1",

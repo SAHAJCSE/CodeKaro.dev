@@ -7,8 +7,8 @@
     window.location.hostname === "localhost" ||
     window.location.hostname === "127.0.0.1";
 
-  // Production Render runner URL (update if your Render service slug differs)
-  const PROD_RUNNER_URL = "https://oops-judge-runner.onrender.com";
+  // Production Render runner URL (matches live Render service)
+  const PROD_RUNNER_URL = "https://oops-judge.onrender.com";
   const LOCAL_RUNNER_URL = window.location.port
     ? `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
     : `${window.location.protocol}//${window.location.hostname}:8000`;
