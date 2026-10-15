@@ -20,7 +20,7 @@ PROBLEMS = {
     "title": "class - Box",
     "summary": "Design `class Box` with **private integer** `length`, `breadth`, `height`.",
     "readme": "# class - Box\n\n*Source: Practice-Test 10*\n\nDesign `class Box` with **private integer** `length`, `breadth`, `height`.\n\n- default constructor -> all 0\n- `Box(int length, int breadth, int height)`\n- copy constructor `Box(Box b1)`\n- `int getLength()`, `int getBreadth()`, `int getHeight()`\n- `long CalculateVolume()`\n\nSample: `3 4 5` -> default `0 0 0 0`, parameterised `3 4 5 60`, copy `3 4 5 60`.\nConstraints: `0 <= dimension <= 10^5` (watch the overflow of the volume!)\n\nEdit `Solution.java`, then run:  `python3 judge.py class-box`\n",
-    "solution": "import java.util.Scanner;\n\nclass Box{\n    private int length, breadth, height;\n\n    Box() {\n       this.length=0;\nthis.breadth=0;\nthis.height=0;\n    }\n\n    Box(int length, int breadth, int height) {\nthis.length=length;\nthis.breadth=breadth;\nthis.height=height;\n    }\n\n    Box(Box b1) {\nthis.length=b1.length;\nthis.breadth=b1.breadth;\nthis.height=b1.height;\n    }\n\n    int getLength() {\n return length; \n}\n    int getBreadth() {\n return breadth;\n }\n    int getHeight() {\n return height; \n}\n    long CalculateVolume() {\n return (long) length*breadth*height; \n}\n}\n"
+    "solution": "import java.util.Scanner;\n\nclass Box {\n    private int length, breadth, height;\n\n    Box() {\n        // Write your code here\n    }\n\n    Box(int length, int breadth, int height) {\n        // Write your code here\n    }\n\n    Box(Box b1) {\n        // Write your code here\n    }\n\n    int getLength() {\n        return 0;\n    }\n\n    int getBreadth() {\n        return 0;\n    }\n\n    int getHeight() {\n        return 0;\n    }\n\n    long CalculateVolume() {\n        return 0;\n    }\n}\n"
   },
   "class-student": {
     "id": "class-student",
@@ -34,7 +34,7 @@ PROBLEMS = {
     "title": "Cloud Server Health Monitoring",
     "summary": "A server is **overloaded** when CPU utilisation is **>= 80**. Return the overloaded values in their original order.",
     "readme": "# Cloud Server Health Monitoring\n\n*Source: Practice-Test 11*\n\nA server is **overloaded** when CPU utilisation is **>= 80**. Return the overloaded values in their original order.\n\n`public static ArrayList<Integer> findOverloadedServers(ArrayList<Integer> cpuUsage)` in `class Main`\n\n`45 82 67 95 79 88 60` -> `82 95 88`\n\nEdit `Solution.java`, then run:  `python3 judge.py cloud-server-health`\n",
-    "solution": "import java.util.*;\n\nclass Main {\n    public static ArrayList<Integer>\n    findOverloadedServers(ArrayList<Integer> cpuUsage) {\n        // Write your code here\nArrayList<Integer> num=new ArrayList<>();\nfor(int id:cpuUsage){\nif(id>=80){\nnum.add(id);\n}\n}\nreturn num;\n\n       \n    }\n}\n"
+    "solution": "import java.util.*;\n\nclass Main {\n    public static ArrayList<Integer>\n    findOverloadedServers(ArrayList<Integer> cpuUsage) {\n        // Write your code here\n        return new ArrayList<Integer>();\n    }\n}\n"
   },
   "college-seats-reserved": {
     "id": "college-seats-reserved",
@@ -289,3 +289,28 @@ PROBLEMS = {
     "solution": "import java.util.*;\n\nclass Main {\n    public static LinkedList<Integer>\n    findFrequentSites(LinkedList<Integer> history) {\n\n        // Write your code here\n        return null;\n    }\n}\n"
   }
 }
+
+import json
+from pathlib import Path
+
+_meta_candidates = [
+    Path(__file__).resolve().parent.parent / "problems_meta.json",
+    Path(__file__).resolve().parent / "problems_meta.json",
+    Path.cwd() / "problems_meta.json",
+]
+_meta = {}
+for _p in _meta_candidates:
+    if _p.is_file():
+        try:
+            _meta = json.loads(_p.read_text(encoding="utf-8"))
+            break
+        except Exception:
+            pass
+
+for _pid, _pdata in PROBLEMS.items():
+    _m = _meta.get(_pid, {})
+    _pdata["difficulty"] = _m.get("difficulty", "Easy")
+    _pdata["topics"] = _m.get("topics", [])
+    _pdata["hints"] = _m.get("hints", [])
+    _pdata["sample_cases"] = _m.get("sample_cases", [])
+

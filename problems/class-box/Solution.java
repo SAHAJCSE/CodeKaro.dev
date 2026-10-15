@@ -1,36 +1,33 @@
 import java.util.Scanner;
 
-class Box{
+class Box {
     private int length, breadth, height;
 
     Box() {
-       this.length=0;
-this.breadth=0;
-this.height=0;
+        // Write your code here
     }
 
     Box(int length, int breadth, int height) {
-this.length=length;
-this.breadth=breadth;
-this.height=height;
+        // Write your code here
     }
 
     Box(Box b1) {
-this.length=b1.length;
-this.breadth=b1.breadth;
-this.height=b1.height;
+        // Write your code here
     }
 
     int getLength() {
- return length; 
-}
+        return 0;
+    }
+
     int getBreadth() {
- return breadth;
- }
+        return 0;
+    }
+
     int getHeight() {
- return height; 
-}
+        return 0;
+    }
+
     long CalculateVolume() {
- return (long) length*breadth*height; 
-}
+        return 0;
+    }
 }

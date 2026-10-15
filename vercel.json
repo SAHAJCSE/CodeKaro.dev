@@ -5,6 +5,22 @@
     {
       "source": "/api/(.*)",
       "destination": "/api/index.py?path=$1"
+    },
+    {
+      "source": "/",
+      "destination": "/web/index.html"
+    },
+    {
+      "source": "/app.css",
+      "destination": "/web/app.css"
+    },
+    {
+      "source": "/app.js",
+      "destination": "/web/app.js"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/web/$1"
     }
   ]
 }

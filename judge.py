@@ -23,7 +23,7 @@ def run(pid, ref):
                            capture_output=True, text=True)
         if c.returncode != 0:
             print(f"\n=== {pid} ===\n[COMPILATION ERROR]\n{c.stderr.replace(tmp + os.sep, '')}"); return False
-        r = subprocess.run(["java", "-cp", tmp, "Test"], text=True)
+        r = subprocess.run(["java", "-cp", tmp, "Test"], text=True, input="")
         return r.returncode == 0
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
@@ -42,4 +42,5 @@ def main():
         print(f"{sum(results.values())}/{len(results)} problems accepted")
     sys.exit(0 if all(results.values()) else 1)
 
-main()
+if __name__ == "__main__":
+    main()

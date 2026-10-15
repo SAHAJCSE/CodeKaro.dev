@@ -3,21 +3,31 @@
 import argparse
 import json
 import re
-import subprocess
 import sys
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-ROOT = Path(__file__).resolve().parent
-WEB = ROOT / "public" if (ROOT / "public").is_dir() else ROOT / "web"
-PROBLEMS = ROOT / "problems"
-PROBLEM_ID = re.compile(r"^[a-z0-9-]+$")
-MAX_REQUEST_BYTES = 1_000_000
+from runner.core import (
+    MAX_REQUEST_BYTES,
+    PROBLEM_ID,
+    PROBLEMS,
+    ROOT,
+    get_problem_ids,
+    run_solution,
+)
+
+WEB = ROOT / "web"
+PROBLEMS_META = ROOT / "problems_meta.json"
 
 
-def get_problem_ids():
-    return sorted(path.name for path in PROBLEMS.iterdir() if path.is_dir())
+def get_problems_meta():
+    if PROBLEMS_META.is_file():
+        try:
+            return json.loads(PROBLEMS_META.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
 
 
 def get_problem(problem_id):
@@ -39,13 +49,25 @@ def get_problem(problem_id):
         "",
     )
     solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
+    reference_path = ROOT / "reference" / problem_id / "Solution.java"
+    reference_solution = reference_path.read_text(encoding="utf-8") if reference_path.is_file() else ""
+    starter_path = ROOT / "starters" / problem_id / "Solution.java"
+    starter_solution = starter_path.read_text(encoding="utf-8") if starter_path.is_file() else solution
+    meta = get_problems_meta().get(problem_id, {})
     return {
         "id": problem_id,
         "title": title,
         "summary": summary,
         "readme": readme,
         "solution": solution,
+        "starter": starter_solution,
+        "reference": reference_solution,
+        "difficulty": meta.get("difficulty", "Easy"),
+        "topics": meta.get("topics", []),
+        "hints": meta.get("hints", []),
+        "sample_cases": meta.get("sample_cases", []),
     }
+
 
 
 class AppHandler(BaseHTTPRequestHandler):
@@ -54,8 +76,19 @@ class AppHandler(BaseHTTPRequestHandler):
         self.send_header("Content-Type", content_type)
         self.send_header("Content-Length", str(len(body)))
         self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
         self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
 
     def send_json(self, status, payload):
         body = json.dumps(payload).encode("utf-8")
@@ -81,21 +114,31 @@ class AppHandler(BaseHTTPRequestHandler):
         return payload
 
     def do_GET(self):
-        path = unquote(urlparse(self.path).path)
-        if path == "/api/problems":
+        path = unquote(urlparse(self.path).path).rstrip("/")
+
+        if path in ("/health", "/api/health"):
+            self.send_json(200, {"status": "ok"})
+            return
+
+        if path in ("/api/problems", "/problems"):
+            meta_all = get_problems_meta()
             problems = []
             for problem_id in get_problem_ids():
                 problem = get_problem(problem_id)
+                m = meta_all.get(problem_id, {})
                 problems.append({
                     "id": problem["id"],
                     "title": problem["title"],
                     "summary": problem["summary"],
+                    "difficulty": m.get("difficulty", "Easy"),
+                    "topics": m.get("topics", []),
                 })
-            self.send_json(200, {"problems": problems})
+            self.send_json(200, {"problems": problems, "status": "ok"})
             return
 
-        if path.startswith("/api/problems/"):
-            problem_id = path[len("/api/problems/"):]
+        match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)
+        if match:
+            problem_id = match.group(1)
             problem = get_problem(problem_id)
             if problem is None:
                 self.send_json(404, {"error": "Problem not found."})
@@ -103,16 +146,18 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_json(200, problem)
             return
 
+        norm_path = "/" if not path else path
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
             "/app.css": ("app.css", "text/css; charset=utf-8"),
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+            "/config.js": ("config.js", "text/javascript; charset=utf-8"),
         }
-        if path not in static_files:
+        if norm_path not in static_files:
             self.send_json(404, {"error": "Page not found."})
             return
-        filename, content_type = static_files[path]
+        filename, content_type = static_files[norm_path]
         try:
             body = (WEB / filename).read_bytes()
         except OSError as error:
@@ -121,8 +166,8 @@ class AppHandler(BaseHTTPRequestHandler):
         self.send_bytes(200, body, content_type)
 
     def do_POST(self):
-        path = unquote(urlparse(self.path).path)
-        match = re.fullmatch(r"/api/problems/([a-z0-9-]+)/(save|run)", path)
+        path = unquote(urlparse(self.path).path).rstrip("/")
+        match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)/(save|run)", path)
         if match is None:
             self.send_json(404, {"error": "Endpoint not found."})
             return
@@ -139,49 +184,20 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_json(400, {"error": "The 'code' field must be a string."})
             return
 
-        try:
-            (PROBLEMS / problem_id / "Solution.java").write_text(source, encoding="utf-8")
-        except OSError as error:
-            self.send_json(500, {"error": f"Could not save Solution.java: {error}"})
-            return
         if action == "save":
             self.send_json(200, {"saved": True})
             return
 
+        mode = payload.get("mode", "run")
         try:
-            result = subprocess.run(
-                [sys.executable, str(ROOT / "judge.py"), problem_id],
-                cwd=ROOT,
-                capture_output=True,
-                text=True,
-                timeout=90,
-                check=False,
-            )
-        except subprocess.TimeoutExpired as error:
-            output = error.stdout or ""
-            if isinstance(output, bytes):
-                output = output.decode("utf-8", errors="replace")
-            self.send_json(200, {
-                "saved": True,
-                "passed": False,
-                "exitCode": None,
-                "output": output + "\nJudge timed out after 90 seconds.",
-                "error": "The judge took too long to finish.",
-            })
-            return
+            result = run_solution(problem_id, source, mode=mode)
+            self.send_json(200, result)
         except OSError as error:
             self.send_json(503, {"error": f"Could not start the judge: {error}"})
             return
-
-        output = result.stdout
-        if result.stderr:
-            output = f"{output}{result.stderr}"
-        self.send_json(200, {
-            "saved": True,
-            "passed": result.returncode == 0,
-            "exitCode": result.returncode,
-            "output": output.strip(),
-        })
+        except Exception as error:
+            self.send_json(500, {"error": f"Internal judge error: {error}"})
+            return
 
     def log_message(self, format_string, *args):
         print(f"[app] {self.address_string()} - {format_string % args}")

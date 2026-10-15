@@ -96,6 +96,8 @@ class handler(BaseHTTPRequestHandler):
                     "id": p["id"],
                     "title": p["title"],
                     "summary": p["summary"],
+                    "difficulty": p.get("difficulty", "Easy"),
+                    "topics": p.get("topics", []),
                 }
                 for p in sorted(PROBLEMS.values(), key=lambda x: x["id"])
             ]
@@ -144,28 +146,10 @@ class handler(BaseHTTPRequestHandler):
         if action == "save":
             self.send_json(200, {
                 "saved": True,
-                "note": "Saved (saved in browser local storage and cloud preview session)."
+                "note": "Saved (saved in browser local storage and preview session)."
             })
             return
 
-        # Action: "run"
-        info_message = (
-            "=== Cloud Preview Mode (Vercel) ===\n\n"
-            "[INFO] Java compilation and testing requires a local JDK (Java 11+).\n"
-            "Serverless cloud environments do not include the Java compiler (javac).\n\n"
-            "To test and judge your solutions locally:\n"
-            "  1. Clone this repository:\n"
-            "     git clone https://github.com/rajeevranjan4812-star/oops-judge.git\n"
-            "  2. Start the judge app:\n"
-            "     python app.py\n"
-            "  3. Open http://127.0.0.1:8000 in your browser\n\n"
-            "✓ All 41 problem statements and starter templates are fully accessible.\n"
-            "✓ Your code changes are automatically preserved in your browser's local storage."
-        )
-        self.send_json(200, {
-            "saved": True,
-            "passed": False,
-            "exitCode": None,
-            "output": info_message,
-            "error": "Local Java JDK required for execution."
+        self.send_json(400, {
+            "error": "Code execution is hosted on the runner backend. Please configure RUNNER_URL."
         })
