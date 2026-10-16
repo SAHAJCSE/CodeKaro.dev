@@ -6,24 +6,47 @@
   <meta name="theme-color" content="#101014">
   <meta name="description" content="Code-Karo.dev profile and coding activity.">
   <title>Profile — Code-Karo.dev</title>
+  <link rel="stylesheet" href="/navbar.css">
+  <link rel="stylesheet" href="/theme.css">
+  <script src="/theme.js"></script>
   <style>
     :root {
       color-scheme: dark;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #101014;
-      color: #e4e4e8;
-      --surface: #17181e;
-      --surface-raised: #202127;
-      --border: rgba(190, 194, 205, .16);
-      --muted: #92949e;
+      --page-bg: #101014;
+      --page-surface: #17181e;
+      --page-surface-raised: #202127;
+      --page-border: rgba(190, 194, 205, .16);
+      --page-muted: #92949e;
+      --surface: var(--page-surface);
+      --surface-raised: var(--page-surface-raised);
+      --border: var(--page-border);
+      --muted: var(--page-muted);
       --cell-size: 12px;
       --cell-gap: 3px;
       --cell-step: 15px;
-      --chart-scale-01: #252830;
-      --chart-scale-02: #173c48;
-      --chart-scale-03: #17627a;
-      --chart-scale-04: #218eb0;
-      --chart-scale-05: #70c9e8;
+      --chart-scale-01: #25262d;
+      --chart-scale-02: #3a3b43;
+      --chart-scale-03: #555761;
+      --chart-scale-04: #737680;
+      --chart-scale-05: #aeb1ba;
+      background: var(--page-bg);
+      color: #e4e4e8;
+    }
+
+    :root[data-theme="light"] {
+      color-scheme: light;
+      --page-bg: #f0f0f2;
+      --page-surface: #ffffff;
+      --page-surface-raised: #ebebee;
+      --page-border: rgba(32, 33, 38, .14);
+      --page-muted: #696b74;
+      --chart-scale-01: #e5e5e8;
+      --chart-scale-02: #cbccd1;
+      --chart-scale-03: #aaacb4;
+      --chart-scale-04: #888a92;
+      --chart-scale-05: #64666e;
+      color: #202126;
     }
 
     * { box-sizing: border-box; }
@@ -31,20 +54,19 @@
     a { color: inherit; }
 
     .navbar {
+      position: sticky;
+      z-index: 5;
+      top: 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       min-height: 64px;
       padding: 0 clamp(20px, 5vw, 72px);
       border-bottom: 1px solid var(--border);
-      background: #111116;
+      background: var(--page-surface);
     }
 
     .brand { font-size: 15px; font-weight: 650; text-decoration: none; }
-    .nav-links { display: flex; align-items: center; gap: 22px; }
-    .nav-links a { color: #b5b6be; font-size: 13px; text-decoration: none; }
-    .nav-links a:hover { color: #fff; }
-
     main {
       width: min(100% - 40px, 1040px);
       margin: 52px auto;
@@ -65,8 +87,8 @@
       place-items: center;
       border: 1px solid var(--border);
       border-radius: 50%;
-      background: #23252c;
-      color: #e9eaf0;
+      background: var(--page-surface-raised);
+      color: #e4e4e8;
       font-size: 19px;
       font-weight: 600;
     }
@@ -156,7 +178,7 @@
       border: 1px solid var(--border);
       border-radius: 6px;
       background: var(--surface-raised);
-      color: #b8bac3;
+      color: var(--page-muted);
       font-size: 13px;
       line-height: 1.6;
     }
@@ -176,9 +198,26 @@
 <body>
   <nav class="navbar" aria-label="Main navigation">
     <a class="brand" href="/">Code-Karo.dev</a>
-    <div class="nav-links">
-      <a href="/">Home</a>
-      <a href="/practice">Practice</a>
+    <button class="theme-switch" data-theme-switch type="button" aria-label="Switch theme" aria-pressed="false">
+      <svg class="theme-switch__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <g class="theme-switch__sun-rays" stroke="currentColor" stroke-linecap="round" stroke-width="1.7">
+          <circle cx="12" cy="12" r="3.7" fill="currentColor" stroke="none" />
+          <path d="M12 2.5v2M12 19.5v2M4.4 4.4l1.4 1.4m12.4 12.4 1.4 1.4M2.5 12h2m15 0h2M4.4 19.6l1.4-1.4M18.2 5.8l1.4-1.4" />
+        </g>
+        <g class="theme-switch__moon">
+          <circle cx="12" cy="12" r="7.5" fill="currentColor" />
+          <circle class="theme-switch__moon-cutout" cx="16" cy="8" r="6" />
+        </g>
+      </svg>
+      <span class="theme-switch__label" data-theme-label>Dark</span>
+    </button>
+    <div class="split-nav" data-split-nav data-compact-nav>
+      <div class="split-nav__links">
+        <a class="split-nav__link" href="/" data-nav-link>Home</a>
+        <a class="split-nav__link" href="/profile" data-nav-link>Profile</a>
+        <a class="split-nav__link" href="/practice" data-nav-link>Practice</a>
+      </div>
+      <button class="split-nav__expand" type="button" data-nav-expand aria-label="Show all navigation links" aria-expanded="false" tabindex="-1">⌄</button>
     </div>
   </nav>
   <main>
@@ -214,6 +253,7 @@
       <div id="empty-state" class="empty-state" hidden>Sign in and submit solutions in Practice to build your activity heatmap.</div>
     </section>
   </main>
+  <script src="/navbar.js" defer></script>
   <script>
     (() => {
       const $ = selector => document.querySelector(selector);

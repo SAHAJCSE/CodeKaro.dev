@@ -157,6 +157,11 @@ async function hashPassword(password, salt) {
 }
 
 let monacoEditor = null;
+document.addEventListener("code-karo-theme-change", event => {
+  if (!monacoEditor || !window.monaco) return;
+  const theme = event.detail.theme === "light" ? "code-karo-light" : "code-karo-dark";
+  window.monaco.editor.setTheme(theme);
+});
 let isMonacoReady = false;
 let isFallbackActive = false;
 let currentFontSize = parseInt(localStorage.getItem("oops_font_size") || "14", 10);
@@ -564,8 +569,8 @@ function initMonaco() {
             rules: [
               { token: "keyword", foreground: "e87998", fontStyle: "bold" },
               { token: "keyword.java", foreground: "e87998", fontStyle: "bold" },
-              { token: "type", foreground: "c9c5df" },
-              { token: "type.identifier", foreground: "c9c5df" },
+              { token: "type", foreground: "c3c5cc" },
+              { token: "type.identifier", foreground: "c3c5cc" },
               { token: "string", foreground: "a3c77b" },
               { token: "string.escape", foreground: "d9b978" },
               { token: "comment", foreground: "858792", fontStyle: "italic" },
@@ -596,10 +601,48 @@ function initMonaco() {
             }
           });
 
+          monaco.editor.defineTheme("code-karo-light", {
+            base: "vs",
+            inherit: true,
+            rules: [
+              { token: "keyword", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "type", foreground: "686a73" },
+              { token: "type.identifier", foreground: "686a73" },
+              { token: "string", foreground: "36775f" },
+              { token: "string.escape", foreground: "8f701c" },
+              { token: "comment", foreground: "888a92", fontStyle: "italic" },
+              { token: "number", foreground: "8f701c" },
+              { token: "delimiter", foreground: "565860" },
+              { token: "operator", foreground: "565860" },
+              { token: "identifier", foreground: "202126" }
+            ],
+            colors: {
+              "editor.background": "#ffffff",
+              "editor.foreground": "#202126",
+              "editorLineNumber.foreground": "#888a92",
+              "editorLineNumber.activeForeground": "#565860",
+              "editorGutter.background": "#ffffff",
+              "editorCursor.foreground": "#64666e",
+              "editor.selectionBackground": "#aeb1ba55",
+              "editor.inactiveSelectionBackground": "#aeb1ba33",
+              "editor.lineHighlightBackground": "#f0f0f2",
+              "editor.lineHighlightBorder": "#00000000",
+              "editorBracketMatch.background": "#aeb1ba33",
+              "editorBracketMatch.border": "#aeb1ba",
+              "editorOverviewRuler.border": "#d0d0d6",
+              "editorIndentGuide.background": "#d6d6dc",
+              "editorIndentGuide.activeBackground": "#888a92",
+              "scrollbarSlider.background": "#888a9255",
+              "scrollbarSlider.hoverBackground": "#696b7488",
+              "scrollbarSlider.activeBackground": "#42434a88"
+            }
+          });
+
           monacoEditor = monaco.editor.create(monacoContainer, {
             value: "",
             language: "java",
-            theme: "code-karo-dark",
+            theme: document.documentElement.dataset.theme === "light" ? "code-karo-light" : "code-karo-dark",
             automaticLayout: true,
             tabSize: 4,
             insertSpaces: true,
@@ -2280,8 +2323,8 @@ async function executeCode(mode = "run") {
             <div style="border-top: 1px solid var(--border-color, #30363d); padding-top: 8px; font-size: 12px; color: var(--text-muted);">
               <strong>How to fix:</strong>
               <ul style="margin: 6px 0 0 18px; padding: 0;">
-                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #38bdf8);">http://127.0.0.1:8000</a> in your browser.</li>
-                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #38bdf8);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
+                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #aeb1ba);">http://127.0.0.1:8000</a> in your browser.</li>
+                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #aeb1ba);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
               </ul>
             </div>
           </div>

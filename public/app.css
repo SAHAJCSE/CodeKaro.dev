@@ -1,38 +1,35 @@
-/* =====================================================================
-   Code-Karo.dev — Dark Neon Design System Tokens (:root)
-   ===================================================================== */
-/* Code-Karo.dev dark interface tokens */
+/* Code-Karo.dev neutral dark interface tokens */
 :root {
   color-scheme: dark;
   --font-sans: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
   --font-mono: "JetBrains Mono", Consolas, "Liberation Mono", Menlo, Courier, monospace;
   --bg-app: #101014;
   --bg-topbar: #111116;
-  --bg-panel: #101115;
+  --bg-panel: #121318;
   --bg-surface: #17181e;
   --bg-surface-raised: #202127;
   --bg-surface-hover: #292a31;
   --bg-surface-active: #303139;
-  --border-subtle: rgba(190, 194, 205, 0.1);
-  --border-default: rgba(190, 194, 205, 0.18);
+  --border-subtle: rgba(190, 194, 205, 0.08);
+  --border-default: rgba(190, 194, 205, 0.16);
   --border-strong: rgba(190, 194, 205, 0.3);
-  --color-accent: #aeb3bf;
-  --color-accent-soft: rgba(174, 179, 191, 0.12);
+  --color-accent: #aeb1ba;
+  --color-accent-soft: rgba(174, 177, 186, 0.12);
   --color-accent-secondary: #cf91a8;
   --color-accent-secondary-soft: rgba(207, 145, 168, 0.12);
   --color-success: #78b99a;
   --color-success-soft: rgba(120, 185, 154, 0.12);
-  --color-warning: #d3ab67;
-  --color-warning-soft: rgba(211, 171, 103, 0.12);
+  --color-warning: #d9bf71;
+  --color-warning-soft: rgba(217, 191, 113, 0.12);
   --color-danger: #d9878e;
   --color-danger-soft: rgba(217, 135, 142, 0.12);
   --text-primary: #e4e4e8;
-  --text-secondary: #b0b1ba;
-  --text-muted: #858792;
+  --text-secondary: #c3c5cc;
+  --text-muted: #92949e;
   --text-faint: #62646e;
-  --text-inverse: #121318;
+  --text-inverse: #101014;
   --btn-submit-bg: #398d7c;
-  --btn-submit-hover: #43a18e;
+  --btn-submit-hover: #327d6e;
   --diff-easy: var(--color-success);
   --diff-easy-bg: var(--color-success-soft);
   --diff-easy-border: rgba(120, 185, 154, 0.28);
@@ -49,6 +46,40 @@
   --split-v: 47%;
   --split-h: 42%;
   --topbar-height: 60px;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+  --bg-app: #f0f0f2;
+  --bg-topbar: #ffffff;
+  --bg-panel: #f7f7f8;
+  --bg-surface: #ffffff;
+  --bg-surface-raised: #ebebee;
+  --bg-surface-hover: #e1e1e5;
+  --bg-surface-active: #d6d6dc;
+  --border-subtle: rgba(32, 33, 38, 0.08);
+  --border-default: rgba(32, 33, 38, 0.16);
+  --border-strong: rgba(32, 33, 38, 0.3);
+  --color-accent: #64666e;
+  --color-accent-soft: rgba(100, 102, 110, 0.1);
+  --color-accent-secondary: #a45e76;
+  --color-accent-secondary-soft: rgba(164, 94, 118, 0.1);
+  --color-success: #28795f;
+  --color-success-soft: rgba(40, 121, 95, 0.1);
+  --color-warning: #8f701c;
+  --color-warning-soft: rgba(143, 112, 28, 0.1);
+  --color-danger: #a54c54;
+  --color-danger-soft: rgba(165, 76, 84, 0.1);
+  --text-primary: #202126;
+  --text-secondary: #42434a;
+  --text-muted: #696b74;
+  --text-faint: #888a92;
+  --text-inverse: #ffffff;
+  --btn-submit-bg: #28795f;
+  --btn-submit-hover: #226b54;
+  --diff-easy-border: rgba(40, 121, 95, 0.24);
+  --diff-medium-border: rgba(143, 112, 28, 0.24);
+  --diff-hard-border: rgba(165, 76, 84, 0.24);
 }
 
 /* Base resets & typography */
@@ -493,8 +524,48 @@ body.resizing-row, body.resizing-row * {
 
 /* Auth Modal Styling */
 .auth-modal-card {
+  position: relative;
+  isolation: isolate;
   width: 380px;
   max-width: 92vw;
+  border-color: transparent;
+  background: var(--bg-surface);
+}
+.auth-modal-card::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  padding: 1px;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--shine-angle, 0deg),
+    transparent 0deg 255deg,
+    #a07cfe 280deg,
+    #fe8fb5 310deg,
+    #ffbe7b 340deg,
+    transparent 360deg
+  );
+  content: "";
+  pointer-events: none;
+  animation: auth-shine-rotate 8s linear infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.auth-modal-card > * {
+  position: relative;
+  z-index: 1;
+}
+@property --shine-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+@keyframes auth-shine-rotate {
+  to { --shine-angle: 360deg; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .auth-modal-card::before { animation: none; }
 }
 .auth-tabs-row {
   display: flex;
@@ -2288,7 +2359,7 @@ kbd {
   backdrop-filter: blur(4px);
 }
 .modal-card {
-  background: #0d0d1a;
+  background: var(--bg-surface);
   border: 1px solid rgba(174, 179, 191, 0.3);
   border-radius: var(--radius-lg);
 
@@ -2807,6 +2878,79 @@ kbd {
   .mobile-tab-icon {
     font-size: 15px;
   }
+}
+
+html[data-theme="light"] .brand-mark {
+  color: #202126;
+  background: #dedee2;
+}
+
+html[data-theme="light"] .brand-muted {
+  color: var(--text-muted);
+}
+
+html[data-theme="light"] .btn-segmented.btn-run {
+  color: var(--text-primary);
+  background: #e3e3e6;
+}
+
+html[data-theme="light"] .btn-segmented.btn-run:not(:disabled):hover {
+  background: #d6d6dc;
+}
+
+html[data-theme="light"] .panel-tab.active,
+html[data-theme="light"] .console-tab.active {
+  color: var(--text-primary);
+  border-bottom-color: var(--color-accent);
+}
+
+html[data-theme="light"] .problem-display-title,
+html[data-theme="light"] .markdown-body h1,
+html[data-theme="light"] .markdown-body h2,
+html[data-theme="light"] .markdown-body h3,
+html[data-theme="light"] .markdown-body strong {
+  color: var(--text-primary);
+}
+
+html[data-theme="light"] .markdown-body,
+html[data-theme="light"] .markdown-body h2 {
+  color: var(--text-secondary);
+}
+
+html[data-theme="light"] .markdown-body code {
+  color: #555761;
+  background: #e4e4e8;
+}
+
+html[data-theme="light"] .example-card {
+  background: #f1f1f3;
+}
+
+html[data-theme="light"] .splitter-vertical {
+  background: #d0d0d6;
+}
+
+html[data-theme="light"] .splitter:hover .splitter-handle,
+html[data-theme="light"] .splitter:focus-visible .splitter-handle,
+html[data-theme="light"] .splitter.active .splitter-handle {
+  background: #aeb1ba;
+}
+
+html[data-theme="light"] .editor-statusbar,
+html[data-theme="light"] .console-panel {
+  background: var(--bg-panel);
+}
+
+html[data-theme="light"] .console-empty-state {
+  color: var(--text-secondary);
+}
+
+html[data-theme="light"] .console-empty-state .empty-title {
+  color: var(--text-primary);
+}
+
+html[data-theme="light"] .console-empty-state .empty-desc {
+  color: var(--text-muted);
 }
 
 body {

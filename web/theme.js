@@ -30,7 +30,7 @@
   function applyTheme(theme, persist = true) {
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
-    if (themeMeta) themeMeta.content = theme === "dark" ? "#080b13" : "#f6f8ff";
+    if (themeMeta) themeMeta.content = theme === "dark" ? "#101014" : "#f0f0f2";
     syncControls(theme);
     if (persist) {
       try {

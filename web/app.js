@@ -569,8 +569,8 @@ function initMonaco() {
             rules: [
               { token: "keyword", foreground: "e87998", fontStyle: "bold" },
               { token: "keyword.java", foreground: "e87998", fontStyle: "bold" },
-              { token: "type", foreground: "c9c5df" },
-              { token: "type.identifier", foreground: "c9c5df" },
+              { token: "type", foreground: "c3c5cc" },
+              { token: "type.identifier", foreground: "c3c5cc" },
               { token: "string", foreground: "a3c77b" },
               { token: "string.escape", foreground: "d9b978" },
               { token: "comment", foreground: "858792", fontStyle: "italic" },
@@ -605,37 +605,37 @@ function initMonaco() {
             base: "vs",
             inherit: true,
             rules: [
-              { token: "keyword", foreground: "1e3fd8", fontStyle: "bold" },
-              { token: "keyword.java", foreground: "1e3fd8", fontStyle: "bold" },
-              { token: "type", foreground: "17638a" },
-              { token: "type.identifier", foreground: "17638a" },
-              { token: "string", foreground: "277248" },
-              { token: "string.escape", foreground: "9b6718" },
-              { token: "comment", foreground: "71819a", fontStyle: "italic" },
-              { token: "number", foreground: "9b6718" },
-              { token: "delimiter", foreground: "52617a" },
-              { token: "operator", foreground: "52617a" },
-              { token: "identifier", foreground: "17223b" }
+              { token: "keyword", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "type", foreground: "686a73" },
+              { token: "type.identifier", foreground: "686a73" },
+              { token: "string", foreground: "36775f" },
+              { token: "string.escape", foreground: "8f701c" },
+              { token: "comment", foreground: "888a92", fontStyle: "italic" },
+              { token: "number", foreground: "8f701c" },
+              { token: "delimiter", foreground: "565860" },
+              { token: "operator", foreground: "565860" },
+              { token: "identifier", foreground: "202126" }
             ],
             colors: {
               "editor.background": "#ffffff",
-              "editor.foreground": "#17223b",
-              "editorLineNumber.foreground": "#8390a5",
-              "editorLineNumber.activeForeground": "#3e4e68",
+              "editor.foreground": "#202126",
+              "editorLineNumber.foreground": "#888a92",
+              "editorLineNumber.activeForeground": "#565860",
               "editorGutter.background": "#ffffff",
-              "editorCursor.foreground": "#1e3fd8",
-              "editor.selectionBackground": "#a5d8ff77",
-              "editor.inactiveSelectionBackground": "#a5d8ff44",
-              "editor.lineHighlightBackground": "#edf4ff",
+              "editorCursor.foreground": "#64666e",
+              "editor.selectionBackground": "#aeb1ba55",
+              "editor.inactiveSelectionBackground": "#aeb1ba33",
+              "editor.lineHighlightBackground": "#f0f0f2",
               "editor.lineHighlightBorder": "#00000000",
-              "editorBracketMatch.background": "#38bdf833",
-              "editorBracketMatch.border": "#38bdf8",
-              "editorOverviewRuler.border": "#d6e8ff",
-              "editorIndentGuide.background": "#d6e2f2",
-              "editorIndentGuide.activeBackground": "#8390a5",
-              "scrollbarSlider.background": "#8390a566",
-              "scrollbarSlider.hoverBackground": "#61708b88",
-              "scrollbarSlider.activeBackground": "#3e4e6888"
+              "editorBracketMatch.background": "#aeb1ba33",
+              "editorBracketMatch.border": "#aeb1ba",
+              "editorOverviewRuler.border": "#d0d0d6",
+              "editorIndentGuide.background": "#d6d6dc",
+              "editorIndentGuide.activeBackground": "#888a92",
+              "scrollbarSlider.background": "#888a9255",
+              "scrollbarSlider.hoverBackground": "#696b7488",
+              "scrollbarSlider.activeBackground": "#42434a88"
             }
           });
 
@@ -2323,8 +2323,8 @@ async function executeCode(mode = "run") {
             <div style="border-top: 1px solid var(--border-color, #30363d); padding-top: 8px; font-size: 12px; color: var(--text-muted);">
               <strong>How to fix:</strong>
               <ul style="margin: 6px 0 0 18px; padding: 0;">
-                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #38bdf8);">http://127.0.0.1:8000</a> in your browser.</li>
-                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #38bdf8);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
+                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #aeb1ba);">http://127.0.0.1:8000</a> in your browser.</li>
+                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #aeb1ba);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
               </ul>
             </div>
           </div>

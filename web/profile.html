@@ -13,11 +13,11 @@
     :root {
       color-scheme: dark;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --page-bg: #0b1324;
-      --page-surface: #111a2b;
-      --page-surface-raised: #17243a;
-      --page-border: rgba(165, 216, 255, .16);
-      --page-muted: #a4b1c7;
+      --page-bg: #101014;
+      --page-surface: #17181e;
+      --page-surface-raised: #202127;
+      --page-border: rgba(190, 194, 205, .16);
+      --page-muted: #92949e;
       --surface: var(--page-surface);
       --surface-raised: var(--page-surface-raised);
       --border: var(--page-border);
@@ -25,28 +25,28 @@
       --cell-size: 12px;
       --cell-gap: 3px;
       --cell-step: 15px;
-      --chart-scale-01: #17243a;
-      --chart-scale-02: #123758;
-      --chart-scale-03: #17638a;
-      --chart-scale-04: #1e3fd8;
-      --chart-scale-05: #38bdf8;
+      --chart-scale-01: #25262d;
+      --chart-scale-02: #3a3b43;
+      --chart-scale-03: #555761;
+      --chart-scale-04: #737680;
+      --chart-scale-05: #aeb1ba;
       background: var(--page-bg);
-      color: #e8f0ff;
+      color: #e4e4e8;
     }
 
     :root[data-theme="light"] {
       color-scheme: light;
-      --page-bg: #f6f8ff;
+      --page-bg: #f0f0f2;
       --page-surface: #ffffff;
-      --page-surface-raised: #edf4ff;
-      --page-border: rgba(30, 63, 216, .14);
-      --page-muted: #61708b;
-      --chart-scale-01: #e4eaf3;
-      --chart-scale-02: #c4e3fb;
-      --chart-scale-03: #82c8f0;
-      --chart-scale-04: #38bdf8;
-      --chart-scale-05: #1e3fd8;
-      color: #17223b;
+      --page-surface-raised: #ebebee;
+      --page-border: rgba(32, 33, 38, .14);
+      --page-muted: #696b74;
+      --chart-scale-01: #e5e5e8;
+      --chart-scale-02: #cbccd1;
+      --chart-scale-03: #aaacb4;
+      --chart-scale-04: #888a92;
+      --chart-scale-05: #64666e;
+      color: #202126;
     }
 
     * { box-sizing: border-box; }
@@ -88,7 +88,7 @@
       border: 1px solid var(--border);
       border-radius: 50%;
       background: var(--page-surface-raised);
-      color: #e8f0ff;
+      color: #e4e4e8;
       font-size: 19px;
       font-weight: 600;
     }
@@ -181,10 +181,6 @@
       color: var(--page-muted);
       font-size: 13px;
       line-height: 1.6;
-    }
-
-    :root[data-theme="light"] .avatar {
-      color: #1e3fd8;
     }
 
     @media (max-width: 560px) {
