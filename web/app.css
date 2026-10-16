@@ -173,6 +173,29 @@ body.resizing-row, body.resizing-row * {
   gap: 12px;
 }
 
+.topbar-github {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  flex: none;
+  place-items: center;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  transition: color .15s ease, border-color .15s ease, background-color .15s ease;
+}
+.topbar-github svg { width: 17px; height: 17px; }
+.topbar-github:hover {
+  border-color: var(--border-strong);
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+.topbar-github:focus-visible {
+  outline: 2px solid var(--border-strong);
+  outline-offset: 2px;
+}
+
 .brand {
   display: flex;
   align-items: center;
