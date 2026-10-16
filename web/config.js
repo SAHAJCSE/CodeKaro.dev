@@ -1,4 +1,4 @@
-// OOPS Judge Configuration
+// Code-Karo.dev Configuration
 // Automatically detects environment (local development vs production Render URL),
 // supports localStorage override ('oops_runner_url'), and allows URL parameter (?runner_url=https://...).
 
@@ -31,4 +31,3 @@
     LOCAL_RUNNER_URL: LOCAL_RUNNER_URL,
   };
 })();
-

@@ -1,4 +1,4 @@
-# OOPS Practice - LeetCode-style Judge (Java)
+# Code-Karo.dev - Java Practice Judge
 
 41 coding problems from Practice-Test 1-15 (the MCQs are not included), each with a starter file, a README, and test cases.
 Only a JDK (Java 11+) is needed. Python 3 is used for the small runner, but you can also use plain `javac`.
@@ -15,7 +15,7 @@ Start the local web app from this folder:
 py app.py
 ```
 
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000) in your browser. Choose a problem, edit `Solution.java`, then select **Run tests** (or press `Ctrl+Enter`). **Save** writes your current solution to that problem's folder. Keep the terminal open while using the app; press `Ctrl+C` there to stop it. If port 8000 is already in use, choose another, for example `py app.py --port 8080`.
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000) for the landing page, [http://127.0.0.1:8000/practice](http://127.0.0.1:8000/practice) for the judge, or [http://127.0.0.1:8000/profile](http://127.0.0.1:8000/profile) for your profile and submission heatmap. In the judge, choose a problem, edit `Solution.java`, then select **Run tests** (or press `Ctrl+Enter`). **Save** writes your current solution to that problem's folder. Keep the terminal open while using the app; press `Ctrl+C` there to stop it. If port 8000 is already in use, choose another, for example `py app.py --port 8080`.
 
 The app uses only Python's standard library and your local JDK. It listens on your computer only; submitted code is compiled and run locally.
 

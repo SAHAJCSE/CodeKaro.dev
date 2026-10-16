@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Automated security verification test suite for OOPS Judge Runner."""
+"""Automated security verification test suite for Code-Karo.dev Runner."""
 import json
 import time
 import urllib.request

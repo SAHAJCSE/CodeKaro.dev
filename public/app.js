@@ -157,6 +157,11 @@ async function hashPassword(password, salt) {
 }
 
 let monacoEditor = null;
+document.addEventListener("code-karo-theme-change", event => {
+  if (!monacoEditor || !window.monaco) return;
+  const theme = event.detail.theme === "light" ? "code-karo-light" : "code-karo-dark";
+  window.monaco.editor.setTheme(theme);
+});
 let isMonacoReady = false;
 let isFallbackActive = false;
 let currentFontSize = parseInt(localStorage.getItem("oops_font_size") || "14", 10);
@@ -557,49 +562,87 @@ function initMonaco() {
       window.require(["vs/editor/editor.main"], function () {
         clearTimeout(timeout);
         try {
-          // Define custom neon dark theme matching the workspace palette
-          monaco.editor.defineTheme("oops-neon", {
+          // Define the dark editor theme to match the neutral workspace palette
+          monaco.editor.defineTheme("code-karo-dark", {
             base: "vs-dark",
             inherit: true,
             rules: [
-              { token: "keyword", foreground: "ff2bd6", fontStyle: "bold" },
-              { token: "keyword.java", foreground: "ff2bd6", fontStyle: "bold" },
-              { token: "type", foreground: "00e5ff" },
-              { token: "type.identifier", foreground: "00e5ff" },
-              { token: "string", foreground: "39ff88" },
-              { token: "string.escape", foreground: "00e5ff" },
-              { token: "comment", foreground: "60688a", fontStyle: "italic" },
-              { token: "number", foreground: "ffb700" },
-              { token: "delimiter", foreground: "aab2cd" },
-              { token: "operator", foreground: "00e5ff" },
-              { token: "identifier", foreground: "e8edff" }
+              { token: "keyword", foreground: "e87998", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "e87998", fontStyle: "bold" },
+              { token: "type", foreground: "c3c5cc" },
+              { token: "type.identifier", foreground: "c3c5cc" },
+              { token: "string", foreground: "a3c77b" },
+              { token: "string.escape", foreground: "d9b978" },
+              { token: "comment", foreground: "858792", fontStyle: "italic" },
+              { token: "number", foreground: "d9b978" },
+              { token: "delimiter", foreground: "c3c5cc" },
+              { token: "operator", foreground: "c3c5cc" },
+              { token: "identifier", foreground: "e4e4e8" }
             ],
             colors: {
-              "editor.background": "#0d0d18",
-              "editor.foreground": "#e8edff",
-              "editorLineNumber.foreground": "#4e5675",
-              "editorLineNumber.activeForeground": "#00e5ff",
-              "editorGutter.background": "#0d0d18",
-              "editorCursor.foreground": "#00e5ff",
-              "editor.selectionBackground": "#00e5ff33",
-              "editor.inactiveSelectionBackground": "#00e5ff1a",
-              "editor.lineHighlightBackground": "#131328",
+              "editor.background": "#17181e",
+              "editor.foreground": "#e4e4e8",
+              "editorLineNumber.foreground": "#62646e",
+              "editorLineNumber.activeForeground": "#c3c5cc",
+              "editorGutter.background": "#17181e",
+              "editorCursor.foreground": "#e4e4e8",
+              "editor.selectionBackground": "#85879233",
+              "editor.inactiveSelectionBackground": "#8587921a",
+              "editor.lineHighlightBackground": "#202127",
               "editor.lineHighlightBorder": "#00000000",
-              "editorBracketMatch.background": "#00e5ff18",
-              "editorBracketMatch.border": "#00e5ff",
-              "editorOverviewRuler.border": "#121324",
-              "editorIndentGuide.background": "#181930",
-              "editorIndentGuide.activeBackground": "#00e5ff44",
-              "scrollbarSlider.background": "#1e1f3d66",
-              "scrollbarSlider.hoverBackground": "#00e5ff44",
-              "scrollbarSlider.activeBackground": "#00e5ff88"
+              "editorBracketMatch.background": "#85879222",
+              "editorBracketMatch.border": "#858792",
+              "editorOverviewRuler.border": "#202127",
+              "editorIndentGuide.background": "#292a31",
+              "editorIndentGuide.activeBackground": "#85879266",
+              "scrollbarSlider.background": "#62646e66",
+              "scrollbarSlider.hoverBackground": "#85879266",
+              "scrollbarSlider.activeBackground": "#aeb1ba88"
+            }
+          });
+
+          monaco.editor.defineTheme("code-karo-light", {
+            base: "vs",
+            inherit: true,
+            rules: [
+              { token: "keyword", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "type", foreground: "686a73" },
+              { token: "type.identifier", foreground: "686a73" },
+              { token: "string", foreground: "36775f" },
+              { token: "string.escape", foreground: "8f701c" },
+              { token: "comment", foreground: "888a92", fontStyle: "italic" },
+              { token: "number", foreground: "8f701c" },
+              { token: "delimiter", foreground: "565860" },
+              { token: "operator", foreground: "565860" },
+              { token: "identifier", foreground: "202126" }
+            ],
+            colors: {
+              "editor.background": "#ffffff",
+              "editor.foreground": "#202126",
+              "editorLineNumber.foreground": "#888a92",
+              "editorLineNumber.activeForeground": "#565860",
+              "editorGutter.background": "#ffffff",
+              "editorCursor.foreground": "#64666e",
+              "editor.selectionBackground": "#aeb1ba55",
+              "editor.inactiveSelectionBackground": "#aeb1ba33",
+              "editor.lineHighlightBackground": "#f0f0f2",
+              "editor.lineHighlightBorder": "#00000000",
+              "editorBracketMatch.background": "#aeb1ba33",
+              "editorBracketMatch.border": "#aeb1ba",
+              "editorOverviewRuler.border": "#d0d0d6",
+              "editorIndentGuide.background": "#d6d6dc",
+              "editorIndentGuide.activeBackground": "#888a92",
+              "scrollbarSlider.background": "#888a9255",
+              "scrollbarSlider.hoverBackground": "#696b7488",
+              "scrollbarSlider.activeBackground": "#42434a88"
             }
           });
 
           monacoEditor = monaco.editor.create(monacoContainer, {
             value: "",
             language: "java",
-            theme: "oops-neon",
+            theme: document.documentElement.dataset.theme === "light" ? "code-karo-light" : "code-karo-dark",
             automaticLayout: true,
             tabSize: 4,
             insertSpaces: true,
@@ -1414,7 +1457,7 @@ function showNotFound(problemId) {
     notFoundState.hidden = false;
     if (notFoundMsg) notFoundMsg.textContent = `The problem "${escapeHtml(problemId)}" was not found in the judge catalogue.`;
   }
-  document.title = "Problem Not Found — OOPS Judge";
+  document.title = "Problem Not Found — Code-Karo.dev";
   if (problemIdTag) problemIdTag.textContent = "404";
   if (editor) editor.disabled = true;
   if (monacoEditor) monacoEditor.updateOptions({ readOnly: true });
@@ -1908,7 +1951,7 @@ function initPanelActions() {
     settingsBtn.addEventListener("click", () => {
       const currentUrl = getRunnerUrl();
       const entered = prompt(
-        "⚙ OOPS.judge Settings\n\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Hotkeys: Run (Ctrl+Enter), Submit (Ctrl+Shift+Enter), Save (Ctrl+S)\n\nExecution Runner URL (leave blank to reset to default):",
+        "⚙ Code-Karo.dev Settings\n\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Hotkeys: Run (Ctrl+Enter), Submit (Ctrl+Shift+Enter), Save (Ctrl+S)\n\nExecution Runner URL (leave blank to reset to default):",
         currentUrl
       );
       if (entered !== null) {
@@ -1983,7 +2026,7 @@ async function selectProblem(problemId, pushState = true) {
     // 1. Problem number + title (e.g. "12. Employee")
     const problemIndex = problems.findIndex(p => p.id === problem.id);
     const displayNum = problemIndex !== -1 ? `${problemIndex + 1}. ` : "";
-    document.title = `${displayNum}${problem.title} — OOPS Judge`;
+    document.title = `${displayNum}${problem.title} — Code-Karo.dev`;
     if (problemIdTag) problemIdTag.textContent = problem.id;
 
     const titleEl = document.querySelector("#problem-display-title");
@@ -2280,8 +2323,8 @@ async function executeCode(mode = "run") {
             <div style="border-top: 1px solid var(--border-color, #30363d); padding-top: 8px; font-size: 12px; color: var(--text-muted);">
               <strong>How to fix:</strong>
               <ul style="margin: 6px 0 0 18px; padding: 0;">
-                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #38bdf8);">http://127.0.0.1:8000</a> in your browser.</li>
-                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #38bdf8);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
+                <li style="margin-bottom: 4px;"><strong>Run locally (instant):</strong> In terminal run <code>py app.py</code>, then open <a href="http://127.0.0.1:8000" target="_blank" style="color: var(--accent, #aeb1ba);">http://127.0.0.1:8000</a> in your browser.</li>
+                <li><strong>Deploy cloud runner:</strong> Deploy this repo to <a href="https://render.com" target="_blank" style="color: var(--accent, #aeb1ba);">Render.com</a> as a Web Service (Docker) and paste your assigned URL above.</li>
               </ul>
             </div>
           </div>
@@ -2725,7 +2768,7 @@ function updateAuthModalState() {
   const confirmGroup = document.querySelector("#confirm-password-group");
   const submitBtn = document.querySelector("#auth-submit-btn");
 
-  if (title) title.textContent = isSignIn ? "Sign in to OOPS.judge" : "Create an Account";
+  if (title) title.textContent = isSignIn ? "Sign in to Code-Karo.dev" : "Create an Account";
   if (tabSignIn) {
     tabSignIn.classList.toggle("active", isSignIn);
     tabSignIn.setAttribute("aria-selected", String(isSignIn));
@@ -3068,6 +3111,3 @@ initAuth();
 initViewCodeModal();
 loadProblems();
 checkRunnerHealthOnStartup();
-
-
-

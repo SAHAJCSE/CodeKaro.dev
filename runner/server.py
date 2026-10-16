@@ -224,7 +224,7 @@ class RunnerHandler(BaseHTTPRequestHandler):
 
 def run_server(port: int = PORT):
     server = ThreadingHTTPServer(("0.0.0.0", port), RunnerHandler)
-    print(f"OOPS Judge Runner started on http://0.0.0.0:{port}")
+    print(f"Code-Karo.dev Runner started on http://0.0.0.0:{port}")
     print(f"Allowed CORS Origins: {ALLOWED_ORIGINS}")
     try:
         server.serve_forever()

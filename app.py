@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Start the local browser app for the OOPS Java practice problems."""
+"""Start the local browser app for Code-Karo.dev Java practice problems."""
 import argparse
 import json
 import re
@@ -150,6 +150,18 @@ class AppHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/practice": ("practice.html", "text/html; charset=utf-8"),
+            "/practice.html": ("practice.html", "text/html; charset=utf-8"),
+            "/profile": ("profile.html", "text/html; charset=utf-8"),
+            "/profile.html": ("profile.html", "text/html; charset=utf-8"),
+            "/navbar.css": ("navbar.css", "text/css; charset=utf-8"),
+            "/navbar.js": ("navbar.js", "text/javascript; charset=utf-8"),
+            "/gooey-nav.css": ("gooey-nav.css", "text/css; charset=utf-8"),
+            "/gooey-nav.js": ("gooey-nav.js", "text/javascript; charset=utf-8"),
+            "/theme.css": ("theme.css", "text/css; charset=utf-8"),
+            "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
+            "/gradient-ascii.js": ("gradient-ascii.js", "text/javascript; charset=utf-8"),
+            "/type-writer.js": ("type-writer.js", "text/javascript; charset=utf-8"),
             "/app.css": ("app.css", "text/css; charset=utf-8"),
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/config.js": ("config.js", "text/javascript; charset=utf-8"),
@@ -211,12 +223,12 @@ def main():
         parser.error("--port must be between 1 and 65535")
 
     server = ThreadingHTTPServer(("127.0.0.1", args.port), AppHandler)
-    print(f"OOPS Judge is running at http://127.0.0.1:{args.port}")
+    print(f"Code-Karo.dev is running at http://127.0.0.1:{args.port}")
     print("Keep this terminal open while using the app. Press Ctrl+C to stop.")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
-        print("\nStopping OOPS Judge.")
+        print("\nStopping Code-Karo.dev.")
     finally:
         server.server_close()
 
