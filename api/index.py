@@ -1,4 +1,4 @@
-"""Vercel Serverless Function entry point for OOPS Judge API."""
+"""Vercel Serverless Function entry point for the Code-Karo.dev API."""
 import json
 import os
 import re
@@ -86,7 +86,7 @@ class handler(BaseHTTPRequestHandler):
         if path in ("", "/api"):
             self.send_json(200, {
                 "status": "ok",
-                "app": "OOPS Judge API",
+                "app": "Code-Karo.dev API",
                 "problems_count": len(PROBLEMS)
             })
             return

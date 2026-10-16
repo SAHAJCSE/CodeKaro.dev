@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comprehensive verification test script for OOPS Judge Runner.
+Comprehensive verification test script for Code-Karo.dev Runner.
 
 Sends for every problem:
   1. The reference solution (reference/<id>/Solution.java) in submit mode (expects ACCEPTED).
@@ -57,7 +57,7 @@ def main():
     target_url = target_url.rstrip("/")
 
     print("=" * 88)
-    print(f"OOPS JUDGE COMPREHENSIVE VERIFICATION SUITE")
+    print(f"CODE-KARO.DEV COMPREHENSIVE VERIFICATION SUITE")
     print(f"Target Runner: {target_url}")
     print("=" * 88)
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""OOPS judge runner.   python3 judge.py list | <problem-id> [--ref] | all [--ref]"""
+"""Code-Karo.dev judge runner.   python3 judge.py list | <problem-id> [--ref] | all [--ref]"""
 import os, shutil, subprocess, sys, tempfile
 
 ROOT = os.path.dirname(os.path.abspath(__file__))

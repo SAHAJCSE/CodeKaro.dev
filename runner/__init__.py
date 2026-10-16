@@ -1,1 +1,1 @@
-"""Runner package for OOPS Judge Java code execution."""
+"""Runner package for Code-Karo.dev Java code execution."""

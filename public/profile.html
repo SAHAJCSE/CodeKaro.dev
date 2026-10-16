@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#101014">
+  <meta name="description" content="Code-Karo.dev profile and coding activity.">
+  <title>Profile — Code-Karo.dev</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #101014;
+      color: #e4e4e8;
+      --surface: #17181e;
+      --surface-raised: #202127;
+      --border: rgba(190, 194, 205, .16);
+      --muted: #92949e;
+      --cell-size: 12px;
+      --cell-gap: 3px;
+      --cell-step: 15px;
+      --chart-scale-01: #252830;
+      --chart-scale-02: #173c48;
+      --chart-scale-03: #17627a;
+      --chart-scale-04: #218eb0;
+      --chart-scale-05: #70c9e8;
+    }
+
+    * { box-sizing: border-box; }
+    body { min-width: 320px; min-height: 100vh; margin: 0; }
+    a { color: inherit; }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 64px;
+      padding: 0 clamp(20px, 5vw, 72px);
+      border-bottom: 1px solid var(--border);
+      background: #111116;
+    }
+
+    .brand { font-size: 15px; font-weight: 650; text-decoration: none; }
+    .nav-links { display: flex; align-items: center; gap: 22px; }
+    .nav-links a { color: #b5b6be; font-size: 13px; text-decoration: none; }
+    .nav-links a:hover { color: #fff; }
+
+    main {
+      width: min(100% - 40px, 1040px);
+      margin: 52px auto;
+    }
+
+    .profile-heading {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      margin-bottom: 28px;
+    }
+
+    .avatar {
+      display: grid;
+      width: 58px;
+      height: 58px;
+      flex: none;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      background: #23252c;
+      color: #e9eaf0;
+      font-size: 19px;
+      font-weight: 600;
+    }
+
+    h1 { margin: 0 0 4px; font-size: 25px; font-weight: 600; letter-spacing: -.03em; }
+    .username { color: var(--muted); font-size: 14px; }
+    .card {
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      padding: 16px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-raised);
+    }
+
+    .stat-value { display: block; margin-bottom: 4px; font-size: 23px; font-weight: 600; }
+    .stat-label { color: var(--muted); font-size: 12px; }
+    .activity-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    h2 { margin: 0 0 5px; font-size: 16px; font-weight: 600; }
+    .activity-summary { color: var(--muted); font-size: 12px; }
+    .chart-scroll { margin-top: 20px; overflow-x: auto; padding-bottom: 8px; }
+    .chart { width: max-content; }
+    .months {
+      position: relative;
+      width: calc(var(--weeks) * var(--cell-step));
+      height: 20px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .months span { position: absolute; left: calc(var(--week) * var(--cell-step)); }
+    .chart-body { display: flex; gap: 8px; }
+    .weekdays {
+      display: grid;
+      grid-template-rows: repeat(7, var(--cell-size));
+      gap: var(--cell-gap);
+      width: 24px;
+      color: var(--muted);
+      font-size: 10px;
+    }
+    .weekdays span { height: var(--cell-size); line-height: var(--cell-size); }
+    .cells {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: var(--cell-size);
+      grid-template-rows: repeat(7, var(--cell-size));
+      gap: var(--cell-gap);
+      width: max-content;
+    }
+    .cell {
+      width: var(--cell-size);
+      height: var(--cell-size);
+      border: 1px solid rgba(220, 229, 247, .04);
+      border-radius: 2px;
+      background: var(--chart-scale-01);
+    }
+    .cell[data-level="1"] { background: var(--chart-scale-02); }
+    .cell[data-level="2"] { background: var(--chart-scale-03); }
+    .cell[data-level="3"] { background: var(--chart-scale-04); }
+    .cell[data-level="4"] { background: var(--chart-scale-05); }
+    .cell.future { visibility: hidden; }
+    .legend {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 5px;
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    .legend .cell { display: inline-block; }
+    .empty-state {
+      margin-top: 20px;
+      padding: 22px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      background: var(--surface-raised);
+      color: #b8bac3;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 560px) {
+      main { width: min(100% - 28px, 1040px); margin: 30px auto; }
+      .card { padding: 16px; }
+      .stats { gap: 8px; }
+      .stat { padding: 12px; }
+      .stat-value { font-size: 20px; }
+      .profile-heading { gap: 13px; }
+      .avatar { width: 50px; height: 50px; }
+      h1 { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar" aria-label="Main navigation">
+    <a class="brand" href="/">Code-Karo.dev</a>
+    <div class="nav-links">
+      <a href="/">Home</a>
+      <a href="/practice">Practice</a>
+    </div>
+  </nav>
+  <main>
+    <header class="profile-heading">
+      <div id="avatar" class="avatar" aria-hidden="true">CK</div>
+      <div>
+        <h1 id="profile-name">Your profile</h1>
+        <div id="profile-username" class="username">Code-Karo.dev</div>
+      </div>
+    </header>
+    <section class="card" aria-labelledby="activity-title">
+      <div class="stats">
+        <div class="stat"><span id="contribution-count" class="stat-value">0</span><span class="stat-label">Submissions this year</span></div>
+        <div class="stat"><span id="streak-count" class="stat-value">0</span><span class="stat-label">Day streak</span></div>
+        <div class="stat"><span id="solved-count" class="stat-value">0</span><span class="stat-label">Problems solved</span></div>
+      </div>
+      <div class="activity-heading">
+        <h2 id="activity-title">Coding activity</h2>
+        <span id="activity-summary" class="activity-summary">Past year</span>
+      </div>
+      <div class="chart-scroll">
+        <div class="chart">
+          <div id="month-labels" class="months"></div>
+          <div class="chart-body">
+            <div class="weekdays" aria-hidden="true"><span></span><span>Mon</span><span></span><span>Wed</span><span></span><span>Fri</span><span></span></div>
+            <div id="heatmap" class="cells" role="img" aria-label="Submission activity over the past year"></div>
+          </div>
+        </div>
+      </div>
+      <div class="legend" aria-label="Submission levels">
+        <span>Less</span><span class="cell" aria-hidden="true"></span><span class="cell" data-level="1" aria-hidden="true"></span><span class="cell" data-level="2" aria-hidden="true"></span><span class="cell" data-level="3" aria-hidden="true"></span><span class="cell" data-level="4" aria-hidden="true"></span><span>More</span>
+      </div>
+      <div id="empty-state" class="empty-state" hidden>Sign in and submit solutions in Practice to build your activity heatmap.</div>
+    </section>
+  </main>
+  <script>
+    (() => {
+      const $ = selector => document.querySelector(selector);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const todayKey = dateKey(today);
+      const storedUser = readUser();
+      const name = storedUser && typeof storedUser.username === "string" ? storedUser.username : "Guest";
+      $("#profile-name").textContent = name;
+      $("#profile-username").textContent = storedUser ? `@${name}` : "Code-Karo.dev";
+      $("#avatar").textContent = name.slice(0, 2).toUpperCase();
+
+      const submissionsByDay = new Map();
+      let storageReadable = true;
+      if (storedUser && typeof storedUser.id === "string") {
+        try {
+          const prefix = `oops_sub:${storedUser.id}:`;
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+            if (!key || !key.startsWith(prefix)) continue;
+            const records = JSON.parse(localStorage.getItem(key) || "[]");
+            if (!Array.isArray(records)) continue;
+            records.forEach(record => {
+              if (!record || typeof record.time !== "string") return;
+              const date = new Date(record.time);
+              if (Number.isNaN(date.getTime())) return;
+              const key = dateKey(date);
+              submissionsByDay.set(key, (submissionsByDay.get(key) || 0) + 1);
+            });
+          }
+        } catch (error) {
+          storageReadable = false;
+        }
+      }
+
+      let solved = 0;
+      if (storedUser && typeof storedUser.id === "string" && storageReadable) {
+        try {
+          const prefix = `oops_status:${storedUser.id}:`;
+          for (let index = 0; index < localStorage.length; index += 1) {
+            const key = localStorage.key(index);
+            if (key && key.startsWith(prefix) && localStorage.getItem(key) === "solved") solved += 1;
+          }
+        } catch (error) {
+          storageReadable = false;
+        }
+      }
+
+      const total = [...submissionsByDay.values()].reduce((sum, count) => sum + count, 0);
+      $("#contribution-count").textContent = total.toLocaleString();
+      $("#solved-count").textContent = solved.toLocaleString();
+      $("#streak-count").textContent = calculateStreak(submissionsByDay, today);
+      $("#activity-summary").textContent = `${total.toLocaleString()} submissions in the past year`;
+      $("#empty-state").hidden = total > 0 || !storageReadable;
+      if (!storageReadable) $("#empty-state").textContent = "Could not read local activity data in this browser.";
+      renderHeatmap(submissionsByDay, today, todayKey);
+
+      function readUser() {
+        try {
+          const user = JSON.parse(localStorage.getItem("oops_session") || "null");
+          return user && typeof user === "object" ? user : null;
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function dateKey(date) {
+        return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+      }
+
+      function calculateStreak(counts, date) {
+        const cursor = new Date(date);
+        if (!counts.has(dateKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+        let streak = 0;
+        while (counts.has(dateKey(cursor))) {
+          streak += 1;
+          cursor.setDate(cursor.getDate() - 1);
+        }
+        return streak;
+      }
+
+      function renderHeatmap(counts, endDate, endKey) {
+        const startDate = new Date(endDate);
+        startDate.setDate(startDate.getDate() - 364);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+        const dayCount = Math.round((endDate - startDate) / 86400000) + 1;
+        const weekCount = Math.ceil(dayCount / 7);
+        $(".chart").style.setProperty("--weeks", weekCount);
+        const heatmap = $("#heatmap");
+        const months = $("#month-labels");
+        const monthSlots = new Set();
+
+        for (let week = 0; week < weekCount; week += 1) {
+          for (let weekday = 0; weekday < 7; weekday += 1) {
+            const date = new Date(startDate);
+            date.setDate(startDate.getDate() + week * 7 + weekday);
+            const key = dateKey(date);
+            const future = key > endKey;
+            const count = future ? 0 : (counts.get(key) || 0);
+            const level = count === 0 ? 0 : count === 1 ? 1 : count <= 3 ? 2 : count <= 6 ? 3 : 4;
+            const cell = document.createElement("span");
+            cell.className = `cell${future ? " future" : ""}`;
+            cell.dataset.level = String(level);
+            if (!future) cell.title = `${date.toLocaleDateString(undefined, { month: "long", day: "numeric", year: "numeric" })}: ${count} submission${count === 1 ? "" : "s"}`;
+            heatmap.appendChild(cell);
+
+            const monthKey = `${date.getFullYear()}-${date.getMonth()}`;
+            if (date.getDate() === 1 && !monthSlots.has(monthKey)) {
+              monthSlots.add(monthKey);
+              const label = document.createElement("span");
+              label.textContent = date.toLocaleDateString(undefined, { month: "short" });
+              label.style.setProperty("--week", week);
+              months.appendChild(label);
+            }
+          }
+        }
+      }
+    })();
+  </script>
+</body>
+</html>

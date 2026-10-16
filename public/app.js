@@ -557,49 +557,49 @@ function initMonaco() {
       window.require(["vs/editor/editor.main"], function () {
         clearTimeout(timeout);
         try {
-          // Define custom neon dark theme matching the workspace palette
-          monaco.editor.defineTheme("oops-neon", {
+          // Define the dark editor theme to match the neutral workspace palette
+          monaco.editor.defineTheme("code-karo-dark", {
             base: "vs-dark",
             inherit: true,
             rules: [
-              { token: "keyword", foreground: "ff2bd6", fontStyle: "bold" },
-              { token: "keyword.java", foreground: "ff2bd6", fontStyle: "bold" },
-              { token: "type", foreground: "00e5ff" },
-              { token: "type.identifier", foreground: "00e5ff" },
-              { token: "string", foreground: "39ff88" },
-              { token: "string.escape", foreground: "00e5ff" },
-              { token: "comment", foreground: "60688a", fontStyle: "italic" },
-              { token: "number", foreground: "ffb700" },
-              { token: "delimiter", foreground: "aab2cd" },
-              { token: "operator", foreground: "00e5ff" },
-              { token: "identifier", foreground: "e8edff" }
+              { token: "keyword", foreground: "e87998", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "e87998", fontStyle: "bold" },
+              { token: "type", foreground: "c9c5df" },
+              { token: "type.identifier", foreground: "c9c5df" },
+              { token: "string", foreground: "a3c77b" },
+              { token: "string.escape", foreground: "d9b978" },
+              { token: "comment", foreground: "858792", fontStyle: "italic" },
+              { token: "number", foreground: "d9b978" },
+              { token: "delimiter", foreground: "c3c5cc" },
+              { token: "operator", foreground: "c3c5cc" },
+              { token: "identifier", foreground: "e4e4e8" }
             ],
             colors: {
-              "editor.background": "#0d0d18",
-              "editor.foreground": "#e8edff",
-              "editorLineNumber.foreground": "#4e5675",
-              "editorLineNumber.activeForeground": "#00e5ff",
-              "editorGutter.background": "#0d0d18",
-              "editorCursor.foreground": "#00e5ff",
-              "editor.selectionBackground": "#00e5ff33",
-              "editor.inactiveSelectionBackground": "#00e5ff1a",
-              "editor.lineHighlightBackground": "#131328",
+              "editor.background": "#17181e",
+              "editor.foreground": "#e4e4e8",
+              "editorLineNumber.foreground": "#62646e",
+              "editorLineNumber.activeForeground": "#c3c5cc",
+              "editorGutter.background": "#17181e",
+              "editorCursor.foreground": "#e4e4e8",
+              "editor.selectionBackground": "#85879233",
+              "editor.inactiveSelectionBackground": "#8587921a",
+              "editor.lineHighlightBackground": "#202127",
               "editor.lineHighlightBorder": "#00000000",
-              "editorBracketMatch.background": "#00e5ff18",
-              "editorBracketMatch.border": "#00e5ff",
-              "editorOverviewRuler.border": "#121324",
-              "editorIndentGuide.background": "#181930",
-              "editorIndentGuide.activeBackground": "#00e5ff44",
-              "scrollbarSlider.background": "#1e1f3d66",
-              "scrollbarSlider.hoverBackground": "#00e5ff44",
-              "scrollbarSlider.activeBackground": "#00e5ff88"
+              "editorBracketMatch.background": "#85879222",
+              "editorBracketMatch.border": "#858792",
+              "editorOverviewRuler.border": "#202127",
+              "editorIndentGuide.background": "#292a31",
+              "editorIndentGuide.activeBackground": "#85879266",
+              "scrollbarSlider.background": "#62646e66",
+              "scrollbarSlider.hoverBackground": "#85879266",
+              "scrollbarSlider.activeBackground": "#aeb1ba88"
             }
           });
 
           monacoEditor = monaco.editor.create(monacoContainer, {
             value: "",
             language: "java",
-            theme: "oops-neon",
+            theme: "code-karo-dark",
             automaticLayout: true,
             tabSize: 4,
             insertSpaces: true,
@@ -1414,7 +1414,7 @@ function showNotFound(problemId) {
     notFoundState.hidden = false;
     if (notFoundMsg) notFoundMsg.textContent = `The problem "${escapeHtml(problemId)}" was not found in the judge catalogue.`;
   }
-  document.title = "Problem Not Found — OOPS Judge";
+  document.title = "Problem Not Found — Code-Karo.dev";
   if (problemIdTag) problemIdTag.textContent = "404";
   if (editor) editor.disabled = true;
   if (monacoEditor) monacoEditor.updateOptions({ readOnly: true });
@@ -1908,7 +1908,7 @@ function initPanelActions() {
     settingsBtn.addEventListener("click", () => {
       const currentUrl = getRunnerUrl();
       const entered = prompt(
-        "⚙ OOPS.judge Settings\n\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Hotkeys: Run (Ctrl+Enter), Submit (Ctrl+Shift+Enter), Save (Ctrl+S)\n\nExecution Runner URL (leave blank to reset to default):",
+        "⚙ Code-Karo.dev Settings\n\n• Language: Java (OpenJDK 11+)\n• Editor: Monaco Editor (Java OOP)\n• Hotkeys: Run (Ctrl+Enter), Submit (Ctrl+Shift+Enter), Save (Ctrl+S)\n\nExecution Runner URL (leave blank to reset to default):",
         currentUrl
       );
       if (entered !== null) {
@@ -1983,7 +1983,7 @@ async function selectProblem(problemId, pushState = true) {
     // 1. Problem number + title (e.g. "12. Employee")
     const problemIndex = problems.findIndex(p => p.id === problem.id);
     const displayNum = problemIndex !== -1 ? `${problemIndex + 1}. ` : "";
-    document.title = `${displayNum}${problem.title} — OOPS Judge`;
+    document.title = `${displayNum}${problem.title} — Code-Karo.dev`;
     if (problemIdTag) problemIdTag.textContent = problem.id;
 
     const titleEl = document.querySelector("#problem-display-title");
@@ -2725,7 +2725,7 @@ function updateAuthModalState() {
   const confirmGroup = document.querySelector("#confirm-password-group");
   const submitBtn = document.querySelector("#auth-submit-btn");
 
-  if (title) title.textContent = isSignIn ? "Sign in to OOPS.judge" : "Create an Account";
+  if (title) title.textContent = isSignIn ? "Sign in to Code-Karo.dev" : "Create an Account";
   if (tabSignIn) {
     tabSignIn.classList.toggle("active", isSignIn);
     tabSignIn.setAttribute("aria-selected", String(isSignIn));
@@ -3068,6 +3068,3 @@ initAuth();
 initViewCodeModal();
 loadProblems();
 checkRunnerHealthOnStartup();
-
-
-
