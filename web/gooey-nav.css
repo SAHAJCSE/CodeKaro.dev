@@ -79,24 +79,6 @@
   transition: opacity .25s ease;
 }
 
-.nav-island::after {
-  position: absolute;
-  z-index: 2;
-  right: 12%;
-  bottom: 0;
-  left: 12%;
-  height: 2px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, #ff5f6d, #ffc857, #72e6a6, #55c7ff, #a88bff, #ff74c8, #ff5f6d);
-  background-size: 200% 100%;
-  box-shadow: 0 0 8px rgba(130, 125, 255, .28);
-  content: "";
-  opacity: .8;
-  pointer-events: none;
-  animation: island-rainbow-flow 3.2s linear infinite;
-  transition: opacity .2s ease;
-}
-
 .nav-island:hover,
 .nav-island:focus-within {
   width: min(350px, calc(100vw - 76px));
@@ -107,8 +89,6 @@
 
 .nav-island:hover::before,
 .nav-island:focus-within::before { opacity: 1; }
-.nav-island:hover::after,
-.nav-island:focus-within::after { opacity: 1; }
 
 .nav-island__brand {
   z-index: 1;
@@ -215,10 +195,6 @@
   to { offset-distance: 100%; }
 }
 
-@keyframes island-rainbow-flow {
-  to { background-position: -200% 0; }
-}
-
 @media (max-width: 560px) {
   .nav-island { width: 106px; }
   .nav-island__brand { min-width: 94px; }
@@ -230,9 +206,7 @@
 @media (prefers-reduced-motion: reduce) {
   .nav-island,
   .nav-island::before,
-  .nav-island::after,
   .nav-island__links,
   .nav-island__link { transition: none; }
-  .nav-island::before,
-  .nav-island::after { animation: none; }
+  .nav-island::before { animation: none; }
 }
