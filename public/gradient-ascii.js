@@ -113,7 +113,7 @@
           Math.floor(Math.max(0, Math.min(1, energy)) * (characters.length - 1))
         );
         const position = Math.min(1, Math.max(0, u * 0.72 + energy * 0.28));
-        context.fillStyle = colorAt(position, reveal * (0.2 + energy * 0.8));
+        context.fillStyle = colorAt(position, reveal * (0.52 + energy * 0.48));
         context.fillText(characters[characterIndex], x, y);
       }
     }

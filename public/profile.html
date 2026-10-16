@@ -7,6 +7,7 @@
   <meta name="description" content="Code-Karo.dev profile and coding activity.">
   <title>Profile — Code-Karo.dev</title>
   <link rel="stylesheet" href="/navbar.css">
+  <link rel="stylesheet" href="/gooey-nav.css">
   <link rel="stylesheet" href="/theme.css">
   <script src="/theme.js"></script>
   <style>
@@ -211,14 +212,27 @@
       </svg>
       <span class="theme-switch__label" data-theme-label>Dark</span>
     </button>
-    <div class="split-nav" data-split-nav data-compact-nav>
-      <div class="split-nav__links">
-        <a class="split-nav__link" href="/" data-nav-link>Home</a>
-        <a class="split-nav__link" href="/profile" data-nav-link>Profile</a>
-        <a class="split-nav__link" href="/practice" data-nav-link>Practice</a>
+    <nav class="gooey-nav gooey-nav--framed" data-gooey-nav aria-label="Main sections">
+      <div class="gooey-nav__stage">
+        <svg class="gooey-nav__filters" aria-hidden="true">
+          <filter id="gooey-nav-filter">
+            <feGaussianBlur in="SourceGraphic" stdDeviation="7" result="blur" />
+            <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+            <feComposite in="SourceGraphic" in2="goo" operator="atop" />
+          </filter>
+        </svg>
+        <div class="gooey-nav__goo" aria-hidden="true">
+          <span class="gooey-nav__pill"></span>
+          <span class="gooey-nav__particles"></span>
+        </div>
+        <ul class="gooey-nav__list">
+          <li class="gooey-nav__item"><a class="gooey-nav__link" href="/" data-nav-link>Home</a></li>
+          <li class="gooey-nav__item"><a class="gooey-nav__link" href="/profile" data-nav-link>Profile</a></li>
+          <li class="gooey-nav__item"><a class="gooey-nav__link" href="/practice" data-nav-link>Practice</a></li>
+        </ul>
       </div>
-      <button class="split-nav__expand" type="button" data-nav-expand aria-label="Show all navigation links" aria-expanded="false" tabindex="-1">⌄</button>
-    </div>
+      <span class="gooey-nav__rim" aria-hidden="true"></span>
+    </nav>
   </nav>
   <main>
     <header class="profile-heading">
@@ -253,7 +267,7 @@
       <div id="empty-state" class="empty-state" hidden>Sign in and submit solutions in Practice to build your activity heatmap.</div>
     </section>
   </main>
-  <script src="/navbar.js" defer></script>
+  <script src="/gooey-nav.js" defer></script>
   <script>
     (() => {
       const $ = selector => document.querySelector(selector);
