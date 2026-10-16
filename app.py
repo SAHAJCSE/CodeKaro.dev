@@ -158,7 +158,7 @@ class AppHandler(BaseHTTPRequestHandler):
             "/navbar.js": ("navbar.js", "text/javascript; charset=utf-8"),
             "/theme.css": ("theme.css", "text/css; charset=utf-8"),
             "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
-            "/shape-waves.js": ("shape-waves.js", "text/javascript; charset=utf-8"),
+            "/gradient-ascii.js": ("gradient-ascii.js", "text/javascript; charset=utf-8"),
             "/app.css": ("app.css", "text/css; charset=utf-8"),
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/config.js": ("config.js", "text/javascript; charset=utf-8"),
