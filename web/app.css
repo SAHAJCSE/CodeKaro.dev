@@ -523,38 +523,23 @@ body.resizing-row, body.resizing-row * {
 }
 
 /* Auth Modal Styling */
-.auth-modal-card {
+.shortcuts-modal .auth-modal-card {
   position: relative;
   isolation: isolate;
   width: 380px;
   max-width: 92vw;
-  border-color: transparent;
-  background: var(--bg-surface);
-}
-.auth-modal-card::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  padding: 1px;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--shine-angle, 0deg),
-    transparent 0deg 255deg,
-    #a07cfe 280deg,
-    #fe8fb5 310deg,
-    #ffbe7b 340deg,
-    transparent 360deg
-  );
-  content: "";
-  pointer-events: none;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(var(--bg-surface), var(--bg-surface)) padding-box,
+    conic-gradient(
+      from var(--shine-angle, 0deg),
+      transparent 0deg 255deg,
+      #a07cfe 280deg,
+      #fe8fb5 310deg,
+      #ffbe7b 340deg,
+      transparent 360deg
+    ) border-box;
   animation: auth-shine-rotate 8s linear infinite;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-}
-.auth-modal-card > * {
-  position: relative;
-  z-index: 1;
 }
 @property --shine-angle {
   syntax: "<angle>";
@@ -565,7 +550,7 @@ body.resizing-row, body.resizing-row * {
   to { --shine-angle: 360deg; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .auth-modal-card::before { animation: none; }
+  .shortcuts-modal .auth-modal-card { animation: none; }
 }
 .auth-tabs-row {
   display: flex;
