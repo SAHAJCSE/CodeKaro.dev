@@ -100,7 +100,10 @@
         const wave = Math.max(0, 1 - distance * 3.2);
         const flicker = 0.94 + 0.06 * Math.sin(column * 1.7 + row * 2.3 + time * 1.8);
         const ripple = clickWave(x, y, now);
-        const energy = Math.max(0, Math.min(1, (rim + sky * wave * 0.78 + ripple * 0.6) * flicker));
+        const pointerGlow = pointer
+          ? Math.exp(-(Math.hypot(x - pointer.x, y - pointer.y) ** 2) / 18000) * 0.9
+          : 0;
+        const energy = Math.max(0, Math.min(1, (rim + sky * wave * 0.78 + ripple * 0.6 + pointerGlow) * flicker));
         const random = (Math.sin(column * 127.1 + row * 311.7) * 43758.5453) % 1;
         if (Math.abs(random) > density * energy) continue;
 

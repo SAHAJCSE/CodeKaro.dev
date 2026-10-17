@@ -3096,6 +3096,11 @@ function initAuth() {
   }
 
   if (logoutBtn) logoutBtn.addEventListener("click", handleLogout);
+
+  const requestedAuthMode = new URLSearchParams(window.location.search).get("auth");
+  if (requestedAuthMode === "signin" || requestedAuthMode === "signup") {
+    openAuthModal(requestedAuthMode);
+  }
 }
 
 setFontSize(currentFontSize);
