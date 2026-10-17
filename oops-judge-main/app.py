@@ -1,0 +1,243 @@
+#!/usr/bin/env python3
+"""Start the local browser app for Code-Karo.dev Java practice problems."""
+import argparse
+import json
+import re
+import sys
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
+from urllib.parse import unquote, urlparse
+
+from runner.core import (
+    MAX_REQUEST_BYTES,
+    PROBLEM_ID,
+    PROBLEMS,
+    ROOT,
+    get_problem_ids,
+    run_solution,
+)
+
+WEB = ROOT / "web"
+PROBLEMS_META = ROOT / "problems_meta.json"
+
+
+def get_problems_meta():
+    if PROBLEMS_META.is_file():
+        try:
+            return json.loads(PROBLEMS_META.read_text(encoding="utf-8"))
+        except Exception:
+            return {}
+    return {}
+
+
+def get_problem(problem_id):
+    if not PROBLEM_ID.fullmatch(problem_id) or problem_id not in get_problem_ids():
+        return None
+
+    problem_dir = PROBLEMS / problem_id
+    readme = (problem_dir / "README.md").read_text(encoding="utf-8")
+    title = next(
+        (line[2:].strip() for line in readme.splitlines() if line.startswith("# ")),
+        problem_id.replace("-", " ").title(),
+    )
+    summary = next(
+        (
+            line.strip()
+            for line in readme.splitlines()
+            if line.strip() and not line.startswith("#") and not line.startswith("*Source:")
+        ),
+        "",
+    )
+    solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
+    reference_path = ROOT / "reference" / problem_id / "Solution.java"
+    reference_solution = reference_path.read_text(encoding="utf-8") if reference_path.is_file() else ""
+    starter_path = ROOT / "starters" / problem_id / "Solution.java"
+    starter_solution = starter_path.read_text(encoding="utf-8") if starter_path.is_file() else solution
+    meta = get_problems_meta().get(problem_id, {})
+    return {
+        "id": problem_id,
+        "title": title,
+        "summary": summary,
+        "readme": readme,
+        "solution": solution,
+        "starter": starter_solution,
+        "reference": reference_solution,
+        "difficulty": meta.get("difficulty", "Easy"),
+        "topics": meta.get("topics", []),
+        "hints": meta.get("hints", []),
+        "sample_cases": meta.get("sample_cases", []),
+    }
+
+
+
+class AppHandler(BaseHTTPRequestHandler):
+    def send_bytes(self, status, body, content_type):
+        self.send_response(status)
+        self.send_header("Content-Type", content_type)
+        self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.end_headers()
+        self.wfile.write(body)
+
+    def do_OPTIONS(self):
+        self.send_response(204)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
+        self.send_header("Access-Control-Max-Age", "86400")
+        self.end_headers()
+
+    def send_json(self, status, payload):
+        body = json.dumps(payload).encode("utf-8")
+        self.send_bytes(status, body, "application/json; charset=utf-8")
+
+    def read_json(self):
+        try:
+            length = int(self.headers.get("Content-Length", "0"))
+        except ValueError:
+            self.send_json(400, {"error": "Invalid Content-Length header."})
+            return None
+        if length < 0 or length > MAX_REQUEST_BYTES:
+            self.send_json(413, {"error": "Request body must be under 1 MB."})
+            return None
+        try:
+            payload = json.loads(self.rfile.read(length).decode("utf-8"))
+        except (UnicodeDecodeError, json.JSONDecodeError):
+            self.send_json(400, {"error": "Request body must be valid UTF-8 JSON."})
+            return None
+        if not isinstance(payload, dict):
+            self.send_json(400, {"error": "Request body must be a JSON object."})
+            return None
+        return payload
+
+    def do_GET(self):
+        path = unquote(urlparse(self.path).path).rstrip("/")
+
+        if path in ("/health", "/api/health"):
+            self.send_json(200, {"status": "ok"})
+            return
+
+        if path in ("/api/problems", "/problems"):
+            meta_all = get_problems_meta()
+            problems = []
+            for problem_id in get_problem_ids():
+                problem = get_problem(problem_id)
+                m = meta_all.get(problem_id, {})
+                problems.append({
+                    "id": problem["id"],
+                    "title": problem["title"],
+                    "summary": problem["summary"],
+                    "difficulty": m.get("difficulty", "Easy"),
+                    "topics": m.get("topics", []),
+                })
+            self.send_json(200, {"problems": problems, "status": "ok"})
+            return
+
+        match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)
+        if match:
+            problem_id = match.group(1)
+            problem = get_problem(problem_id)
+            if problem is None:
+                self.send_json(404, {"error": "Problem not found."})
+                return
+            self.send_json(200, problem)
+            return
+
+        norm_path = "/" if not path else path
+        static_files = {
+            "/": ("index.html", "text/html; charset=utf-8"),
+            "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/practice": ("practice.html", "text/html; charset=utf-8"),
+            "/practice.html": ("practice.html", "text/html; charset=utf-8"),
+            "/profile": ("profile.html", "text/html; charset=utf-8"),
+            "/profile.html": ("profile.html", "text/html; charset=utf-8"),
+            "/navbar.css": ("navbar.css", "text/css; charset=utf-8"),
+            "/navbar.js": ("navbar.js", "text/javascript; charset=utf-8"),
+            "/gooey-nav.css": ("gooey-nav.css", "text/css; charset=utf-8"),
+            "/gooey-nav.js": ("gooey-nav.js", "text/javascript; charset=utf-8"),
+            "/theme.css": ("theme.css", "text/css; charset=utf-8"),
+            "/theme.js": ("theme.js", "text/javascript; charset=utf-8"),
+            "/gradient-ascii.js": ("gradient-ascii.js", "text/javascript; charset=utf-8"),
+            "/type-writer.js": ("type-writer.js", "text/javascript; charset=utf-8"),
+            "/text-reveal.js": ("text-reveal.js", "text/javascript; charset=utf-8"),
+            "/hero-gradient.jpg": ("hero-gradient.jpg", "image/jpeg"),
+            "/footer-gradient.jpg": ("footer-gradient.jpg", "image/jpeg"),
+            "/footer-contact.js": ("footer-contact.js", "text/javascript; charset=utf-8"),
+            "/fonts/DMSans-Regular.woff2": ("fonts/DMSans-Regular.woff2", "font/woff2"),
+            "/fonts/Epilogue-Black.woff2": ("fonts/Epilogue-Black.woff2", "font/woff2"),
+            "/app.css": ("app.css", "text/css; charset=utf-8"),
+            "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+            "/config.js": ("config.js", "text/javascript; charset=utf-8"),
+        }
+        if norm_path not in static_files:
+            self.send_json(404, {"error": "Page not found."})
+            return
+        filename, content_type = static_files[norm_path]
+        try:
+            body = (WEB / filename).read_bytes()
+        except OSError as error:
+            self.send_json(500, {"error": f"Could not read app file: {error}"})
+            return
+        self.send_bytes(200, body, content_type)
+
+    def do_POST(self):
+        path = unquote(urlparse(self.path).path).rstrip("/")
+        match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)/(save|run)", path)
+        if match is None:
+            self.send_json(404, {"error": "Endpoint not found."})
+            return
+        problem_id, action = match.groups()
+        if problem_id not in get_problem_ids():
+            self.send_json(404, {"error": "Problem not found."})
+            return
+
+        payload = self.read_json()
+        if payload is None:
+            return
+        source = payload.get("code")
+        if not isinstance(source, str):
+            self.send_json(400, {"error": "The 'code' field must be a string."})
+            return
+
+        if action == "save":
+            self.send_json(200, {"saved": True})
+            return
+
+        mode = payload.get("mode", "run")
+        try:
+            result = run_solution(problem_id, source, mode=mode)
+            self.send_json(200, result)
+        except OSError as error:
+            self.send_json(503, {"error": f"Could not start the judge: {error}"})
+            return
+        except Exception as error:
+            self.send_json(500, {"error": f"Internal judge error: {error}"})
+            return
+
+    def log_message(self, format_string, *args):
+        print(f"[app] {self.address_string()} - {format_string % args}")
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--port", type=int, default=8000, help="local web server port (default: 8000)")
+    args = parser.parse_args()
+    if not 1 <= args.port <= 65535:
+        parser.error("--port must be between 1 and 65535")
+
+    server = ThreadingHTTPServer(("127.0.0.1", args.port), AppHandler)
+    print(f"Code-Karo.dev is running at http://127.0.0.1:{args.port}")
+    print("Keep this terminal open while using the app. Press Ctrl+C to stop.")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nStopping Code-Karo.dev.")
+    finally:
+        server.server_close()
+
+
+if __name__ == "__main__":
+    main()

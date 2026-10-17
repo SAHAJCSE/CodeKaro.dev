@@ -1,0 +1,1135 @@
+{
+  "airline-ticket-concat": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings",
+      "Arrays"
+    ],
+    "hints": [
+      "Do not use String.concat() or the '+' string concatenation operator.",
+      "Copy characters of str1 from index 0 into result, then copy str2 directly following str1."
+    ],
+    "sample_cases": [
+      {
+        "name": "Code + Quotient",
+        "input": "\"Code\", \"Quotient\", 0",
+        "expected": "CodeQuotient"
+      },
+      {
+        "name": "John + Doe",
+        "input": "\"John\", \"Doe\", 0",
+        "expected": "JohnDoe"
+      },
+      {
+        "name": "single chars",
+        "input": "\"a\", \"b\", 0",
+        "expected": "ab"
+      }
+    ]
+  },
+  "assignment44-analyze-sentence": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Iterate through the characters of sentence using Character.isDigit(c). If any digit is found, return 'Invalid Sentence'.",
+      "If valid, split the sentence by whitespace using sentence.trim().split(\"\\\\s+\") and return the length as a String."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1",
+        "input": "\"Java is powerful\"",
+        "expected": "3"
+      },
+      {
+        "name": "sample 2 (digits)",
+        "input": "\"Java is powerful123\"",
+        "expected": "Invalid Sentence"
+      },
+      {
+        "name": "single word",
+        "input": "\"Hello\"",
+        "expected": "1"
+      }
+    ]
+  },
+  "class-box": {
+    "difficulty": "Medium",
+    "topics": [
+      "Classes and Objects",
+      "Constructors"
+    ],
+    "hints": [
+      "Declare length, breadth, and height as private int variables.",
+      "Volume can overflow 32-bit int with dimensions up to 10^5. Cast to (long) before multiplying.",
+      "Implement the copy constructor by copying length, breadth, and height from the provided Box object."
+    ],
+    "sample_cases": [
+      {
+        "name": "default constructor",
+        "input": "new Box()",
+        "expected": "0 0 0 0"
+      },
+      {
+        "name": "parameterised constructor (sample)",
+        "input": "new Box(3, 4, 5)",
+        "expected": "3 4 5 60"
+      },
+      {
+        "name": "copy constructor (sample)",
+        "input": "new Box(new Box(3, 4, 5))",
+        "expected": "3 4 5 60"
+      }
+    ]
+  },
+  "class-student": {
+    "difficulty": "Medium",
+    "topics": [
+      "Classes and Objects",
+      "Constructors",
+      "Arrays"
+    ],
+    "hints": [
+      "Save studentId, name, and marks (int array of 5 elements) into private instance fields in the constructor.",
+      "printValues() prints studentId on line 1, name on line 2, and the 5 marks separated by spaces on line 3.",
+      "secondMaxMarks() should determine the second highest value among the 5 marks."
+    ],
+    "sample_cases": [
+      {
+        "name": "printValues (sample)",
+        "input": "14, \"Deepak Singh\", new int[]{57,85,45,86,95}).printValues(",
+        "expected": "14\nDeepak Singh\n57 85 45 86 95\n"
+      },
+      {
+        "name": "calTotalMarks (sample)",
+        "input": "14, \"Deepak Singh\", new int[]{57,85,45,86,95}).calTotalMarks(",
+        "expected": "368"
+      },
+      {
+        "name": "secondMaxMarks (sample)",
+        "input": "14, \"Deepak Singh\", new int[]{57,85,45,86,95}).secondMaxMarks(",
+        "expected": "86"
+      }
+    ]
+  },
+  "cloud-server-health": {
+    "difficulty": "Easy",
+    "topics": [
+      "Collections",
+      "Classes and Objects"
+    ],
+    "hints": [
+      "Iterate through the cpuUsage ArrayList and select values where usage >= 80.",
+      "Preserve the original order of the servers in the returned ArrayList."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new ArrayList<>(List.of(45,82,67,95,79,88,60))",
+        "expected": "List.of(82, 95, 88)"
+      },
+      {
+        "name": "exactly 80 counts",
+        "input": "new ArrayList<>(List.of(80,79,81))",
+        "expected": "List.of(80, 81)"
+      },
+      {
+        "name": "none overloaded",
+        "input": "new ArrayList<>(List.of(10,20,79))",
+        "expected": "List.of()"
+      }
+    ]
+  },
+  "college-seats-reserved": {
+    "difficulty": "Medium",
+    "topics": [
+      "Arrays",
+      "Collections"
+    ],
+    "hints": [
+      "Sort both arrays A and B and verify whether they are identical at every index.",
+      "Alternatively, tally the frequency of each age in A and B using a frequency map or array."
+    ],
+    "sample_cases": [
+      {
+        "name": "statement example 1",
+        "input": "new int[]{11,12,13,12,13}, new int[]{12,13,11,12,13}",
+        "expected": "true"
+      },
+      {
+        "name": "statement example 2",
+        "input": "new int[]{11,12,13}, new int[]{12,13,12}",
+        "expected": "false"
+      },
+      {
+        "name": "sample",
+        "input": "new int[]{11,12,13}, new int[]{12,11,13}",
+        "expected": "true"
+      }
+    ]
+  },
+  "compress-a-string": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Traverse the string while counting consecutive occurrences of the current character.",
+      "If a character occurs more than once, append the character followed by the count; otherwise, append just the character."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1",
+        "input": "\"aabbccdef\"",
+        "expected": "a2b2c2def"
+      },
+      {
+        "name": "sample 2",
+        "input": "\"abddddddd\"",
+        "expected": "abd7"
+      },
+      {
+        "name": "no repeats",
+        "input": "\"abc\"",
+        "expected": "abc"
+      }
+    ]
+  },
+  "count-pos-neg-even-odd": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "Zero (0) is an even number, but it is neither positive nor negative.",
+      "Iterate through the array and track four counters: positive, negative, even, and odd.",
+      "Print each counter on its own line in that specific order."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new int[]{-3,10,20,-4,7,1,-2,3,4,5}, 10",
+        "expected": "7\n3\n5\n5\n"
+      },
+      {
+        "name": "with zeros",
+        "input": "new int[]{0,0,1,-1,2,-2,3,-3,4,-4}, 10",
+        "expected": "4\n4\n6\n4\n"
+      },
+      {
+        "name": "all positive",
+        "input": "new int[]{1,2,3,4,5,6,7,8,9,10}, 10",
+        "expected": "10\n0\n5\n5\n"
+      }
+    ]
+  },
+  "custom-exception-power": {
+    "difficulty": "Medium",
+    "topics": [
+      "Exceptions",
+      "Inheritance"
+    ],
+    "hints": [
+      "Define a custom exception class extending Exception.",
+      "If either n < 0 or p < 0, throw your custom exception with message 'Negative numbers not allowed'.",
+      "Otherwise, calculate (long) Math.pow(n, p) and return as String."
+    ],
+    "sample_cases": [
+      {
+        "name": "2^2 = 4",
+        "input": "2, 2",
+        "expected": "4"
+      },
+      {
+        "name": "both negative",
+        "input": "-4, -5",
+        "expected": "EX: Negative numbers not allowed"
+      },
+      {
+        "name": "negative base",
+        "input": "-2, 3",
+        "expected": "EX: Negative numbers not allowed"
+      }
+    ]
+  },
+  "daily-loss-counter": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "A loss day is strictly defined as an element where value < 0.",
+      "Zero represents a break-even day and does not count as a loss."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new int[]{1,2,3,-5}, 4",
+        "expected": "1"
+      },
+      {
+        "name": "zero is not a loss",
+        "input": "new int[]{0,0,0}, 3",
+        "expected": "0"
+      },
+      {
+        "name": "all losses",
+        "input": "new int[]{-1,-2,-3}, 3",
+        "expected": "3"
+      }
+    ]
+  },
+  "date-class": {
+    "difficulty": "Medium",
+    "topics": [
+      "Classes and Objects",
+      "Constructors"
+    ],
+    "hints": [
+      "Validate day, month, and year according to calendar rules and leap years if required.",
+      "Format output with leading zeros where specified in the problem statement."
+    ],
+    "sample_cases": [
+      {
+        "name": "default constructor",
+        "input": "{ Date d = new Date(",
+        "expected": "1/1"
+      },
+      {
+        "name": "sample: daysInMonth(3)",
+        "input": "3, 25).daysInMonth(",
+        "expected": "31"
+      },
+      {
+        "name": "sample: getDay / getMonth",
+        "input": "{ Date d = new Date(3, 25",
+        "expected": "25 3"
+      }
+    ]
+  },
+  "employee": {
+    "difficulty": "Easy",
+    "topics": [
+      "Classes and Objects",
+      "Arrays"
+    ],
+    "hints": [
+      "Store the employee ID, name, and 6 months of salary in private fields.",
+      "totalSalary() sums up the salary across all 6 months.",
+      "maxSalaryMonth() returns the 1-based index (1 to 6) of the month with the highest salary."
+    ],
+    "sample_cases": [
+      {
+        "name": "printValues (sample)",
+        "input": "{ Employee e = new Employee(",
+        "expected": "3234\nNitin Kumar\n12313 12001 10333 14923 15783 10010\n"
+      },
+      {
+        "name": "calTotalSalary (sample)",
+        "input": "{ Employee e = new Employee(",
+        "expected": "75363"
+      },
+      {
+        "name": "maxSalary (sample) -> month 5",
+        "input": "{ Employee e = new Employee(",
+        "expected": "5"
+      }
+    ]
+  },
+  "exam-topper": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "Scan the marks array to find the maximum value.",
+      "Return the 1-based position or highest mark as requested in the problem description."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1",
+        "input": "new int[]{20,30,93,71,18,82,66}, 7",
+        "expected": "93"
+      },
+      {
+        "name": "sample 2 (max repeated)",
+        "input": "new int[]{33,45,67,33,67}, 5",
+        "expected": "67"
+      },
+      {
+        "name": "single element",
+        "input": "new int[]{-5}, 1",
+        "expected": "-5"
+      }
+    ]
+  },
+  "find-the-longest-word": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Split the sentence into words using spaces as delimiters.",
+      "Track the word with the maximum length and return it."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "\"I love programming\"",
+        "expected": "programming"
+      },
+      {
+        "name": "single word",
+        "input": "\"hello\"",
+        "expected": "hello"
+      },
+      {
+        "name": "longest in the middle",
+        "input": "\"a bb ccc dd e\"",
+        "expected": "ccc"
+      }
+    ]
+  },
+  "layered-pyramid-3": {
+    "difficulty": "Easy",
+    "topics": [
+      "Patterns"
+    ],
+    "hints": [
+      "Observe the outer loop for rows (1 to n) and inner loop for spaces and numbers.",
+      "Ensure spacing aligns with the pyramid format."
+    ],
+    "sample_cases": [
+      {
+        "name": "n = 5",
+        "input": "n = 5",
+        "expected": "\"5\\n\", exp(5), Test::go"
+      },
+      {
+        "name": "n = 3",
+        "input": "n = 3",
+        "expected": "\"3\\n\", exp(3), Test::go"
+      },
+      {
+        "name": "n = 1",
+        "input": "n = 1",
+        "expected": "\"1\\n\", exp(1), Test::go"
+      }
+    ]
+  },
+  "library-book-inventory": {
+    "difficulty": "Easy",
+    "topics": [
+      "Collections"
+    ],
+    "hints": [
+      "Manage inventory operations using appropriate Java Collections (e.g., HashMap or ArrayList).",
+      "Handle case sensitivity and missing book lookups gracefully."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "al(101,102,103,104), new int[]{104,105,106,102,107}",
+        "expected": "List.of(101,102,103,104,105,106,107)"
+      },
+      {
+        "name": "statement example",
+        "input": "al(101,102,103), new int[]{102,104,105,101,106}",
+        "expected": "List.of(101,102,103,104,105,106)"
+      },
+      {
+        "name": "all already present",
+        "input": "al(1,2,3), new int[]{3,2,1}",
+        "expected": "List.of(1,2,3)"
+      }
+    ]
+  },
+  "lowercase-to-uppercase": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Convert ASCII values by subtracting 32 or using Character.toUpperCase(c).",
+      "Only alter lowercase letters ('a' through 'z'); leave digits and punctuation intact."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "sample",
+        "expected": "\"codequotient\\n\", \"CODEQUOTIENT\\n\", Test::go"
+      },
+      {
+        "name": "single letter",
+        "input": "single letter",
+        "expected": "\"q\\n\", \"Q\\n\", Test::go"
+      },
+      {
+        "name": "whole alphabet",
+        "input": "whole alphabet",
+        "expected": "\"abcdefghijklmnopqrstuvwxyz\\n\", \"ABCDEFGHIJKLMNOPQRSTUVWXYZ\\n\", Test::go"
+      }
+    ]
+  },
+  "main-diagonal-sum": {
+    "difficulty": "Easy",
+    "topics": [
+      "Matrix",
+      "Arrays"
+    ],
+    "hints": [
+      "The main diagonal contains elements where row index equals column index (matrix[i][i]).",
+      "A single loop from i = 0 to n-1 is sufficient to compute the sum in O(n) time."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new int[][]{{1,2,3},{4,5,6},{7,8,9}}, 3",
+        "expected": "15"
+      },
+      {
+        "name": "1x1",
+        "input": "new int[][]{{-4}}, 1",
+        "expected": "-4"
+      },
+      {
+        "name": "negatives",
+        "input": "new int[][]{{-1,2,3},{4,-5,6},{7,8,-9}}, 3",
+        "expected": "-15"
+      }
+    ]
+  },
+  "matrix-multiplication": {
+    "difficulty": "Medium",
+    "topics": [
+      "Matrix",
+      "Arrays"
+    ],
+    "hints": [
+      "Columns of matrix A must equal rows of matrix B.",
+      "Use three nested loops: result[i][j] += A[i][k] * B[k][j]."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample test 1",
+        "input": "new int[][]{{1,2,3},{4,5,6}}, new int[][]{{2,3},{1,2},{2,1}}, 2, 3, 2",
+        "expected": "new int[][]{{10,10},{25,28}}"
+      },
+      {
+        "name": "sample test 2",
+        "input": "new int[][]{{12,4},{7,6}}, new int[][]{{2,4,6},{3,5,7}}, 2, 2, 3",
+        "expected": "new int[][]{{36,68,100},{32,58,84}}"
+      },
+      {
+        "name": "1x1",
+        "input": "new int[][]{{2}}, new int[][]{{-3}}, 1, 1, 1",
+        "expected": "new int[][]{{-6}}"
+      }
+    ]
+  },
+  "matrix-row-and-column-sum": {
+    "difficulty": "Easy",
+    "topics": [
+      "Matrix",
+      "Arrays"
+    ],
+    "hints": [
+      "Compute row sums by iterating columns for each row.",
+      "Compute column sums by iterating rows for each column."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 2",
+        "input": "sample 2",
+        "expected": "\"2\\n3\\n1 2 3\\n4 5 6\\n0\\n0\\n\", \"11\\n\", Test::go"
+      },
+      {
+        "name": "3x3, row 1 + column 2",
+        "input": "3x3, row 1 + column 2",
+        "expected": "\"3\\n3\\n1 2 3\\n2 2 2\\n4 5 3\\n1\\n2\\n\", \"14\\n\", Test::go"
+      },
+      {
+        "name": "1x1",
+        "input": "1x1",
+        "expected": "\"1\\n1\\n5\\n0\\n0\\n\", \"10\\n\", Test::go"
+      }
+    ]
+  },
+  "mycalculator-exception": {
+    "difficulty": "Medium",
+    "topics": [
+      "Exceptions",
+      "Inheritance"
+    ],
+    "hints": [
+      "If either n or p is negative, throw an Exception: 'n or p should not be negative.'",
+      "If both n and p are zero, throw an Exception: 'n and p should not be zero.'",
+      "Otherwise compute and return (long) Math.pow(n, p)."
+    ],
+    "sample_cases": [
+      {
+        "name": "2^3 = 8",
+        "input": "2, 3",
+        "expected": "8\n"
+      },
+      {
+        "name": "negative n",
+        "input": "-3, 2",
+        "expected": "-1\n"
+      },
+      {
+        "name": "both zero",
+        "input": "0, 0",
+        "expected": "-2\n"
+      }
+    ]
+  },
+  "perfect-string": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "A string is perfect if all alphabetic letters appear at least once (pangram) or meet the problem's condition.",
+      "Use a boolean array of size 26 or a Set<Character> to track seen letters."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1: xaxbyyb",
+        "input": "\"xaxbyyb\"",
+        "expected": "true"
+      },
+      {
+        "name": "sample 2: aabbxxyy",
+        "input": "\"aabbxxyy\"",
+        "expected": "false"
+      },
+      {
+        "name": "sample 3: abaabxy",
+        "input": "\"abaabxy\"",
+        "expected": "true"
+      }
+    ]
+  },
+  "pyramid-13": {
+    "difficulty": "Easy",
+    "topics": [
+      "Patterns"
+    ],
+    "hints": [
+      "Determine the row count and number of stars/numbers per line.",
+      "Check prefix spaces carefully for row alignment."
+    ],
+    "sample_cases": [
+      {
+        "name": "n = 5",
+        "input": "n = 5",
+        "expected": "\"5\\n\", exp(5), Test::go"
+      },
+      {
+        "name": "n = 1",
+        "input": "n = 1",
+        "expected": "\"1\\n\", exp(1), Test::go"
+      },
+      {
+        "name": "n = 3",
+        "input": "n = 3",
+        "expected": "\"3\\n\", exp(3), Test::go"
+      }
+    ]
+  },
+  "pyramid-4": {
+    "difficulty": "Easy",
+    "topics": [
+      "Patterns"
+    ],
+    "hints": [
+      "Print spaces descending and characters/numbers ascending per row.",
+      "Ensure each line terminates with a newline."
+    ],
+    "sample_cases": [
+      {
+        "name": "n = 5",
+        "input": "n = 5",
+        "expected": "\"5\\n\", exp(5), Test::go"
+      },
+      {
+        "name": "n = 3",
+        "input": "n = 3",
+        "expected": "\"3\\n\", exp(3), Test::go"
+      },
+      {
+        "name": "n = 1",
+        "input": "n = 1",
+        "expected": "\"1\\n\", exp(1), Test::go"
+      }
+    ]
+  },
+  "pyramid-9": {
+    "difficulty": "Easy",
+    "topics": [
+      "Patterns"
+    ],
+    "hints": [
+      "Inspect the symmetry of the pattern.",
+      "Handle odd and even increments according to the sample specification."
+    ],
+    "sample_cases": [
+      {
+        "name": "n = 3",
+        "input": "n = 3",
+        "expected": "\"3\\n\", exp(3), Test::go"
+      },
+      {
+        "name": "n = 1",
+        "input": "n = 1",
+        "expected": "\"1\\n\", exp(1), Test::go"
+      },
+      {
+        "name": "n = 5",
+        "input": "n = 5",
+        "expected": "\"5\\n\", exp(5), Test::go"
+      }
+    ]
+  },
+  "quality-check": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "Check each element against the minimum threshold.",
+      "Count or filter elements that pass quality inspection."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new int[]{1,3,5,8}, 4",
+        "expected": "1 3\n"
+      },
+      {
+        "name": "all even",
+        "input": "new int[]{2,4,6}, 3",
+        "expected": "3 0\n"
+      },
+      {
+        "name": "all odd",
+        "input": "new int[]{1,1,1,1,1}, 5",
+        "expected": "0 5\n"
+      }
+    ]
+  },
+  "save-bandwidth-compression": {
+    "difficulty": "Medium",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Compress repeated sequences to reduce data size.",
+      "Handle single characters without unnecessary count suffixes."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1",
+        "input": "\"aabbccdef\"",
+        "expected": "a2b2c2def"
+      },
+      {
+        "name": "sample 2",
+        "input": "\"abddddddd\"",
+        "expected": "abd7"
+      },
+      {
+        "name": "no repeats",
+        "input": "\"abc\"",
+        "expected": "abc"
+      }
+    ]
+  },
+  "search-an-element": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "Traverse the array linearly and compare each element to the target key.",
+      "Return the 0-based index if found, or -1 if the key is not present."
+    ],
+    "sample_cases": [
+      {
+        "name": "appears twice",
+        "input": "a, 4",
+        "expected": "2"
+      },
+      {
+        "name": "appears once",
+        "input": "a, 5",
+        "expected": "1"
+      },
+      {
+        "name": "not present",
+        "input": "a, 6",
+        "expected": "-1"
+      }
+    ]
+  },
+  "separate-even-odd": {
+    "difficulty": "Easy",
+    "topics": [
+      "Arrays"
+    ],
+    "hints": [
+      "Create two sub-lists or separate passes for even numbers and odd numbers.",
+      "Preserve the relative ordering of elements if stable ordering is required."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "new int[]{1,3,5,8}, 4",
+        "expected": "8\n1 3 5\n"
+      },
+      {
+        "name": "order is preserved",
+        "input": "new int[]{2,1,4,3}, 4",
+        "expected": "2 4\n1 3\n"
+      },
+      {
+        "name": "negative numbers and zero",
+        "input": "new int[]{10,-3,7,-8,0,5}, 6",
+        "expected": "10 -8 0\n-3 7 5\n"
+      }
+    ]
+  },
+  "sequential-id-pyramid-7": {
+    "difficulty": "Easy",
+    "topics": [
+      "Patterns"
+    ],
+    "hints": [
+      "Track a running sequence counter across rows.",
+      "Print the counter formatted with required spaces."
+    ],
+    "sample_cases": [
+      {
+        "name": "n = 3",
+        "input": "n = 3",
+        "expected": "\"3\\n\", \"1\\n2 3\\n4 5 6\\n\", Test::go"
+      },
+      {
+        "name": "n = 1",
+        "input": "n = 1",
+        "expected": "\"1\\n\", \"1\\n\", Test::go"
+      },
+      {
+        "name": "n = 4",
+        "input": "n = 4",
+        "expected": "\"4\\n\", \"1\\n2 3\\n4 5 6\\n7 8 9 10\\n\", Test::go"
+      }
+    ]
+  },
+  "stock-price-trend": {
+    "difficulty": "Medium",
+    "topics": [
+      "Collections"
+    ],
+    "hints": [
+      "Compare adjacent price points: price[i] > price[i-1] indicates an upward trend.",
+      "Use a Deque or List to track running windows if required."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "ll(500,520,510,550,550,580,560)",
+        "expected": "List.of(520, 550, 580)"
+      },
+      {
+        "name": "strictly decreasing -> empty",
+        "input": "ll(50,40,30,20)",
+        "expected": "List.of()"
+      },
+      {
+        "name": "single price -> empty",
+        "input": "ll(100)",
+        "expected": "List.of()"
+      }
+    ]
+  },
+  "strings-are-anagram": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings",
+      "Arrays"
+    ],
+    "hints": [
+      "Two strings are anagrams if they have the exact same character counts.",
+      "Sort both character arrays or count character frequencies in an array of size 256."
+    ],
+    "sample_cases": [
+      {
+        "name": "act / cat",
+        "input": "\"act\", \"cat\"",
+        "expected": "1"
+      },
+      {
+        "name": "CodeQuotient / QuotientCode",
+        "input": "\"CodeQuotient\", \"QuotientCode\"",
+        "expected": "1"
+      },
+      {
+        "name": "Hello / Hillo",
+        "input": "\"Hello\", \"Hillo\"",
+        "expected": "0"
+      }
+    ]
+  },
+  "strong-virus": {
+    "difficulty": "Medium",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Find the first and last occurrence of target characters in the string.",
+      "Check whether characters in between satisfy the contagion rule."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1: txma yert",
+        "input": "\"txma yert\"",
+        "expected": "true"
+      },
+      {
+        "name": "sample 2: BMuxp ioqytB yxurN",
+        "input": "\"BMuxp ioqytB yxurN\"",
+        "expected": "false"
+      },
+      {
+        "name": "sample 3: xaxoerylm",
+        "input": "\"xaxoerylm\"",
+        "expected": "true"
+      }
+    ]
+  },
+  "student-marks-get-element": {
+    "difficulty": "Easy",
+    "topics": [
+      "Exceptions",
+      "Arrays"
+    ],
+    "hints": [
+      "Check array bounds before indexing, or catch ArrayIndexOutOfBoundsException.",
+      "Return a custom error message or fallback value when index is invalid."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample: index 2",
+        "input": "a, 2",
+        "expected": "30"
+      },
+      {
+        "name": "sample: index 7",
+        "input": "a, 7",
+        "expected": "Invalid Index"
+      },
+      {
+        "name": "first element",
+        "input": "a, 0",
+        "expected": "10"
+      }
+    ]
+  },
+  "sum-lower-triangle": {
+    "difficulty": "Easy",
+    "topics": [
+      "Matrix",
+      "Arrays"
+    ],
+    "hints": [
+      "The lower triangle of an N x N matrix contains elements where row >= col (i >= j).",
+      "Iterate with outer loop i from 0 to N-1 and inner loop j from 0 to i."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "sample",
+        "expected": "\"3\\n1 2 3\\n4 5 6\\n7 8 9\\n\", \"34\\n\", Test::go"
+      },
+      {
+        "name": "1x1",
+        "input": "1x1",
+        "expected": "\"1\\n-7\\n\", \"-7\\n\", Test::go"
+      },
+      {
+        "name": "2x2",
+        "input": "2x2",
+        "expected": "\"2\\n1 2\\n3 4\\n\", \"8\\n\", Test::go"
+      }
+    ]
+  },
+  "sum-of-kth-row": {
+    "difficulty": "Easy",
+    "topics": [
+      "Matrix",
+      "Arrays"
+    ],
+    "hints": [
+      "Access row K of the matrix: matrix[K].",
+      "Sum all column elements across that specific row."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "sample",
+        "expected": "\"3 5\\n1 3 5 7 9\\n2 4 6 8 10\\n2 6 9 3 4\\n2\\n\", \"24\\n\", Test::go"
+      },
+      {
+        "name": "first row",
+        "input": "first row",
+        "expected": "\"3 5\\n1 3 5 7 9\\n2 4 6 8 10\\n2 6 9 3 4\\n0\\n\", \"25\\n\", Test::go"
+      },
+      {
+        "name": "middle row",
+        "input": "middle row",
+        "expected": "\"3 5\\n1 3 5 7 9\\n2 4 6 8 10\\n2 6 9 3 4\\n1\\n\", \"30\\n\", Test::go"
+      }
+    ]
+  },
+  "translate-the-letter": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Map specific characters to their replacement translation according to rules.",
+      "Use a StringBuilder for efficient in-place string transformation."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample 1",
+        "input": "\"Code Loves Quotient Code\"",
+        "expected": "Code Quotient Loves Code"
+      },
+      {
+        "name": "sample 2",
+        "input": "\"Coders Hello\"",
+        "expected": "Hello Coders"
+      },
+      {
+        "name": "single word",
+        "input": "\"Single\"",
+        "expected": "Single"
+      }
+    ]
+  },
+  "tricycle-speed-manager": {
+    "difficulty": "Easy",
+    "topics": [
+      "Classes and Objects",
+      "Constructors"
+    ],
+    "hints": [
+      "Encapsulate speed state within the Tricycle class.",
+      "Provide methods to accelerate, decelerate, and validate non-negative speed."
+    ],
+    "sample_cases": [
+      {
+        "name": "default speed is 5",
+        "input": ").getSpeed(",
+        "expected": "5"
+      },
+      {
+        "name": "incr",
+        "input": "{ Tricycle t = new Tricycle(",
+        "expected": "6"
+      },
+      {
+        "name": "brake",
+        "input": "{ Tricycle t = new Tricycle(",
+        "expected": "4"
+      }
+    ]
+  },
+  "uppercase-to-lowercase": {
+    "difficulty": "Easy",
+    "topics": [
+      "Strings"
+    ],
+    "hints": [
+      "Convert ASCII values by adding 32 or using Character.toLowerCase(c).",
+      "Ensure characters already in lowercase or symbols remain unchanged."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "sample",
+        "expected": "\"CODEQUOTIENT\\n\", \"codequotient\\n\", Test::go"
+      },
+      {
+        "name": "single letter",
+        "input": "single letter",
+        "expected": "\"Q\\n\", \"q\\n\", Test::go"
+      },
+      {
+        "name": "whole alphabet",
+        "input": "whole alphabet",
+        "expected": "\"ABCDEFGHIJKLMNOPQRSTUVWXYZ\\n\", \"abcdefghijklmnopqrstuvwxyz\\n\", Test::go"
+      }
+    ]
+  },
+  "valid-email-address": {
+    "difficulty": "Medium",
+    "topics": [
+      "Exceptions",
+      "Strings"
+    ],
+    "hints": [
+      "Validate format: must contain exactly one '@' followed by a valid domain with a '.'",
+      "Ensure username and domain portions are non-empty and throw an exception for malformed emails."
+    ],
+    "sample_cases": [
+      {
+        "name": "abc@gmail.com",
+        "input": "\"abc@gmail.com\"",
+        "expected": "1\n"
+      },
+      {
+        "name": "no dot after @",
+        "input": "\"email@codequotient\"",
+        "expected": "0\n"
+      },
+      {
+        "name": "dot before @",
+        "input": "\"user.name@domain\"",
+        "expected": "0\n"
+      }
+    ]
+  },
+  "web-browser-tab-history": {
+    "difficulty": "Hard",
+    "topics": [
+      "Collections"
+    ],
+    "hints": [
+      "Use two stacks: backStack and forwardStack.",
+      "Visiting a new page pushes current page to backStack and clears forwardStack.",
+      "Back pops from backStack onto forwardStack; forward pops from forwardStack onto backStack."
+    ],
+    "sample_cases": [
+      {
+        "name": "sample",
+        "input": "ll(101,205,310,101,450,205,101,520,310,600)",
+        "expected": "List.of(101, 205, 310)"
+      },
+      {
+        "name": "no frequent site -> empty",
+        "input": "ll(100,200,300)",
+        "expected": "List.of()"
+      },
+      {
+        "name": "all the same -> reported once",
+        "input": "ll(100,100,100)",
+        "expected": "List.of(100)"
+      }
+    ]
+  }
+}
