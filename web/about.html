@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#120f17">
+  <meta name="description" content="About Code-Karo.dev — A Java practice workspace built by students for real OOP mastery. Meet our team.">
+  <title>About — Code-Karo.dev</title>
+
+  <!-- Shared Style Dependencies (Read-only) -->
+  <link rel="stylesheet" href="/navbar.css">
+  <link rel="stylesheet" href="/gooey-nav.css">
+  <link rel="stylesheet" href="/theme.css">
+
+  <!-- Google Fonts: Exact set used by Home page + JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Lexend+Giga:wght@100..900&family=Michroma&family=Play:wght@400;700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Zalando+Sans+Expanded:ital,wght@0,200..900;1,200..900&family=Zen+Dots&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <script src="/theme.js"></script>
+
+  <!-- Scoped Stylesheet for About Page -->
+  <link rel="stylesheet" href="/about.css">
+  <style>
+    @font-face {
+      font-family: "DM Sans";
+      src: url("/fonts/DMSans-Regular.woff2") format("woff2");
+      font-weight: 400;
+      font-style: normal;
+      font-display: swap;
+    }
+    @font-face {
+      font-family: Epilogue;
+      src: url("/fonts/Epilogue-Black.woff2") format("woff2");
+      font-weight: 900;
+      font-style: normal;
+      font-display: swap;
+    }
+  </style>
+</head>
+<body class="page-about">
+
+  <!-- Floating Pill Navbar (Identical markup, classes, and controls as Home) -->
+  <header class="navbar">
+    <a class="repository-link repository-link--social" href="https://github.com/rajeevranjan4812-star/oops-judge" target="_blank" rel="noopener noreferrer" aria-label="Open the Code-Karo.dev GitHub repository" title="GitHub repository">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 .1.76 2.68 3.76 2.03.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.75 1.02.75 2.06V22c0 .29.2.63.76.53A11.1 11.1 0 0 0 12 .9Z"/></svg>
+      <span class="repository-link__label">GitHub</span>
+    </a>
+    <div class="home-auth">
+      <button class="home-auth__button" type="button" aria-label="Account options" aria-haspopup="true" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.7"/>
+          <path d="M4.8 20c.7-3.3 3.2-5.1 7.2-5.1s6.5 1.8 7.2 5.1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <div class="home-auth__panel">
+        <p class="home-auth__prompt">Join Code-Karo</p>
+        <div class="home-auth__actions">
+          <a class="home-auth__link" href="/practice?auth=signup">Sign up</a>
+          <a class="home-auth__link" href="/practice?auth=signin">Log in</a>
+        </div>
+      </div>
+    </div>
+    <button class="theme-switch theme-switch--compact" data-theme-switch type="button" aria-label="Switch theme" aria-pressed="false">
+      <svg class="theme-switch__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <g class="theme-switch__sun-rays" stroke="currentColor" stroke-linecap="round" stroke-width="1.7">
+          <circle cx="12" cy="12" r="3.7" fill="currentColor" stroke="none" />
+          <path d="M12 2.5v2M12 19.5v2M4.4 4.4l1.4 1.4m12.4 12.4 1.4 1.4M2.5 12h2m15 0h2M4.4 19.6l1.4-1.4M18.2 5.8l1.4-1.4" />
+        </g>
+        <g class="theme-switch__moon">
+          <circle cx="12" cy="12" r="7.5" fill="currentColor" />
+          <circle class="theme-switch__moon-cutout" cx="16" cy="8" r="6" />
+        </g>
+      </svg>
+      <span class="theme-switch__label" data-theme-label>Dark</span>
+    </button>
+    <nav class="nav-island" data-nav-island aria-label="Main sections">
+      <a class="nav-island__brand" href="/" aria-label="CodeKaro home">CodeKaro</a>
+      <div class="nav-island__links">
+        <a class="nav-island__link" href="/" data-nav-link>Home</a>
+        <a class="nav-island__link" href="/profile" data-nav-link>Profile</a>
+        <a class="nav-island__link" href="/practice" data-nav-link>Practice</a>
+        <a class="nav-island__link" href="/about" data-nav-link aria-current="page">About</a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero Section: Two Columns with Character-Field Canvas & Purple Glow -->
+    <section class="about-hero hero" aria-labelledby="hero-title">
+      <canvas class="gradient-ascii-canvas" aria-hidden="true"></canvas>
+
+      <div class="page-container hero-grid">
+        <!-- Left: Editorial Brand Pitch & Actions -->
+        <div class="hero-left">
+          <span class="mono-eyebrow">// about</span>
+          <h1 id="hero-title" class="hero-heading">Java practice,<br>tested for real.</h1>
+          <p class="hero-lead">Code-Karo.dev is a Java practice workspace built by four students who wanted a calmer, focused place to master Object-Oriented Programming. Write code, test against real test cases, and see instant feedback.</p>
+          <div class="hero-actions">
+            <a href="/practice" class="btn-primary-conic">Start practicing</a>
+            <a href="#team" class="btn-outline-pill">Meet the team</a>
+          </div>
+        </div>
+
+        <!-- Right: Code Runner Panel Mockup (Real HTML text) -->
+        <div class="hero-right">
+          <div class="hero-code-panel" aria-label="Sample test runner output">
+            <div class="code-window-top">
+              <div class="window-dots">
+                <span class="window-dot dot-red"></span>
+                <span class="window-dot dot-yellow"></span>
+                <span class="window-dot dot-green"></span>
+              </div>
+              <span class="window-title">Solution.java: Run</span>
+              <span style="width: 38px;"></span>
+            </div>
+            <div class="code-window-body">
+              <div class="case-row">
+                <span class="case-pass">✔ PASS</span>
+                <span class="case-label">Case 1 — Valid Palindrome</span>
+                <span class="case-time">2ms</span>
+              </div>
+              <div class="case-row">
+                <span class="case-pass">✔ PASS</span>
+                <span class="case-label">Case 2 — Single Character String</span>
+                <span class="case-time">1ms</span>
+              </div>
+              <div class="case-row">
+                <span class="case-fail">✖ FAIL</span>
+                <span class="case-label">Case 3 — Mixed Case with Punctuation</span>
+                <span class="case-time">3ms</span>
+              </div>
+              <div class="case-diff">
+                <div>Expected: <strong>true</strong></div>
+                <div>Actual: &nbsp;&nbsp;<strong>false</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works Section: Vertical Flow Connected with Status Dots -->
+    <section class="panel-section" aria-labelledby="how-it-works-title">
+      <div class="page-container">
+        <div class="section-header">
+          <span class="mono-eyebrow">// workflow</span>
+          <h2 id="how-it-works-title" class="section-title">How it works</h2>
+          <p class="section-sub">A focused execution loop from problem to verified solution.</p>
+        </div>
+
+        <div class="timeline-flow">
+          <!-- Step 1 -->
+          <div class="timeline-step">
+            <div class="timeline-dot">1</div>
+            <div class="timeline-content">
+              <h3 class="timeline-title">Write in the browser editor</h3>
+              <p class="timeline-desc">Write standard Java in an integrated Monaco code editor. Instant syntax highlighting, indentation, and clean boilerplate with zero local JDK installation.</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="timeline-step">
+            <div class="timeline-dot">2</div>
+            <div class="timeline-content">
+              <h3 class="timeline-title">Execute against real test suites</h3>
+              <p class="timeline-desc">Run against visible sample tests or submit across full hidden test suites executed in isolated sandboxed runners with strict time and memory limits.</p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="timeline-step">
+            <div class="timeline-dot">3</div>
+            <div class="timeline-content">
+              <h3 class="timeline-title">Inspect per-test diagnostics</h3>
+              <p class="timeline-desc">Read per-case results showing exact expected versus actual outputs, execution time, memory usage, and precise javac compiler diagnostics.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Built With Section: Import-Style Code Window -->
+    <section class="panel-section" aria-labelledby="built-with-title">
+      <div class="page-container">
+        <div class="section-header">
+          <span class="mono-eyebrow">// architecture</span>
+          <h2 id="built-with-title" class="section-title">Built with precision</h2>
+          <p class="section-sub">Only confirmed, verified technologies used across the platform.</p>
+        </div>
+
+        <div class="code-import-card">
+          <div class="code-window-top">
+            <div class="window-dots">
+              <span class="window-dot dot-red"></span>
+              <span class="window-dot dot-yellow"></span>
+              <span class="window-dot dot-green"></span>
+            </div>
+            <span class="window-title">dependencies.java</span>
+            <span style="width: 38px;"></span>
+          </div>
+          <div class="code-import-body">
+            <div class="kw-comment">// Core Platform Stack</div>
+            <div><span class="kw-keyword">import</span> <span class="kw-package">org.openjdk.java.</span><span class="kw-class">Java17</span>;</div>
+            <div><span class="kw-keyword">import</span> <span class="kw-package">com.docker.runner.</span><span class="kw-class">IsolatedSandbox</span>;</div>
+            <div><span class="kw-keyword">import</span> <span class="kw-package">io.fastapi.judge.</span><span class="kw-class">ExecutionService</span>;</div>
+            <div><span class="kw-keyword">import</span> <span class="kw-package">com.microsoft.monaco.</span><span class="kw-class">CodeEditor</span>;</div>
+            <div><span class="kw-keyword">import</span> <span class="kw-package">com.vercel.edge.</span><span class="kw-class">StaticCDN</span>;</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Team Section: Purple Gradient Cards in Home's Visual Language -->
+    <section class="panel-section" id="team" aria-labelledby="team-title">
+      <div class="page-container">
+        <div class="section-header">
+          <span class="mono-eyebrow">// team</span>
+          <h2 id="team-title" class="section-title">The team</h2>
+          <p class="section-sub">Four developers, one codebase.</p>
+        </div>
+
+        <!-- Rendered dynamically by /about.js from /team.json -->
+        <div class="team-grid" id="team-grid"></div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer (Matching Home's Structure, Gradient Art, Eye Tracking, and Contact Dropdown) -->
+  <footer class="site-footer" aria-label="Code-Karo.dev footer">
+    <img class="site-footer__art" src="/footer-gradient.jpg" alt="" aria-hidden="true">
+    <div class="footer-jobs">
+      <span class="footer-tag">have a fresh idea?</span>
+      <span class="footer-headline footer-job-title">imagination<br>meets craft</span>
+      <nav class="footer-nav" aria-label="Studio links">
+        <a href="/practice" style="text-decoration:none;color:inherit;">Practice</a>
+        <a href="#team" style="text-decoration:none;color:inherit;">Team</a>
+        <a href="https://github.com/rajeevranjan4812-star/oops-judge" target="_blank" rel="noopener noreferrer" style="text-decoration:none;color:inherit;">GitHub</a>
+        <a href="#team" style="text-decoration:none;color:inherit;">Say hey</a>
+      </nav>
+    </div>
+
+    <!-- Pupil Tracking Eyes -->
+    <div class="footer-follow-eyes" data-follow-eyes role="img" aria-label="Eyes follow your cursor">
+      <span class="footer-follow-eye"><span class="footer-follow-eye__pupil"></span></span>
+      <span class="footer-follow-eye"><span class="footer-follow-eye__pupil"></span></span>
+    </div>
+
+    <!-- Contact CTA Dropdown -->
+    <div class="footer-contact">
+      <span class="footer-tag">say hey</span>
+      <div class="footer-headline footer-contact__headlines">
+        <span>let’s team up!</span>
+        <span>bring us your idea*</span>
+      </div>
+      <p class="footer-contact__note">Made by Rajeev, Shubham, Duwarka and Sahaj</p>
+      <div class="footer-contact-cta" data-footer-contact>
+        <button class="footer-contact-cta__button" type="button" aria-expanded="false" aria-controls="footer-contact-menu">
+          Get in touch
+          <svg class="footer-contact-cta__chevron" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 9 6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div class="footer-contact-cta__menu" id="footer-contact-menu">
+          <a class="footer-contact-cta__link" href="https://github.com/rajeevranjan4812-star/oops-judge" target="_blank" rel="noopener noreferrer">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 .1.76 2.68 3.76 2.03.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.75 1.02.75 2.06V22c0 .29.2.63.76.53A11.1 11.1 0 0 0 12 .9Z"/></svg>
+            GitHub repository
+          </a>
+        </div>
+      </div>
+    </div>
+    <p class="site-footer__brand">CODE-KARO.DEV</p>
+  </footer>
+
+  <!-- Scripts: Shared Home Scripts (Unmodified) + About Cards Renderer -->
+  <script src="/gooey-nav.js" defer></script>
+  <script src="/gradient-ascii.js" defer></script>
+  <script src="/footer-contact.js" defer></script>
+  <script src="/about.js" defer></script>
+</body>
+</html>

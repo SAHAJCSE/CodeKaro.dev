@@ -154,6 +154,16 @@ class AppHandler(BaseHTTPRequestHandler):
             "/practice.html": ("practice.html", "text/html; charset=utf-8"),
             "/profile": ("profile.html", "text/html; charset=utf-8"),
             "/profile.html": ("profile.html", "text/html; charset=utf-8"),
+            "/about": ("about.html", "text/html; charset=utf-8"),
+            "/about.html": ("about.html", "text/html; charset=utf-8"),
+            "/about.css": ("about.css", "text/css; charset=utf-8"),
+            "/about.js": ("about.js", "text/javascript; charset=utf-8"),
+            "/team.js": ("team.js", "text/javascript; charset=utf-8"),
+            "/team.json": ("team.json", "application/json; charset=utf-8"),
+            "/assets/team/rajeev.jpg": ("assets/team/rajeev.jpg", "image/jpeg"),
+            "/assets/team/shubham.jpg": ("assets/team/shubham.jpg", "image/jpeg"),
+            "/assets/team/duwarka.jpg": ("assets/team/duwarka.jpg", "image/jpeg"),
+            "/assets/team/sahaj.jpg": ("assets/team/sahaj.jpg", "image/jpeg"),
             "/navbar.css": ("navbar.css", "text/css; charset=utf-8"),
             "/navbar.js": ("navbar.js", "text/javascript; charset=utf-8"),
             "/gooey-nav.css": ("gooey-nav.css", "text/css; charset=utf-8"),
@@ -172,10 +182,30 @@ class AppHandler(BaseHTTPRequestHandler):
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/config.js": ("config.js", "text/javascript; charset=utf-8"),
         }
-        if norm_path not in static_files:
-            self.send_json(404, {"error": "Page not found."})
-            return
-        filename, content_type = static_files[norm_path]
+        if norm_path in static_files:
+            filename, content_type = static_files[norm_path]
+        else:
+            rel_path = norm_path.lstrip("/")
+            file_candidate = (WEB / rel_path).resolve()
+            if file_candidate.is_file() and str(file_candidate).startswith(str(WEB.resolve())):
+                ext = file_candidate.suffix.lower()
+                mime_types = {
+                    ".html": "text/html; charset=utf-8",
+                    ".css": "text/css; charset=utf-8",
+                    ".js": "text/javascript; charset=utf-8",
+                    ".json": "application/json; charset=utf-8",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".png": "image/png",
+                    ".webp": "image/webp",
+                    ".svg": "image/svg+xml",
+                    ".woff2": "font/woff2",
+                }
+                content_type = mime_types.get(ext, "application/octet-stream")
+                filename = rel_path
+            else:
+                self.send_json(404, {"error": "Page not found."})
+                return
         try:
             body = (WEB / filename).read_bytes()
         except OSError as error:

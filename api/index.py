@@ -120,10 +120,15 @@ class handler(BaseHTTPRequestHandler):
             clean = clean[4:]
         if clean.startswith("public/"):
             clean = clean[7:]
-        if clean in ("", "index.html", "app.css", "app.js", "config.js"):
-            file_name = clean or "index.html"
+        if clean in ("", "index.html", "about.html", "about", "about.css", "about.js", "team.js", "team.json", "app.css", "app.js", "config.js"):
+            file_name = "index.html" if clean == "" else "about.html" if clean == "about" else clean
             content_types = {
                 "index.html": "text/html; charset=utf-8",
+                "about.html": "text/html; charset=utf-8",
+                "about.css": "text/css; charset=utf-8",
+                "about.js": "application/javascript; charset=utf-8",
+                "team.js": "application/javascript; charset=utf-8",
+                "team.json": "application/json; charset=utf-8",
                 "app.css": "text/css; charset=utf-8",
                 "app.js": "application/javascript; charset=utf-8",
                 "config.js": "application/javascript; charset=utf-8",
