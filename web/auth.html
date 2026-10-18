@@ -1,0 +1,1525 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#120f17">
+  <meta name="description" content="Sign in or create your CodeKaro account — a calmer place to practice code.">
+  <title>CodeKaro — Sign In</title>
+
+  <!-- Fonts (matching the site exactly) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Lexend+Giga:wght@100..900&family=Michroma&family=Play:wght@400;700&display=swap" rel="stylesheet">
+
+  <!-- Site theme system (MUST come before body renders) -->
+  <link rel="stylesheet" href="./navbar.css">
+  <link rel="stylesheet" href="./theme.css">
+  <script src="./theme.js"></script>
+
+  <!-- Google Identity Services SDK -->
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+  <style>
+    /* ══════════════════════════════════════════════════════
+       1. DESIGN TOKENS — DARK (matches index.html + app.css)
+       ══════════════════════════════════════════════════════ */
+    :root {
+      color-scheme: dark;
+      font-family: "Play", ui-sans-serif, system-ui, sans-serif;
+
+      /* Page backgrounds */
+      --ck-bg:           #120f17;
+      --ck-panel-left:   #16131f;
+      --ck-form-surface: rgba(255,255,255,0.035);
+
+      /* Borders */
+      --ck-border:       rgba(220,229,247,0.10);
+      --ck-border-hover: rgba(180,155,255,0.55);
+      --ck-border-focus: rgba(120,75,255,0.65);
+
+      /* Typography */
+      --ck-text:  #f4f4f6;
+      --ck-muted: #8e8e9e;
+      --ck-link:  #c9adff;
+
+      /* Brand accent */
+      --ck-accent:       #784bff;
+      --ck-accent-glow:  rgba(120,75,255,0.25);
+      --ck-accent-soft:  rgba(120,75,255,0.08);
+
+      /* Semantic */
+      --ck-success: #26d7f4;
+      --ck-error:   #ff4a6e;
+
+      /* Inputs */
+      --ck-input-bg: rgba(220,229,247,0.05);
+
+      /* Nav */
+      --ck-nav-bg:   rgba(18,15,23,0.82);
+      --ck-nav-border: rgba(220,229,247,0.06);
+
+      /* Radii */
+      --r-sm: 8px;
+      --r-md: 12px;
+      --r-lg: 20px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       2. DESIGN TOKENS — LIGHT (matches index.html light vars)
+       ══════════════════════════════════════════════════════ */
+    html[data-theme="light"] {
+      color-scheme: light;
+
+      --ck-bg:           #f1f1f3;
+      --ck-panel-left:   #e8e5f0;
+      --ck-form-surface: rgba(255,255,255,0.65);
+
+      --ck-border:       rgba(32,33,38,0.14);
+      --ck-border-hover: rgba(104,68,174,0.45);
+      --ck-border-focus: rgba(104,68,174,0.5);
+
+      --ck-text:  #202126;
+      --ck-muted: #696b74;
+      --ck-link:  #6a3ecf;
+
+      --ck-accent:       #6a3ecf;
+      --ck-accent-glow:  rgba(104,68,174,0.18);
+      --ck-accent-soft:  rgba(104,68,174,0.06);
+
+      --ck-success: #207a5e;
+      --ck-error:   #a54c54;
+
+      --ck-input-bg: rgba(255,255,255,0.8);
+
+      --ck-nav-bg:    rgba(241,241,243,0.90);
+      --ck-nav-border: rgba(32,33,38,0.10);
+    }
+
+    /* ══════════════════════════════════════════════════════
+       3. RESET
+       ══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { width: 100%; min-height: 100%; }
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: var(--ck-bg);
+      color: var(--ck-text);
+      transition: background .25s ease, color .25s ease;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       4. ANIMATED PROPERTIES
+       ══════════════════════════════════════════════════════ */
+    @property --cta-angle    { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+    @property --border-angle { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+
+    @keyframes spin-grad  { to { --cta-angle: 360deg; } }
+    @keyframes cta-spin   { to { --cta-angle: 360deg; } }
+    @keyframes float-dev  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-14px)} }
+    @keyframes chip-float { 0%,100%{transform:translateY(0) rotate(-1deg);opacity:.75} 50%{transform:translateY(-9px) rotate(1deg);opacity:1} }
+    @keyframes typewriter-cursor { 50%{opacity:0} }
+    @keyframes pulse-ring { 0%{transform:scale(1);opacity:.5} 100%{transform:scale(1.6);opacity:0} }
+
+    /* ══════════════════════════════════════════════════════
+       5. NAVBAR
+       ══════════════════════════════════════════════════════ */
+    .auth-nav {
+      position: fixed; z-index: 50; inset: 0 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 clamp(20px,5vw,56px); min-height: 68px;
+      border-bottom: 1px solid var(--ck-nav-border);
+      background: var(--ck-nav-bg);
+      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px);
+      transition: background .25s ease, border-color .25s ease;
+    }
+
+    .auth-nav__brand {
+      font-family: "Audiowide", sans-serif; font-size: 18px; font-weight: 600;
+      letter-spacing: -0.03em; color: var(--ck-text); text-decoration: none;
+      display: flex; align-items: center; gap: 9px;
+      transition: color .2s;
+    }
+
+    .auth-nav__brand-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      background: conic-gradient(from var(--cta-angle),#ff3cac,#784bff,#26d7f4,#c4ff4d,#ffb43b,#ff3cac);
+      animation: spin-grad 3s linear infinite;
+    }
+
+    .auth-nav__right { display: flex; align-items: center; gap: 10px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      min-height: 36px; padding: 0 14px;
+      border: 1px solid var(--ck-border); border-radius: var(--r-sm);
+      background: var(--ck-form-surface);
+      color: var(--ck-muted); font-family: "Play",sans-serif; font-size: 13px; font-weight: 500;
+      text-decoration: none;
+      transition: color .18s, border-color .18s, background .18s;
+    }
+    .back-link:hover { color: var(--ck-text); border-color: var(--ck-border-hover); background: var(--ck-accent-soft); }
+    .back-link svg { width: 14px; height: 14px; }
+
+    /* ══════════════════════════════════════════════════════
+       6. PAGE LAYOUT
+       ══════════════════════════════════════════════════════ */
+    .auth-page {
+      flex: 1; display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 100vh; padding-top: 68px;
+    }
+
+    /* ══════════════════════════════════════════════════════
+       7. LEFT ILLUSTRATION PANEL
+       ══════════════════════════════════════════════════════ */
+    .auth-panel-left {
+      position: relative; overflow: hidden;
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(120,75,255,0.28), transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(38,215,244,0.14), transparent 50%),
+        radial-gradient(ellipse at 60% 50%, rgba(255,60,172,0.10), transparent 45%),
+        var(--ck-panel-left);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 48px 40px;
+      transition: background .25s ease;
+    }
+
+    html[data-theme="light"] .auth-panel-left {
+      background:
+        radial-gradient(ellipse at 30% 20%, rgba(104,68,174,0.15), transparent 55%),
+        radial-gradient(ellipse at 80% 80%, rgba(38,215,244,0.08), transparent 50%),
+        var(--ck-panel-left);
+    }
+
+    /* Grid overlay */
+    .auth-panel-left::before {
+      content: "";
+      position: absolute; inset: 0; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(120,75,255,0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(120,75,255,0.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, rgba(0,0,0,0.6) 40%, transparent 80%);
+    }
+
+    html[data-theme="light"] .auth-panel-left::before {
+      background-image:
+        linear-gradient(rgba(104,68,174,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(104,68,174,0.08) 1px, transparent 1px);
+    }
+
+    .auth-panel-left__content {
+      position: relative; z-index: 1;
+      display: flex; flex-direction: column;
+      align-items: center; text-align: center; gap: 32px;
+    }
+
+    /* ── SVG Illustration ── */
+    .dev-illustration {
+      width: min(340px, 90%);
+      filter: drop-shadow(0 24px 48px rgba(120,75,255,0.35));
+      animation: float-dev 5s ease-in-out infinite;
+    }
+
+    html[data-theme="light"] .dev-illustration {
+      filter: drop-shadow(0 24px 48px rgba(104,68,174,0.20));
+    }
+
+    /* ── Floating code chips ── */
+    .code-chips { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+
+    .chip {
+      position: absolute; padding: 6px 12px;
+      border: 1px solid rgba(120,75,255,0.4); border-radius: 8px;
+      background: rgba(26,23,36,0.82); color: #dcdcaa;
+      font-family: "Michroma", monospace; font-size: 11px; white-space: nowrap;
+      animation: chip-float 6s ease-in-out infinite;
+      -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+    }
+
+    html[data-theme="light"] .chip {
+      background: rgba(240,237,255,0.88);
+      border-color: rgba(104,68,174,0.3);
+    }
+
+    .chip--1 { top:14%;left:6%;    color:#569cd6; animation-delay:0s;   animation-duration:5.5s; }
+    .chip--2 { top:22%;right:5%;   color:#ce9178; animation-delay:1.2s; animation-duration:6.5s; }
+    .chip--3 { bottom:26%;left:4%; color:#4ec9b0; animation-delay:0.6s; animation-duration:7s;   }
+    .chip--4 { bottom:18%;right:8%;color:#c792ea; animation-delay:1.8s; animation-duration:5.8s; }
+    .chip--5 { top:48%;left:2%;    color:#9cdcfe; animation-delay:0.9s; animation-duration:6.2s; }
+
+    html[data-theme="light"] .chip--1 { color:#1e6db5; }
+    html[data-theme="light"] .chip--2 { color:#a0461e; }
+    html[data-theme="light"] .chip--3 { color:#0d6b59; }
+    html[data-theme="light"] .chip--4 { color:#7c3fb5; }
+    html[data-theme="light"] .chip--5 { color:#1565a0; }
+
+    /* ── Panel tagline ── */
+    .panel-tagline h2 {
+      font-family: "Audiowide", sans-serif;
+      font-size: clamp(18px,2.2vw,26px); font-weight: 600;
+      letter-spacing: -0.04em; color: var(--ck-text); margin-bottom: 10px;
+    }
+
+    .panel-tagline p { color: var(--ck-muted); font-size: 14px; line-height: 1.7; }
+
+    /* ── Stat pills ── */
+    .panel-stats { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+
+    .stat-pill {
+      display: flex; align-items: center; gap: 7px;
+      padding: 7px 14px;
+      border: 1px solid var(--ck-border); border-radius: 999px;
+      background: var(--ck-form-surface); color: var(--ck-muted);
+      font-size: 12px; font-weight: 600;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .stat-pill:hover { border-color: var(--ck-border-hover); color: var(--ck-text); background: var(--ck-accent-soft); }
+    .stat-pill__dot { width: 6px; height: 6px; border-radius: 50%; }
+
+    /* ══════════════════════════════════════════════════════
+       8. RIGHT FORM PANEL
+       ══════════════════════════════════════════════════════ */
+    .auth-panel-right {
+      display: flex; align-items: center; justify-content: center;
+      padding: clamp(32px,5vh,64px) clamp(24px,5vw,64px);
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(120,75,255,0.08), transparent 50%),
+        var(--ck-bg);
+      transition: background .25s ease;
+    }
+
+    html[data-theme="light"] .auth-panel-right {
+      background:
+        radial-gradient(ellipse at 80% 10%, rgba(104,68,174,0.05), transparent 50%),
+        var(--ck-bg);
+    }
+
+    .auth-form-card { width: 100%; max-width: 420px; }
+
+    /* ── Logo mark ── */
+    .form-logo {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 28px; text-decoration: none;
+    }
+
+    .form-logo__mark {
+      display: grid; width: 36px; height: 36px; place-items: center;
+      border-radius: 10px;
+      background: conic-gradient(from var(--cta-angle),#ff3cac,#784bff,#26d7f4,#c4ff4d,#ff3cac);
+      animation: spin-grad 4s linear infinite;
+      font-family: "Audiowide",sans-serif; font-size: 14px; color: #fff; font-weight: 700;
+    }
+
+    .form-logo__text {
+      font-family: "Audiowide",sans-serif; font-size: 16px; font-weight: 600;
+      color: var(--ck-text); letter-spacing: -0.02em;
+    }
+
+    /* ── Heading ── */
+    .auth-heading {
+      font-size: clamp(24px,3.5vw,34px);
+      font-family: "Lexend Giga",sans-serif; font-weight: 700;
+      letter-spacing: -0.055em; line-height: 1.12;
+      color: var(--ck-text); margin-bottom: 6px;
+    }
+
+    .auth-sub { color: var(--ck-muted); font-size: 14px; line-height: 1.6; margin-bottom: 26px; }
+
+    /* ── Tabs ── */
+    .auth-tabs {
+      display: flex; gap: 4px; padding: 4px;
+      border-radius: 14px;
+      background: var(--ck-form-surface); border: 1px solid var(--ck-border);
+      margin-bottom: 26px;
+      transition: background .25s, border-color .25s;
+    }
+
+    .auth-tab {
+      flex: 1; min-height: 38px; padding: 0 16px;
+      border: none; border-radius: 11px; background: transparent;
+      color: var(--ck-muted);
+      font-family: "Play",sans-serif; font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, color .2s, box-shadow .2s;
+    }
+
+    .auth-tab.is-active {
+      background: var(--ck-accent-soft); color: var(--ck-link);
+      box-shadow: 0 0 0 1px var(--ck-border-focus) inset;
+    }
+
+    /* ── Auth panels ── */
+    .auth-panel { display: none; }
+    .auth-panel.is-visible { display: block; }
+
+    /* ── Form fields ── */
+    .form-group { position: relative; margin-bottom: 14px; }
+
+    .form-label {
+      display: block; margin-bottom: 6px;
+      color: var(--ck-muted); font-size: 12px; font-weight: 600;
+      letter-spacing: 0.04em; text-transform: uppercase;
+    }
+
+    .form-input {
+      width: 100%; min-height: 48px; padding: 0 44px 0 16px;
+      border: 1px solid var(--ck-border); border-radius: var(--r-md);
+      background: var(--ck-input-bg); color: var(--ck-text);
+      font-family: "Play",sans-serif; font-size: 14px; outline: none;
+      transition: border-color .2s, box-shadow .2s, background .2s;
+    }
+
+    .form-input::placeholder { color: var(--ck-muted); }
+
+    .form-input:focus {
+      border-color: var(--ck-border-focus); background: var(--ck-accent-soft);
+      box-shadow: 0 0 0 3px var(--ck-accent-glow);
+    }
+
+    .form-input.has-error { border-color: var(--ck-error); box-shadow: 0 0 0 3px rgba(255,74,110,0.12); }
+
+    html[data-theme="light"] .form-input.has-error { box-shadow: 0 0 0 3px rgba(165,76,84,0.12); }
+
+    .input-icon-wrap { position: relative; }
+
+    .form-input-icon {
+      position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
+      color: var(--ck-muted); background: none; border: none; padding: 0;
+      display: flex; align-items: center; cursor: pointer;
+      transition: color .18s;
+    }
+    .form-input-icon:hover { color: var(--ck-text); }
+    .form-input-icon svg { width: 18px; height: 18px; }
+
+    .form-error { display: none; margin-top: 5px; color: var(--ck-error); font-size: 12px; }
+
+    /* ── Password strength ── */
+    .strength-bar { display: flex; gap: 4px; margin-top: 8px; }
+    .strength-seg { flex: 1; height: 3px; border-radius: 3px; background: var(--ck-border); transition: background .3s; }
+    .strength-seg.weak   { background: var(--ck-error); }
+    .strength-seg.medium { background: #d9bf71; }
+    .strength-seg.strong { background: var(--ck-success); }
+
+    /* ── Submit CTA (matches hero-cta from index.html) ── */
+    .auth-submit {
+      width: 100%; min-height: 50px; margin-top: 20px; padding: 0 24px;
+      border: 1px solid transparent; border-radius: 999px;
+      background:
+        linear-gradient(rgba(18,15,23,.94), rgba(18,15,23,.94)) padding-box,
+        conic-gradient(from var(--cta-angle),#ff3cac,#784bff,#26d7f4,#c4ff4d,#ffb43b,#ff3cac) border-box;
+      box-shadow: 0 0 24px rgba(139,78,255,.2), inset 0 0 18px rgba(143,94,255,.08);
+      color: #fff;
+      font-family: "Lexend Giga",sans-serif; font-size: 13px; font-weight: 600; letter-spacing: .04em;
+      text-shadow: 0 0 12px rgba(194,156,255,.62);
+      animation: cta-spin 4s linear infinite;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: box-shadow .2s, transform .2s;
+    }
+
+    html[data-theme="light"] .auth-submit {
+      background:
+        linear-gradient(rgba(245,245,248,.96), rgba(245,245,248,.96)) padding-box,
+        conic-gradient(from var(--cta-angle),#ff3cac,#784bff,#26a9d7,#77bd23,#ff9d22,#ff3cac) border-box;
+      color: #202126;
+      text-shadow: 0 0 12px rgba(125,83,219,.35);
+    }
+
+    .auth-submit:hover, .auth-submit:focus-visible {
+      transform: translateY(-2px);
+      box-shadow: 0 0 18px rgba(255,74,177,.34), 0 0 34px rgba(104,97,255,.28);
+      outline: none;
+    }
+    .auth-submit:active { transform: translateY(0); }
+
+    /* ── Divider ── */
+    .auth-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 20px 0; color: var(--ck-muted); font-size: 12px; font-weight: 500;
+    }
+    .auth-divider::before, .auth-divider::after {
+      flex: 1; height: 1px; background: var(--ck-border); content: "";
+    }
+
+    /* ── OAuth buttons ── */
+    .oauth-buttons { display: flex; gap: 10px; }
+
+    .oauth-btn {
+      flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px;
+      border: 1px solid var(--ck-border); border-radius: var(--r-md);
+      background: var(--ck-form-surface); color: var(--ck-text);
+      font-family: "Play",sans-serif; font-size: 13px; font-weight: 600;
+      text-decoration: none; cursor: pointer;
+      transition: border-color .18s, background .18s, box-shadow .18s, transform .18s;
+    }
+    .oauth-btn:hover {
+      border-color: var(--ck-border-hover); background: var(--ck-accent-soft);
+      box-shadow: 0 4px 16px var(--ck-accent-glow); transform: translateY(-1px);
+    }
+    .oauth-btn svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* Google One Tap uses its own UI — hide if user manages auth themselves */
+    #g_id_signin { display: none; }
+
+    /* ── Switch prompt ── */
+    .auth-switch { margin-top: 22px; text-align: center; color: var(--ck-muted); font-size: 13px; }
+    .auth-switch a { color: var(--ck-link); font-weight: 600; text-decoration: none; transition: color .18s; }
+    .auth-switch a:hover { color: var(--ck-accent); }
+
+    /* ── Form row helpers ── */
+    .form-row {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; flex-wrap: wrap; margin-bottom: 2px;
+    }
+    .form-check {
+      display: flex; align-items: center; gap: 8px;
+      color: var(--ck-muted); font-size: 13px; cursor: pointer; user-select: none;
+    }
+    .form-check input { width: 16px; height: 16px; accent-color: var(--ck-accent); cursor: pointer; }
+    .form-link { color: var(--ck-link); font-size: 13px; font-weight: 600; text-decoration: none; transition: color .18s; }
+    .form-link:hover { color: var(--ck-accent); }
+
+    /* ══════════════════════════════════════════════════════
+       9. TOAST
+       ══════════════════════════════════════════════════════ */
+    .toast {
+      position: fixed; bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 20px; border-radius: var(--r-md);
+      border: 1px solid rgba(38,215,244,0.3);
+      background: var(--ck-nav-bg); color: var(--ck-text);
+      font-size: 13px; font-weight: 600;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.32);
+      opacity: 0; z-index: 999;
+      -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .35s ease;
+      white-space: nowrap;
+    }
+    .toast.is-shown { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast--error { border-color: rgba(255,74,110,0.4); }
+    .toast__icon { width: 18px; height: 18px; flex-shrink: 0; }
+
+    /* ══════════════════════════════════════════════════════
+       10. LOADING SPINNER (for OAuth redirect)
+       ══════════════════════════════════════════════════════ */
+    .oauth-spinner {
+      display: none; position: fixed; inset: 0; z-index: 200;
+      align-items: center; justify-content: center; flex-direction: column; gap: 20px;
+      background: rgba(18,15,23,.88);
+      -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+      color: var(--ck-text); font-size: 15px; font-weight: 600;
+    }
+    .oauth-spinner.is-active { display: flex; }
+
+    .spinner-ring {
+      width: 44px; height: 44px; border-radius: 50%;
+      border: 3px solid var(--ck-border);
+      border-top-color: var(--ck-accent);
+      animation: spin-ring .8s linear infinite;
+    }
+    @keyframes spin-ring { to { transform: rotate(360deg); } }
+
+    /* ══════════════════════════════════════════════════════
+       11. RESPONSIVE
+       ══════════════════════════════════════════════════════ */
+    @media (max-width: 760px) {
+      .auth-page { grid-template-columns: 1fr; }
+      .auth-panel-left { display: none; }
+      .auth-panel-right { padding: clamp(28px,6vh,48px) clamp(20px,6vw,32px); }
+    }
+    @media (max-width: 400px) { .oauth-buttons { flex-direction: column; } }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─────────────────────────── NAVBAR ─────────────────────────── -->
+  <nav class="auth-nav" role="navigation" aria-label="Auth navigation">
+    <a class="auth-nav__brand" href="./index.html" aria-label="CodeKaro Home">
+      <span class="auth-nav__brand-dot" aria-hidden="true"></span>
+      CodeKaro
+    </a>
+    <div class="auth-nav__right">
+      <!-- Theme toggle — uses existing theme.js (data-theme-switch) -->
+      <button class="theme-switch theme-switch--compact" data-theme-switch type="button"
+              aria-label="Switch theme" aria-pressed="false">
+        <svg class="theme-switch__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <g class="theme-switch__sun-rays" stroke="currentColor" stroke-linecap="round" stroke-width="1.7">
+            <circle cx="12" cy="12" r="3.7" fill="currentColor" stroke="none"/>
+            <path d="M12 2.5v2M12 19.5v2M4.4 4.4l1.4 1.4m12.4 12.4 1.4 1.4M2.5 12h2m15 0h2M4.4 19.6l1.4-1.4M18.2 5.8l1.4-1.4"/>
+          </g>
+          <g class="theme-switch__moon">
+            <circle cx="12" cy="12" r="7.5" fill="currentColor"/>
+            <circle class="theme-switch__moon-cutout" cx="16" cy="8" r="6"/>
+          </g>
+        </svg>
+        <span class="theme-switch__label" data-theme-label>Dark</span>
+      </button>
+      <a class="back-link" href="./index.html" aria-label="Back to homepage">
+        <svg viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <path d="M12.5 15l-5-5 5-5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Back
+      </a>
+    </div>
+  </nav>
+
+  <!-- ─────────────────────────── MAIN ─────────────────────────── -->
+  <main class="auth-page">
+
+    <!-- LEFT: Illustration -->
+    <section class="auth-panel-left" aria-hidden="true">
+      <div class="code-chips">
+        <span class="chip chip--1">function solve() {</span>
+        <span class="chip chip--2">return result;</span>
+        <span class="chip chip--3">for (int i = 0; …)</span>
+        <span class="chip chip--4">O(n log n) ✓</span>
+        <span class="chip chip--5">class Solution {</span>
+      </div>
+
+      <div class="auth-panel-left__content">
+        <!-- Developer SVG illustration -->
+        <svg class="dev-illustration" viewBox="0 0 340 300" xmlns="http://www.w3.org/2000/svg"
+             role="img" aria-label="Developer coding at a desk">
+          <defs>
+            <radialGradient id="deskGlow" cx="50%" cy="100%" r="60%">
+              <stop offset="0%" stop-color="#784bff" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+            <radialGradient id="screenGlow" cx="50%" cy="50%" r="60%">
+              <stop offset="0%" stop-color="#26d7f4" stop-opacity="0.35"/>
+              <stop offset="100%" stop-color="#784bff" stop-opacity="0.1"/>
+            </radialGradient>
+            <filter id="glow2">
+              <feGaussianBlur stdDeviation="4" result="blur"/>
+              <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+            <linearGradient id="bodyGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#9b72f8"/>
+              <stop offset="100%" stop-color="#6235c8"/>
+            </linearGradient>
+            <linearGradient id="deskGrad2" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#2a2545"/>
+              <stop offset="100%" stop-color="#1a1630"/>
+            </linearGradient>
+          </defs>
+          <ellipse cx="170" cy="280" rx="130" ry="22" fill="url(#deskGlow)" opacity="0.5"/>
+          <rect x="50" y="205" width="240" height="18" rx="4" fill="url(#deskGrad2)"/>
+          <rect x="68" y="220" width="12" height="55" rx="4" fill="#1e1a30"/>
+          <rect x="260" y="220" width="12" height="55" rx="4" fill="#1e1a30"/>
+          <rect x="115" y="178" width="110" height="30" rx="6" fill="#252040"/>
+          <rect x="115" y="176" width="110" height="6" rx="3" fill="#1e1a30"/>
+          <rect x="120" y="110" width="100" height="70" rx="5" fill="#1e1e2e"/>
+          <rect x="120" y="110" width="100" height="70" rx="5" fill="url(#screenGlow)" opacity="0.7"/>
+          <rect x="128" y="122" width="44" height="4" rx="2" fill="#569cd6" opacity="0.9"/>
+          <rect x="128" y="132" width="64" height="3" rx="2" fill="#9cdcfe" opacity="0.75"/>
+          <rect x="128" y="140" width="36" height="3" rx="2" fill="#ce9178" opacity="0.85"/>
+          <rect x="128" y="148" width="56" height="3" rx="2" fill="#4ec9b0" opacity="0.7"/>
+          <rect x="128" y="156" width="48" height="3" rx="2" fill="#dcdcaa" opacity="0.75"/>
+          <rect x="128" y="164" width="32" height="3" rx="2" fill="#6a9955" opacity="0.65"/>
+          <rect x="160" y="164" width="2" height="10" rx="1" fill="#fff" opacity="0.9">
+            <animate attributeName="opacity" values="0.9;0;0.9" dur="1.1s" repeatCount="indefinite"/>
+          </rect>
+          <ellipse cx="170" cy="172" rx="30" ry="14" fill="url(#bodyGrad2)"/>
+          <rect x="142" y="162" width="56" height="30" rx="8" fill="url(#bodyGrad2)"/>
+          <path d="M142 172 Q118 180 120 196" stroke="#9b72f8" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <path d="M198 172 Q222 180 220 196" stroke="#9b72f8" stroke-width="16" stroke-linecap="round" fill="none"/>
+          <ellipse cx="122" cy="198" rx="9" ry="7" fill="#f5c5a3"/>
+          <ellipse cx="218" cy="198" rx="9" ry="7" fill="#f5c5a3"/>
+          <rect x="163" y="138" width="14" height="16" rx="4" fill="#f5c5a3"/>
+          <ellipse cx="170" cy="118" rx="26" ry="26" fill="#f5c5a3"/>
+          <path d="M144 108 Q148 82 170 80 Q192 82 196 108 Q190 94 170 93 Q150 94 144 108Z" fill="#3d2510"/>
+          <rect x="153" y="113" width="13" height="8" rx="3" fill="none" stroke="#c4a882" stroke-width="1.5"/>
+          <rect x="174" y="113" width="13" height="8" rx="3" fill="none" stroke="#c4a882" stroke-width="1.5"/>
+          <line x1="166" y1="117" x2="174" y2="117" stroke="#c4a882" stroke-width="1.2"/>
+          <line x1="150" y1="116" x2="153" y2="116" stroke="#c4a882" stroke-width="1.2"/>
+          <line x1="187" y1="116" x2="190" y2="116" stroke="#c4a882" stroke-width="1.2"/>
+          <ellipse cx="159" cy="117" rx="3.5" ry="3.5" fill="#fff"/>
+          <ellipse cx="180" cy="117" rx="3.5" ry="3.5" fill="#fff"/>
+          <ellipse cx="160" cy="117" rx="2" ry="2" fill="#3d2510"/>
+          <ellipse cx="181" cy="117" rx="2" ry="2" fill="#3d2510"/>
+          <path d="M163 128 Q170 134 177 128" stroke="#c47d5a" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          <rect x="232" y="190" width="18" height="16" rx="3" fill="#4a4070"/>
+          <path d="M250 196 Q258 196 258 202 Q258 208 250 208" stroke="#4a4070" stroke-width="3" fill="none" stroke-linecap="round"/>
+          <path d="M237 189 Q239 184 237 179" stroke="rgba(255,255,255,0.35)" stroke-width="1.5" fill="none" stroke-linecap="round">
+            <animate attributeName="opacity" values="0.35;0.7;0.35" dur="2s" repeatCount="indefinite"/>
+          </path>
+          <path d="M243 188 Q245 182 243 177" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" fill="none" stroke-linecap="round">
+            <animate attributeName="opacity" values="0.25;0.6;0.25" dur="2.4s" repeatCount="indefinite"/>
+          </path>
+          <ellipse cx="170" cy="210" rx="50" ry="6" fill="#26d7f4" opacity="0.06"/>
+          <text x="30" y="90" font-family="monospace" font-size="22" fill="#784bff" opacity="0.55" filter="url(#glow2)">{}</text>
+          <text x="288" y="150" font-family="monospace" font-size="18" fill="#26d7f4" opacity="0.45" filter="url(#glow2)">&lt;/&gt;</text>
+          <text x="24" y="200" font-family="monospace" font-size="14" fill="#c792ea" opacity="0.4">( )</text>
+          <text x="296" y="80" font-family="monospace" font-size="14" fill="#4ec9b0" opacity="0.45">[]</text>
+        </svg>
+
+        <div class="panel-tagline">
+          <h2>Code. Practice. Level up.</h2>
+          <p>Join thousands of developers solving real problems and growing one commit at a time.</p>
+        </div>
+
+        <div class="panel-stats">
+          <div class="stat-pill">
+            <span class="stat-pill__dot" style="background:#26d7f4"></span>500+ Problems
+          </div>
+          <div class="stat-pill">
+            <span class="stat-pill__dot" style="background:#c4ff4d"></span>Java · Python · JS
+          </div>
+          <div class="stat-pill">
+            <span class="stat-pill__dot" style="background:#ff3cac"></span>Free Forever
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT: Form -->
+    <section class="auth-panel-right">
+      <div class="auth-form-card">
+
+        <!-- Logo -->
+        <a class="form-logo" href="./index.html" aria-label="CodeKaro Home">
+          <span class="form-logo__mark" aria-hidden="true">C</span>
+          <span class="form-logo__text">CodeKaro</span>
+        </a>
+
+        <!-- Tab switcher -->
+        <div class="auth-tabs" role="tablist" aria-label="Authentication options">
+          <button id="tab-login" class="auth-tab is-active" role="tab"
+                  aria-selected="true" aria-controls="panel-login"
+                  onclick="switchTab('login')" type="button">Log In</button>
+          <button id="tab-signup" class="auth-tab" role="tab"
+                  aria-selected="false" aria-controls="panel-signup"
+                  onclick="switchTab('signup')" type="button">Sign Up</button>
+        </div>
+
+        <!-- ── LOGIN PANEL ── -->
+        <div id="panel-login" class="auth-panel is-visible" role="tabpanel" aria-labelledby="tab-login">
+          <h1 class="auth-heading">Welcome back</h1>
+          <p class="auth-sub">Sign in to continue your coding journey.</p>
+
+          <form id="login-form" novalidate onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label" for="login-email">Email address or Username</label>
+              <div class="input-icon-wrap">
+                <input id="login-email" class="form-input" type="text"
+                       placeholder="you@example.com or username" autocomplete="username"
+                       aria-required="true" aria-describedby="login-email-err"/>
+                <span class="form-input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M2 8l10 7 10-7" stroke="currentColor" stroke-width="1.6"/></svg>
+                </span>
+              </div>
+              <p id="login-email-err" class="form-error" role="alert"></p>
+            </div>
+
+            <div class="form-group">
+              <div class="form-row">
+                <label class="form-label" for="login-pass" style="margin-bottom:0">Password</label>
+                <a class="form-link" href="#" onclick="showForgot(event)">Forgot password?</a>
+              </div>
+              <div class="input-icon-wrap" style="margin-top:6px">
+                <input id="login-pass" class="form-input" type="password"
+                       placeholder="••••••••" autocomplete="current-password"
+                       aria-required="true" aria-describedby="login-pass-err"/>
+                <button class="form-input-icon" type="button"
+                        onclick="togglePwd('login-pass',this)" aria-label="Toggle password visibility">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M2 12c2.4-5 5.8-7.5 10-7.5s7.6 2.5 10 7.5c-2.4 5-5.8 7.5-10 7.5S4.4 17 2 12Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                </button>
+              </div>
+              <p id="login-pass-err" class="form-error" role="alert"></p>
+            </div>
+
+            <label class="form-check">
+              <input type="checkbox" id="remember-me"> Remember me for 30 days
+            </label>
+
+            <button id="login-submit" class="auth-submit" type="submit">
+              <span>Sign In to CodeKaro</span>
+            </button>
+          </form>
+
+          <div class="auth-divider" aria-hidden="true">or continue with</div>
+
+          <div class="oauth-buttons">
+            <button class="oauth-btn" type="button" id="google-login-btn"
+                    onclick="startGoogleOAuth()" aria-label="Sign in with Google">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Google
+            </button>
+            <button class="oauth-btn" type="button" id="github-login-btn"
+                    onclick="startGitHubOAuth()" aria-label="Sign in with GitHub">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 1.7 2.62 1.21 3.26.93.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.75 1.02.75 2.06V22c0 .29.2.63.76.53A11.1 11.1 0 0 0 12 .9Z"/>
+              </svg>
+              GitHub
+            </button>
+          </div>
+
+          <p class="auth-switch">Don't have an account?
+            <a href="#" onclick="switchTab('signup');return false;">Sign up free</a></p>
+        </div><!-- /panel-login -->
+
+        <!-- ── SIGNUP PANEL ── -->
+        <div id="panel-signup" class="auth-panel" role="tabpanel" aria-labelledby="tab-signup">
+          <h1 class="auth-heading">Create account</h1>
+          <p class="auth-sub">Start your CodeKaro journey today — it's free.</p>
+
+          <form id="signup-form" novalidate onsubmit="handleSignup(event)">
+            <div class="form-group">
+              <label class="form-label" for="signup-name">Full name</label>
+              <div class="input-icon-wrap">
+                <input id="signup-name" class="form-input" type="text"
+                       placeholder="Your Name" autocomplete="name"
+                       aria-required="true" aria-describedby="signup-name-err"/>
+                <span class="form-input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.6"/><path d="M4.8 20c.7-3.3 3.2-5.1 7.2-5.1s6.5 1.8 7.2 5.1" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+                </span>
+              </div>
+              <p id="signup-name-err" class="form-error" role="alert"></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-email">Email address</label>
+              <div class="input-icon-wrap">
+                <input id="signup-email" class="form-input" type="email"
+                       placeholder="you@example.com" autocomplete="email"
+                       aria-required="true" aria-describedby="signup-email-err"/>
+                <span class="form-input-icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" stroke-width="1.6"/><path d="M2 8l10 7 10-7" stroke="currentColor" stroke-width="1.6"/></svg>
+                </span>
+              </div>
+              <p id="signup-email-err" class="form-error" role="alert"></p>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="signup-pass">Password</label>
+              <div class="input-icon-wrap">
+                <input id="signup-pass" class="form-input" type="password"
+                       placeholder="Min. 8 characters" autocomplete="new-password"
+                       aria-required="true" aria-describedby="signup-pass-err"
+                       oninput="updateStrength(this.value)"/>
+                <button class="form-input-icon" type="button"
+                        onclick="togglePwd('signup-pass',this)" aria-label="Toggle password visibility">
+                  <svg viewBox="0 0 24 24" fill="none"><path d="M2 12c2.4-5 5.8-7.5 10-7.5s7.6 2.5 10 7.5c-2.4 5-5.8 7.5-10 7.5S4.4 17 2 12Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/></svg>
+                </button>
+              </div>
+              <div class="strength-bar" role="progressbar" aria-label="Password strength" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0">
+                <span class="strength-seg" id="sseg1"></span>
+                <span class="strength-seg" id="sseg2"></span>
+                <span class="strength-seg" id="sseg3"></span>
+                <span class="strength-seg" id="sseg4"></span>
+              </div>
+              <p id="signup-pass-err" class="form-error" role="alert"></p>
+            </div>
+
+            <label class="form-check" style="margin-bottom:4px">
+              <input type="checkbox" id="signup-terms" aria-required="true">
+              I agree to the
+              <a class="form-link" href="#" style="margin-left:4px">Terms</a>&nbsp;&amp;&nbsp;<a class="form-link" href="#">Privacy Policy</a>
+            </label>
+            <p id="signup-terms-err" class="form-error" role="alert"></p>
+
+            <button id="signup-submit" class="auth-submit" type="submit">
+              <span>Create My Account</span>
+            </button>
+          </form>
+
+          <div class="auth-divider" aria-hidden="true">or sign up with</div>
+
+          <div class="oauth-buttons">
+            <button class="oauth-btn" type="button"
+                    onclick="startGoogleOAuth()" aria-label="Sign up with Google">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+              </svg>
+              Google
+            </button>
+            <button class="oauth-btn" type="button"
+                    onclick="startGitHubOAuth()" aria-label="Sign up with GitHub">
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 1.7 2.62 1.21 3.26.93.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.75 1.02.75 2.06V22c0 .29.2.63.76.53A11.1 11.1 0 0 0 12 .9Z"/>
+              </svg>
+              GitHub
+            </button>
+          </div>
+
+          <p class="auth-switch">Already have an account?
+            <a href="#" onclick="switchTab('login');return false;">Log in</a></p>
+        </div><!-- /panel-signup -->
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Toast notification -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <svg class="toast__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true" id="toast-icon">
+      <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.8"/>
+      <path d="M8 12l3 3 5-5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <span id="toast-msg">Done!</span>
+  </div>
+
+  <!-- OAuth loading overlay -->
+  <div class="oauth-spinner" id="oauth-spinner" role="status" aria-live="polite" aria-label="Connecting to OAuth provider">
+    <div class="spinner-ring"></div>
+    <span id="spinner-msg">Connecting…</span>
+  </div>
+
+  <!-- ─────────────────────── SCRIPTS ─────────────────────── -->
+  <script>
+  /* ═══════════════════════════════════════════════════════════
+     THEME CONTROLLER (Standalone fallback + theme.js sync)
+     ═══════════════════════════════════════════════════════════ */
+  (function initTheme() {
+    function readSavedTheme() {
+      try {
+        const stored = localStorage.getItem("code-karo-theme");
+        if (stored === "light" || stored === "dark") return stored;
+      } catch (e) {}
+      return window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    }
+    function updateThemeUI(t) {
+      document.documentElement.setAttribute("data-theme", t);
+      document.documentElement.style.colorScheme = t;
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.content = t === "dark" ? "#120f17" : "#f1f1f3";
+      document.querySelectorAll("[data-theme-switch]").forEach(btn => {
+        const next = t === "dark" ? "light" : "dark";
+        btn.setAttribute("aria-label", `Switch to ${next} theme`);
+        btn.setAttribute("aria-pressed", String(t === "dark"));
+        btn.title = `Switch to ${next} theme`;
+        const label = btn.querySelector("[data-theme-label]");
+        if (label) label.textContent = t === "dark" ? "Dark" : "Light";
+      });
+    }
+    const currentTheme = readSavedTheme();
+    updateThemeUI(currentTheme);
+
+    document.addEventListener("click", e => {
+      const btn = e.target.closest("[data-theme-switch]");
+      if (!btn) return;
+      const active = document.documentElement.getAttribute("data-theme") || "dark";
+      const next = active === "dark" ? "light" : "dark";
+      try { localStorage.setItem("code-karo-theme", next); } catch (err) {}
+      updateThemeUI(next);
+    });
+  })();
+
+  function getAppUrl(path) {
+    if (window.location.protocol === 'file:') {
+      const clean = path.replace(/^\//, '') || 'index';
+      return './' + (clean.endsWith('.html') ? clean : clean + '.html');
+    }
+    return path;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     ACCOUNT & SESSION STORAGE HELPERS
+     (Synchronized with app.js, problems.js, and profile.html)
+     ═══════════════════════════════════════════════════════════ */
+  function getStoredAccounts() {
+    try {
+      return JSON.parse(localStorage.getItem("oops_accounts") || "{}");
+    } catch {
+      return {};
+    }
+  }
+
+  function saveStoredAccounts(accounts) {
+    try {
+      localStorage.setItem("oops_accounts", JSON.stringify(accounts));
+    } catch (e) {
+      console.warn("Could not save accounts to localStorage", e);
+    }
+  }
+
+  function generateSalt() {
+    const bytes = new Uint8Array(16);
+    if (window.crypto && crypto.getRandomValues) {
+      crypto.getRandomValues(bytes);
+    } else {
+      for (let i = 0; i < 16; i++) bytes[i] = Math.floor(Math.random() * 256);
+    }
+    return Array.from(bytes).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  async function hashPassword(password, salt) {
+    if (window.crypto && crypto.subtle && crypto.subtle.digest) {
+      const enc = new TextEncoder();
+      const data = enc.encode(`${salt}:${password}`);
+      const digest = await crypto.subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(digest)).map(b => b.toString(16).padStart(2, "0")).join("");
+    }
+    let h = 0x811c9dc5;
+    const s = `${salt}:${password}`;
+    for (let i = 0; i < s.length; i++) {
+      h ^= s.charCodeAt(i);
+      h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+    }
+    return (h >>> 0).toString(16);
+  }
+
+  function setAppSession(userObj) {
+    const cleanHandle = (userObj.username || (userObj.email ? userObj.email.split('@')[0] : 'Coder'))
+      .toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+    const session = {
+      id: userObj.id || ("u_" + cleanHandle + "_" + Date.now().toString(36)),
+      username: cleanHandle,
+      name: userObj.name || userObj.username || cleanHandle,
+      email: userObj.email || "",
+      picture: userObj.picture || userObj.avatar || "",
+      avatar: userObj.picture || userObj.avatar || "",
+      provider: userObj.provider || "local",
+      createdAt: userObj.createdAt || Date.now()
+    };
+    try {
+      localStorage.setItem("oops_session", JSON.stringify(session));
+      localStorage.setItem("ck_user", JSON.stringify(session));
+    } catch (e) {
+      console.warn("Could not write session to localStorage", e);
+    }
+    return session;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     OAUTH CONFIGURATION
+     ─────────────────────────────────────────────────────────
+     Fill in these values from your OAuth app consoles:
+
+     Google:  https://console.cloud.google.com/ → APIs & Services → Credentials
+              Add "http://localhost:8000" to Authorised JavaScript origins
+              Add "http://localhost:8000/auth.html" to Authorised redirect URIs
+
+     GitHub:  https://github.com/settings/developers → New OAuth App
+              Homepage URL:      http://localhost:8000
+              Callback URL:      http://localhost:8000/auth.html
+
+     For production, replace localhost URLs with your Render/Vercel domain.
+     ═══════════════════════════════════════════════════════════ */
+  const OAUTH_CONFIG = {
+    google: {
+      clientId: 'YOUR_GOOGLE_CLIENT_ID',           // ← paste your Google Client ID
+      redirectUri: window.location.origin + '/auth.html',
+      scope: 'openid email profile',
+    },
+    github: {
+      clientId: 'YOUR_GITHUB_CLIENT_ID',            // ← paste your GitHub Client ID
+      redirectUri: window.location.origin + '/auth.html',
+      scope: 'read:user user:email',
+    },
+  };
+
+  /* ═══════════════════════════════════════════════════════════
+     GOOGLE OAUTH
+     ═══════════════════════════════════════════════════════════ */
+  function startGoogleOAuth() {
+    const { clientId, redirectUri, scope } = OAUTH_CONFIG.google;
+
+    if (!clientId || clientId === 'YOUR_GOOGLE_CLIENT_ID') {
+      // Demo instant sign-in with simulated Google account
+      showSpinner('Signing in with Google Demo Account…');
+      setTimeout(() => {
+        const demoGoogleUser = {
+          id: 'u_google_demo_' + Math.floor(Math.random() * 1000),
+          username: 'alex_google',
+          name: 'Alex Rivers',
+          email: 'alex.rivers@gmail.com',
+          picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80',
+          provider: 'google'
+        };
+        const accounts = getStoredAccounts();
+        accounts[demoGoogleUser.email] = demoGoogleUser;
+        accounts[demoGoogleUser.username] = demoGoogleUser;
+        saveStoredAccounts(accounts);
+        setAppSession(demoGoogleUser);
+        hideSpinner();
+        showToast('Signed in with Google! Welcome Alex 🎉');
+        setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1000);
+      }, 700);
+      return;
+    }
+
+    showSpinner('Connecting to Google…');
+
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('oauth_state', state);
+    sessionStorage.setItem('oauth_provider', 'google');
+
+    const params = new URLSearchParams({
+      client_id:     clientId,
+      redirect_uri:  redirectUri,
+      response_type: 'token id_token',
+      scope,
+      state,
+      nonce:         crypto.randomUUID(),
+    });
+
+    window.location.href = `https://accounts.google.com/o/oauth2/v2/auth?${params}`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     GITHUB OAUTH
+     ═══════════════════════════════════════════════════════════ */
+  function startGitHubOAuth() {
+    const { clientId, redirectUri, scope } = OAUTH_CONFIG.github;
+
+    if (!clientId || clientId === 'YOUR_GITHUB_CLIENT_ID') {
+      // Demo instant sign-in with simulated GitHub account
+      showSpinner('Signing in with GitHub Demo Account…');
+      setTimeout(() => {
+        const demoGitHubUser = {
+          id: 'u_github_demo_' + Math.floor(Math.random() * 1000),
+          username: 'octocoder',
+          name: 'Dev Sharma',
+          email: 'octocoder@github.com',
+          picture: 'https://avatars.githubusercontent.com/u/9919?v=4',
+          provider: 'github'
+        };
+        const accounts = getStoredAccounts();
+        accounts[demoGitHubUser.email] = demoGitHubUser;
+        accounts[demoGitHubUser.username] = demoGitHubUser;
+        saveStoredAccounts(accounts);
+        setAppSession(demoGitHubUser);
+        hideSpinner();
+        showToast('Signed in with GitHub! Welcome Dev 🎉');
+        setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1000);
+      }, 700);
+      return;
+    }
+
+    showSpinner('Connecting to GitHub…');
+
+    const state = crypto.randomUUID();
+    sessionStorage.setItem('oauth_state', state);
+    sessionStorage.setItem('oauth_provider', 'github');
+
+    const params = new URLSearchParams({
+      client_id:    clientId,
+      redirect_uri: redirectUri,
+      scope,
+      state,
+    });
+
+    window.location.href = `https://github.com/login/oauth/authorize?${params}`;
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     OAUTH CALLBACK HANDLER (runs on redirect back)
+     ═══════════════════════════════════════════════════════════ */
+  function handleOAuthCallback() {
+    const hash   = new URLSearchParams(window.location.hash.slice(1));
+    const search = new URLSearchParams(window.location.search);
+
+    const provider = sessionStorage.getItem('oauth_provider');
+    const savedState = sessionStorage.getItem('oauth_state');
+    sessionStorage.removeItem('oauth_state');
+    sessionStorage.removeItem('oauth_provider');
+
+    /* ── Google implicit: token in hash fragment ── */
+    if (hash.get('access_token') && provider === 'google') {
+      const returnedState = hash.get('state');
+      if (returnedState !== savedState) {
+        showToast('Security verification failed. Please try again.', 'error');
+        return;
+      }
+      const accessToken = hash.get('access_token');
+      history.replaceState(null, '', window.location.pathname);
+
+      showSpinner('Getting your Google profile…');
+      fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + accessToken }
+      })
+      .then(r => r.json())
+      .then(user => {
+        hideSpinner();
+        const userObj = {
+          id: 'u_g_' + (user.sub || Date.now().toString(36)),
+          username: (user.email ? user.email.split('@')[0] : 'user').toLowerCase().replace(/[^a-z0-9_-]/g, '_'),
+          name: user.name || user.given_name || 'Coder',
+          email: user.email,
+          picture: user.picture,
+          provider: 'google',
+          token: accessToken
+        };
+        const accounts = getStoredAccounts();
+        accounts[userObj.email] = userObj;
+        accounts[userObj.username] = userObj;
+        saveStoredAccounts(accounts);
+        setAppSession(userObj);
+        showToast(`Welcome, ${user.given_name || user.name}! 🎉`);
+        setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1200);
+      })
+      .catch(() => {
+        hideSpinner();
+        showToast('Google sign-in failed. Try again.', 'error');
+      });
+      return;
+    }
+
+    /* ── GitHub: code in query string ── */
+    const code  = search.get('code');
+    const state = search.get('state');
+    if (code && provider === 'github') {
+      if (state !== savedState) {
+        showToast('Security verification failed. Please try again.', 'error');
+        return;
+      }
+      history.replaceState(null, '', window.location.pathname);
+
+      showSpinner('Signing in with GitHub…');
+      fetch('/api/github-callback?code=' + encodeURIComponent(code))
+        .then(r => r.json())
+        .then(data => {
+          if (data.error) throw new Error(data.error);
+          hideSpinner();
+          const user = data.user || {};
+          const userObj = {
+            id: 'u_gh_' + (user.id || Date.now().toString(36)),
+            username: (user.login || 'coder').toLowerCase(),
+            name: user.name || user.login || 'Coder',
+            email: user.email || '',
+            picture: user.avatar_url || '',
+            provider: 'github',
+            token: data.access_token
+          };
+          const accounts = getStoredAccounts();
+          if (userObj.email) accounts[userObj.email] = userObj;
+          accounts[userObj.username] = userObj;
+          saveStoredAccounts(accounts);
+          setAppSession(userObj);
+          showToast(`Welcome, ${userObj.name}! 🎉`);
+          setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1200);
+        })
+        .catch(err => {
+          hideSpinner();
+          showToast('GitHub sign-in failed. ' + (err.message || 'Please try again.'), 'error');
+        });
+    }
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TAB SWITCHING
+     ═══════════════════════════════════════════════════════════ */
+  function switchTab(tab) {
+    ['login','signup'].forEach(t => {
+      const btn   = document.getElementById('tab-' + t);
+      const panel = document.getElementById('panel-' + t);
+      const active = t === tab;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', String(active));
+      panel.classList.toggle('is-visible', active);
+    });
+    document.title = tab === 'login' ? 'CodeKaro — Sign In' : 'CodeKaro — Create Account';
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     FORM VALIDATION & HANDLERS
+     ═══════════════════════════════════════════════════════════ */
+  function setErr(id, msg, isHtml = false) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (isHtml) el.innerHTML = msg;
+    else el.textContent = msg;
+    el.style.display = msg ? 'block' : 'none';
+    const grp = el.closest('.form-group');
+    const input = grp && grp.querySelector('input');
+    if (input) input.classList.toggle('has-error', !!msg);
+  }
+
+  function clearErrs(...ids) {
+    ids.forEach(id => setErr(id, ''));
+  }
+
+  function isValidEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+
+  async function handleLogin(e) {
+    e.preventDefault();
+    clearErrs('login-email-err', 'login-pass-err');
+    const identifier = document.getElementById('login-email').value.trim();
+    const pass       = document.getElementById('login-pass').value;
+
+    let ok = true;
+    if (!identifier) {
+      setErr('login-email-err', 'Please enter your email address or username.');
+      ok = false;
+    } else if (identifier.includes('@') && !isValidEmail(identifier)) {
+      setErr('login-email-err', 'Please enter a valid email address.');
+      ok = false;
+    } else if (!identifier.includes('@') && identifier.length < 2) {
+      setErr('login-email-err', 'Username must be at least 2 characters.');
+      ok = false;
+    }
+
+    if (!pass) {
+      setErr('login-pass-err', 'Please enter your password.');
+      ok = false;
+    } else if (pass.length < 4) {
+      setErr('login-pass-err', 'Password must be at least 4 characters.');
+      ok = false;
+    }
+
+    if (!ok) return;
+
+    const btn = document.getElementById('login-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Signing in…</span>';
+
+    try {
+      const accounts = getStoredAccounts();
+      const query = identifier.toLowerCase();
+
+      // Find user by exact key or search across all stored accounts
+      let account = accounts[query];
+      if (!account) {
+        for (const k of Object.keys(accounts)) {
+          const acc = accounts[k];
+          if (
+            (acc.email && acc.email.toLowerCase() === query) ||
+            (acc.username && acc.username.toLowerCase() === query) ||
+            (acc.name && acc.name.toLowerCase() === query)
+          ) {
+            account = acc;
+            break;
+          }
+        }
+      }
+
+      // STRICT USER REQUIREMENT:
+      // Only users who have created an account are allowed to log in!
+      if (!account) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Sign In to CodeKaro</span>';
+        setErr(
+          'login-email-err',
+          'No account found. <a href="#" onclick="switchTab(\'signup\');return false;" style="color:var(--ck-link);text-decoration:underline;font-weight:600">Create an account first →</a>',
+          true
+        );
+        return;
+      }
+
+      // Verify password against stored salt + hash
+      if (account.salt && account.hash) {
+        const testHash = await hashPassword(pass, account.salt);
+        if (testHash !== account.hash) {
+          throw new Error('Incorrect password. Please verify and try again.');
+        }
+      }
+
+      setAppSession(account);
+      btn.disabled = false;
+      btn.innerHTML = '<span>Sign In to CodeKaro</span>';
+      showToast(`Welcome back, ${account.name || account.username}! 🎉`);
+      setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1000);
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Sign In to CodeKaro</span>';
+      setErr('login-pass-err', err.message || 'Authentication failed.');
+    }
+  }
+
+  async function handleSignup(e) {
+    e.preventDefault();
+    clearErrs('signup-name-err','signup-email-err','signup-pass-err','signup-terms-err');
+    const name  = document.getElementById('signup-name').value.trim();
+    const email = document.getElementById('signup-email').value.trim();
+    const pass  = document.getElementById('signup-pass').value;
+    const terms = document.getElementById('signup-terms').checked;
+    let ok = true;
+    if (name.length < 2)       { setErr('signup-name-err',  'Please enter your full name.'); ok = false; }
+    if (!isValidEmail(email))  { setErr('signup-email-err', 'Please enter a valid email.'); ok = false; }
+    if (pass.length < 6)       { setErr('signup-pass-err',  'Password must be at least 6 characters.'); ok = false; }
+    if (!terms)                { setErr('signup-terms-err', 'You must accept the Terms & Privacy Policy.'); ok = false; }
+    if (!ok) return;
+
+    const btn = document.getElementById('signup-submit');
+    btn.disabled = true;
+    btn.innerHTML = '<span>Creating account…</span>';
+
+    try {
+      const accounts = getStoredAccounts();
+      const emailKey = email.toLowerCase();
+      const usernameKey = email.split('@')[0].toLowerCase().replace(/[^a-z0-9_-]/g, '_');
+
+      // Check if user already exists
+      let existing = accounts[emailKey] || accounts[usernameKey];
+      if (!existing) {
+        for (const k of Object.keys(accounts)) {
+          if (accounts[k]?.email?.toLowerCase() === emailKey) {
+            existing = accounts[k];
+            break;
+          }
+        }
+      }
+      if (existing) {
+        btn.disabled = false;
+        btn.innerHTML = '<span>Create My Account</span>';
+        setErr(
+          'signup-email-err',
+          'An account with this email already exists. <a href="#" onclick="switchTab(\'login\');return false;" style="color:var(--ck-link);text-decoration:underline;font-weight:600">Log in here →</a>',
+          true
+        );
+        return;
+      }
+
+      const salt = generateSalt();
+      const hash = await hashPassword(pass, salt);
+      const newUser = {
+        id: "u_" + usernameKey + "_" + Date.now().toString(36),
+        username: usernameKey,
+        name: name,
+        email: email,
+        salt: salt,
+        hash: hash,
+        provider: 'local',
+        createdAt: Date.now()
+      };
+
+      accounts[emailKey] = newUser;
+      accounts[usernameKey] = newUser;
+      saveStoredAccounts(accounts);
+      setAppSession(newUser);
+
+      btn.disabled = false;
+      btn.innerHTML = '<span>Create My Account</span>';
+      showToast('Account created successfully! Welcome to CodeKaro 🎉');
+      setTimeout(() => { window.location.href = getAppUrl('/practice'); }, 1100);
+    } catch (err) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>Create My Account</span>';
+      setErr('signup-email-err', err.message || 'Could not create account.');
+    }
+  }
+
+  /* ── Password visibility ── */
+  function togglePwd(id, btn) {
+    const input = document.getElementById(id);
+    const hide = input.type === 'password';
+    input.type = hide ? 'text' : 'password';
+    btn.setAttribute('aria-label', hide ? 'Hide password' : 'Show password');
+    btn.querySelector('svg').innerHTML = hide
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>`
+      : `<path d="M2 12c2.4-5 5.8-7.5 10-7.5s7.6 2.5 10 7.5c-2.4 5-5.8 7.5-10 7.5S4.4 17 2 12Z" stroke="currentColor" stroke-width="1.6"/><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.6"/>`;
+  }
+
+  /* ── Strength bar ── */
+  function updateStrength(val) {
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const cls = score <= 1 ? 'weak' : score <= 2 ? 'medium' : 'strong';
+    const bar = document.querySelector('.strength-bar');
+    if (bar) bar.setAttribute('aria-valuenow', score);
+    for (let i = 1; i <= 4; i++) {
+      const seg = document.getElementById('sseg' + i);
+      if (seg) { seg.className = 'strength-seg'; if (i <= score) seg.classList.add(cls); }
+    }
+  }
+
+  /* ── Forgot password ── */
+  function showForgot(e) {
+    e.preventDefault();
+    const identifier = document.getElementById('login-email').value.trim();
+    if (!identifier) {
+      setErr('login-email-err', 'Enter your email or username first to reset password.');
+      return;
+    }
+    const accounts = getStoredAccounts();
+    const query = identifier.toLowerCase();
+    let account = accounts[query];
+    if (!account) {
+      for (const k of Object.keys(accounts)) {
+        const acc = accounts[k];
+        if (
+          (acc.email && acc.email.toLowerCase() === query) ||
+          (acc.username && acc.username.toLowerCase() === query)
+        ) {
+          account = acc;
+          break;
+        }
+      }
+    }
+    if (!account) {
+      setErr('login-email-err', 'No account found. <a href="#" onclick="switchTab(\'signup\');return false;" style="color:var(--ck-link);text-decoration:underline;font-weight:600">Create an account first →</a>', true);
+      return;
+    }
+    showToast('Password reset link sent to ' + (account.email || identifier));
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     SPINNER
+     ═══════════════════════════════════════════════════════════ */
+  function showSpinner(msg) {
+    document.getElementById('spinner-msg').textContent = msg || 'Loading…';
+    document.getElementById('oauth-spinner').classList.add('is-active');
+  }
+  function hideSpinner() {
+    document.getElementById('oauth-spinner').classList.remove('is-active');
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     TOAST
+     ═══════════════════════════════════════════════════════════ */
+  let _toastTimer;
+  function showToast(msg, type) {
+    const toast = document.getElementById('toast');
+    const icon  = document.getElementById('toast-icon');
+    document.getElementById('toast-msg').textContent = msg;
+    toast.classList.remove('toast--error');
+    if (type === 'error') {
+      toast.classList.add('toast--error');
+      icon.innerHTML = `<circle cx="12" cy="12" r="9" stroke="#ff4a6e" stroke-width="1.8"/>
+        <path d="M12 8v4m0 4h.01" stroke="#ff4a6e" stroke-width="1.8" stroke-linecap="round"/>`;
+    } else {
+      icon.innerHTML = `<circle cx="12" cy="12" r="9" stroke="#26d7f4" stroke-width="1.8"/>
+        <path d="M8 12l3 3 5-5" stroke="#26d7f4" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>`;
+    }
+    toast.classList.add('is-shown');
+    clearTimeout(_toastTimer);
+    _toastTimer = setTimeout(() => toast.classList.remove('is-shown'), 3800);
+  }
+
+  /* ═══════════════════════════════════════════════════════════
+     INIT — URL param tab + OAuth callback detection
+     ═══════════════════════════════════════════════════════════ */
+  (function init() {
+    // Tab from URL
+    const tab = new URLSearchParams(location.search).get('auth');
+    if (tab === 'signup') switchTab('signup');
+
+    // OAuth callback
+    const hasHash   = window.location.hash.includes('access_token');
+    const hasCode   = new URLSearchParams(window.location.search).has('code');
+    const hasError  = new URLSearchParams(window.location.search).has('error');
+
+    if (hasError) {
+      const err = new URLSearchParams(window.location.search).get('error_description') || 'OAuth was cancelled.';
+      history.replaceState(null, '', window.location.pathname);
+      showToast(err, 'error');
+    } else if (hasHash || hasCode) {
+      handleOAuthCallback();
+    }
+  })();
+  </script>
+</body>
+</html>
