@@ -5,16 +5,6 @@
    and clean 24px hairline team cards.
    ========================================================================== */
 
-/* Scope nav-island expansion on About page so all 4 links fit cleanly */
-.nav-island:hover,
-.nav-island:focus-within {
-  width: min(390px, calc(100vw - 76px));
-}
-
-.nav-island:hover .nav-island__links,
-.nav-island:focus-within .nav-island__links {
-  max-width: 280px;
-}
 
 /* ==========================================================================
    Hero Section

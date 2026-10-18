@@ -18,28 +18,6 @@
           link.removeAttribute("aria-current");
         }
       });
-
-      const prevMax = linksContainer.style.maxWidth;
-      const prevVis = linksContainer.style.visibility;
-      linksContainer.style.maxWidth = "none";
-      linksContainer.style.visibility = "hidden";
-
-      const gap = parseFloat(window.getComputedStyle(linksContainer).gap) || 4;
-      let totalLinksWidth = 0;
-      links.forEach((link, index) => {
-        totalLinksWidth += link.getBoundingClientRect().width;
-        if (index > 0) totalLinksWidth += gap;
-      });
-      totalLinksWidth = Math.ceil(totalLinksWidth);
-
-      linksContainer.style.maxWidth = prevMax;
-      linksContainer.style.visibility = prevVis;
-
-      const brandWidth = Math.ceil(brand.getBoundingClientRect().width) || 104;
-      const totalPillWidth = brandWidth + totalLinksWidth + 12;
-
-      nav.style.setProperty("--island-links-width", `${totalLinksWidth}px`);
-      nav.style.setProperty("--island-expanded-width", `${totalPillWidth}px`);
     });
   }
 
@@ -47,11 +25,6 @@
     document.addEventListener("DOMContentLoaded", updateNav);
   } else {
     updateNav();
-  }
-  window.addEventListener("resize", updateNav);
-  window.addEventListener("load", updateNav);
-  if (document.fonts) {
-    document.fonts.ready.then(updateNav);
   }
 })();
 
