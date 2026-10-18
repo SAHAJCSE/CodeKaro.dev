@@ -1399,8 +1399,14 @@
 
     try {
       const resp = await fetch("/api/problems");
-      if (!resp.ok) throw new Error(`HTTP error ${resp.status}`);
-      const data = await resp.json();
+      const text = await resp.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(resp.ok ? "Server sent non-JSON response." : `Server error (${resp.status}): ${text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 80)}`);
+      }
+      if (!resp.ok) throw new Error(data.error || `HTTP error ${resp.status}`);
 
       allProblems = data.problems || [];
       serverPaths = data.paths || [];

@@ -84,49 +84,53 @@ class handler(BaseHTTPRequestHandler):
         return payload
 
     def do_GET(self):
-        path = self.get_effective_path()
-        if path in ("", "/api"):
-            self.send_json(200, {
-                "status": "ok",
-                "app": "Code-Karo.dev API",
-                "problems_count": len(PROBLEMS)
-            })
-            return
-
-        if path == "/api/problems":
-            problem_list = [
-                {
-                    "id": p["id"],
-                    "display_number": p.get("display_number", 0),
-                    "display_id": p.get("display_id", f"{p.get('display_number', 0):02d}"),
-                    "title": p["title"],
-                    "summary": p.get("summary", ""),
-                    "difficulty": p.get("difficulty", "Easy"),
-                    "topics": p.get("topics", []),
-                    "languages": p.get("languages", ["Java"]),
-                    "path_id": p.get("path_id", "java-basics"),
-                    "path_name": p.get("path_name", "Java Basics"),
-                    "order_in_path": p.get("order_in_path", 1),
-                    "collection_ids": p.get("collection_ids", []),
-                    "review_needed": p.get("review_needed", False),
-                }
-                for p in sorted(PROBLEMS.values(), key=lambda x: x.get("display_number", 0))
-            ]
-            self.send_json(200, {
-                "problems": problem_list,
-                "paths": PATHS,
-                "collections": COLLECTIONS,
-                "status": "ok"
-            })
-            return
-
-        if path.startswith("/api/problems/"):
-            problem_id = path[len("/api/problems/"):]
-            problem = PROBLEMS.get(problem_id)
-            if problem is None:
-                self.send_json(404, {"error": f"Problem '{problem_id}' not found."})
+        try:
+            path = self.get_effective_path()
+            if path in ("", "/api"):
+                self.send_json(200, {
+                    "status": "ok",
+                    "app": "Code-Karo.dev API",
+                    "problems_count": len(PROBLEMS)
+                })
                 return
-            self.send_json(200, problem)
+
+            if path == "/api/problems":
+                problem_list = [
+                    {
+                        "id": p["id"],
+                        "display_number": p.get("display_number", 0),
+                        "display_id": p.get("display_id", f"{p.get('display_number', 0):02d}"),
+                        "title": p.get("title", p["id"]),
+                        "summary": p.get("summary", ""),
+                        "difficulty": p.get("difficulty", "Easy"),
+                        "topics": p.get("topics", []),
+                        "languages": p.get("languages", ["Java"]),
+                        "path_id": p.get("path_id", "java-basics"),
+                        "path_name": p.get("path_name", "Java Basics"),
+                        "order_in_path": p.get("order_in_path", 1),
+                        "collection_ids": p.get("collection_ids", []),
+                        "review_needed": p.get("review_needed", False),
+                    }
+                    for p in sorted(PROBLEMS.values(), key=lambda x: x.get("display_number", 0))
+                ]
+                self.send_json(200, {
+                    "problems": problem_list,
+                    "paths": PATHS,
+                    "collections": COLLECTIONS,
+                    "status": "ok"
+                })
+                return
+
+            if path.startswith("/api/problems/"):
+                problem_id = path[len("/api/problems/"):]
+                problem = PROBLEMS.get(problem_id)
+                if problem is None:
+                    self.send_json(404, {"error": f"Problem '{problem_id}' not found."})
+                    return
+                self.send_json(200, problem)
+                return
+        except Exception as err:
+            self.send_json(500, {"error": str(err), "status": "error"})
             return
 
         # Fallback static file serving if a static request reaches the serverless function

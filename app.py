@@ -31,11 +31,35 @@ def get_problems_meta():
 
 
 def get_problem(problem_id):
-    if not PROBLEM_ID.fullmatch(problem_id) or problem_id not in get_problem_ids():
+    if not PROBLEM_ID.fullmatch(problem_id):
         return None
 
+    meta = get_problems_meta().get(problem_id, {})
     problem_dir = PROBLEMS / problem_id
-    readme = (problem_dir / "README.md").read_text(encoding="utf-8")
+
+    readme = ""
+    solution = ""
+    if (problem_dir / "README.md").is_file():
+        try:
+            readme = (problem_dir / "README.md").read_text(encoding="utf-8")
+        except Exception:
+            readme = ""
+    if (problem_dir / "Solution.java").is_file():
+        try:
+            solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
+        except Exception:
+            solution = ""
+
+    # Fallback to pre-bundled data if available
+    if not readme or not solution:
+        try:
+            from api.problems_data import PROBLEMS as BUNDLED
+            bundled = BUNDLED.get(problem_id)
+            if bundled:
+                return bundled
+        except Exception:
+            pass
+
     title = next(
         (line[2:].strip() for line in readme.splitlines() if line.startswith("# ")),
         problem_id.replace("-", " ").title(),
@@ -46,14 +70,24 @@ def get_problem(problem_id):
             for line in readme.splitlines()
             if line.strip() and not line.startswith("#") and not line.startswith("*Source:")
         ),
-        "",
+        meta.get("summary", ""),
     )
-    solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
     reference_path = ROOT / "reference" / problem_id / "Solution.java"
-    reference_solution = reference_path.read_text(encoding="utf-8") if reference_path.is_file() else ""
+    reference_solution = ""
+    if reference_path.is_file():
+        try:
+            reference_solution = reference_path.read_text(encoding="utf-8")
+        except Exception:
+            reference_solution = ""
+
     starter_path = ROOT / "starters" / problem_id / "Solution.java"
-    starter_solution = starter_path.read_text(encoding="utf-8") if starter_path.is_file() else solution
-    meta = get_problems_meta().get(problem_id, {})
+    starter_solution = solution
+    if starter_path.is_file():
+        try:
+            starter_solution = starter_path.read_text(encoding="utf-8")
+        except Exception:
+            starter_solution = solution
+
     return {
         "id": problem_id,
         "display_number": meta.get("display_number", 0),
@@ -122,41 +156,47 @@ class AppHandler(BaseHTTPRequestHandler):
         return payload
 
     def do_GET(self):
-        path = unquote(urlparse(self.path).path).rstrip("/")
+        try:
+            path = unquote(urlparse(self.path).path).rstrip("/")
 
-        if path in ("/health", "/api/health"):
-            self.send_json(200, {"status": "ok"})
-            return
+            if path in ("/health", "/api/health"):
+                self.send_json(200, {"status": "ok"})
+                return
 
-        if path == "/api/problems":
-            meta_all = get_problems_meta()
-            problems = []
-            for problem_id in get_problem_ids():
-                problem = get_problem(problem_id)
-                m = meta_all.get(problem_id, {})
-                problems.append({
-                    "id": problem["id"],
-                    "display_number": m.get("display_number", 0),
-                    "display_id": m.get("id", "00"),
-                    "title": problem["title"],
-                    "summary": problem["summary"],
-                    "difficulty": m.get("difficulty", "Easy"),
-                    "topics": m.get("topics", []),
-                    "languages": m.get("languages", ["Java"]),
-                    "path_id": m.get("path_id", "java-basics"),
-                    "path_name": m.get("path_name", "Java Basics"),
-                    "order_in_path": m.get("order_in_path", 1),
-                    "collection_ids": m.get("collection_ids", []),
-                    "review_needed": m.get("review_needed", False),
+            if path == "/api/problems":
+                meta_all = get_problems_meta()
+                problems = []
+                for problem_id in get_problem_ids():
+                    problem = get_problem(problem_id)
+                    if not problem:
+                        continue
+                    m = meta_all.get(problem_id, {})
+                    problems.append({
+                        "id": problem["id"],
+                        "display_number": m.get("display_number", problem.get("display_number", 0)),
+                        "display_id": m.get("id", problem.get("display_id", "00")),
+                        "title": problem.get("title", problem_id),
+                        "summary": problem.get("summary", ""),
+                        "difficulty": m.get("difficulty", problem.get("difficulty", "Easy")),
+                        "topics": m.get("topics", problem.get("topics", [])),
+                        "languages": m.get("languages", problem.get("languages", ["Java"])),
+                        "path_id": m.get("path_id", problem.get("path_id", "java-basics")),
+                        "path_name": m.get("path_name", problem.get("path_name", "Java Basics")),
+                        "order_in_path": m.get("order_in_path", problem.get("order_in_path", 1)),
+                        "collection_ids": m.get("collection_ids", problem.get("collection_ids", [])),
+                        "review_needed": m.get("review_needed", problem.get("review_needed", False)),
+                    })
+                paths_data = meta_all.get("_paths", [])
+                collections_data = meta_all.get("_collections", [])
+                self.send_json(200, {
+                    "problems": problems,
+                    "paths": paths_data,
+                    "collections": collections_data,
+                    "status": "ok"
                 })
-            paths_data = meta_all.get("_paths", [])
-            collections_data = meta_all.get("_collections", [])
-            self.send_json(200, {
-                "problems": problems,
-                "paths": paths_data,
-                "collections": collections_data,
-                "status": "ok"
-            })
+                return
+        except Exception as error:
+            self.send_json(500, {"error": str(error), "status": "error"})
             return
 
         match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)

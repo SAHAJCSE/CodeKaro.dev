@@ -501,7 +501,14 @@ let currentFontSize = parseInt(localStorage.getItem("oops_font_size") || "14", 1
 
 async function requestJson(url, options) {
   const response = await fetch(url, options);
-  const result = await response.json();
+  const text = await response.text();
+  let result;
+  try {
+    result = JSON.parse(text);
+  } catch {
+    const cleanSnippet = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
+    throw new Error(response.ok ? "Server sent non-JSON response." : `Server error (${response.status}): ${cleanSnippet || "Unknown error"}`);
+  }
   if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
   return result;
 }
