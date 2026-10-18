@@ -872,9 +872,11 @@
     :root[data-theme="light"] .site-footer__brand { color: #202126; }
 
     .community-avatars {
-      display: grid;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
       min-height: 150px;
-      place-items: center;
       padding: 26px 24px;
       background: #101014;
     }
@@ -884,32 +886,121 @@
     .community-avatars__list {
       display: flex;
       align-items: center;
-      gap: 16px;
+      justify-content: center;
     }
 
     .community-avatar {
       position: relative;
       display: grid;
-      width: 60px;
-      height: 60px;
+      width: 72px;
+      height: 72px;
+      flex-shrink: 0;
       overflow: hidden;
       place-items: center;
       border: 2px solid #101014;
       border-radius: 50%;
-      background: linear-gradient(145deg, #dcd0ff, #8b69d3);
-      color: #211535;
-      font-size: 15px;
-      font-weight: 700;
+      background: linear-gradient(145deg, #1e3a8a, #2563eb);
+      color: #ffffff;
+      text-decoration: none;
+      transition: transform 150ms ease;
     }
 
     :root[data-theme="light"] .community-avatar {
       border-color: #f0f0f2;
-      color: #353640;
     }
 
-    .community-avatar:nth-child(2) { background: linear-gradient(145deg, #ffd1a8, #ed7599); }
-    .community-avatar:nth-child(3) { background: linear-gradient(145deg, #a8e8dc, #5585c9); }
-    .community-avatar:nth-child(4) { background: linear-gradient(145deg, #ffe58e, #ef8a45); }
+    .community-avatar:not(:first-child) {
+      margin-left: -18px;
+    }
+
+    .community-avatar:nth-child(1) { background: linear-gradient(145deg, #1e3a8a, #2563eb, #06b6d4); z-index: 1; }
+    .community-avatar:nth-child(2) { background: linear-gradient(145deg, #4c1d95, #7c3aed, #ec4899); z-index: 2; }
+    .community-avatar:nth-child(3) { background: linear-gradient(145deg, #064e3b, #059669, #14b8a6); z-index: 3; }
+    .community-avatar:nth-child(4) { background: linear-gradient(145deg, #7c2d12, #ea580c, #f59e0b); z-index: 4; }
+
+    .community-avatar__initial {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .community-avatar__img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      display: block;
+      z-index: 2;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+      .community-avatar:hover {
+        transform: scale(1.04);
+        z-index: 5;
+      }
+    }
+
+    .community-avatar:focus-visible {
+      outline: 2px solid #aeb3bf;
+      outline-offset: 3px;
+      z-index: 6;
+      transform: scale(1.04);
+    }
+
+    :root[data-theme="light"] .community-avatar:focus-visible {
+      outline-color: #353640;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .community-avatar {
+        transition: none;
+      }
+      .community-avatar:hover,
+      .community-avatar:focus-visible {
+        transform: none;
+      }
+    }
+
+    .community-avatars__caption {
+      margin: 16px 0 0;
+      font-family: inherit;
+      font-size: 14px;
+      color: #9a9ca6;
+      text-align: center;
+      line-height: 1.5;
+    }
+
+    :root[data-theme="light"] .community-avatars__caption {
+      color: #696b74;
+    }
+
+    .community-avatars__link {
+      color: #e4e4e8;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-weight: 500;
+      transition: color .15s ease;
+    }
+
+    .community-avatars__link:hover {
+      color: #ffffff;
+    }
+
+    :root[data-theme="light"] .community-avatars__link {
+      color: #202126;
+    }
+
+    :root[data-theme="light"] .community-avatars__link:hover {
+      color: #000000;
+    }
 
     .footer-follow-eyes {
       position: absolute;
@@ -1064,10 +1155,6 @@
         bottom: 24px;
         font-size: clamp(22px, 7.5vw, 48px);
       }
-
-      .community-avatars { min-height: 128px; }
-      .community-avatars__list { gap: 12px; }
-      .community-avatar { width: 56px; height: 56px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -1168,16 +1255,86 @@
       <li class="tech-tags__item">Problem Solving</li>
     </ul>
   </section>
-  <section class="community-avatars" aria-label="Code-Karo.dev community">
-    <div class="community-avatars__list">
-      <span class="community-avatar" role="img" aria-label="Member 1: S">
-        <span aria-hidden="true">S</span>
-      </span>
-      <span class="community-avatar" role="img" aria-label="Member 2: S"><span aria-hidden="true">S</span></span>
-      <span class="community-avatar" role="img" aria-label="Member 3: R"><span aria-hidden="true">R</span></span>
-      <span class="community-avatar" role="img" aria-label="Member 4: D"><span aria-hidden="true">D</span></span>
+  <section class="community-avatars" aria-label="Code-Karo.dev team">
+    <div class="community-avatars__list" id="community-avatars-list">
+      <!-- Fallback avatars in team order: Rajeev, Shubham, Duwarka, Sahaj -->
+      <a class="community-avatar" href="/about#team" aria-label="Rajeev Ranjan, team member">
+        <span class="community-avatar__initial" aria-hidden="true">R</span>
+        <img class="community-avatar__img" src="/assets/team/rajeev.jpg" alt="" width="72" height="72" loading="lazy">
+      </a>
+      <a class="community-avatar" href="/about#team" aria-label="Shubham Thakur, team member">
+        <span class="community-avatar__initial" aria-hidden="true">S</span>
+        <img class="community-avatar__img" src="/assets/team/shubham.jpg" alt="" width="72" height="72" loading="lazy">
+      </a>
+      <a class="community-avatar" href="/about#team" aria-label="Duwarka Gupta, team member">
+        <span class="community-avatar__initial" aria-hidden="true">D</span>
+        <img class="community-avatar__img" src="/assets/team/duwarka.jpg" alt="" width="72" height="72" loading="lazy">
+      </a>
+      <a class="community-avatar" href="/about#team" aria-label="Sahaj, team member">
+        <span class="community-avatar__initial" aria-hidden="true">S</span>
+        <img class="community-avatar__img" src="/assets/team/sahaj.jpg" alt="" width="72" height="72" loading="lazy">
+      </a>
     </div>
+    <p class="community-avatars__caption">Built by Rajeev, Shubham, Duwarka and Sahaj · <a href="/about#team" class="community-avatars__link">Meet the team</a></p>
   </section>
+  <script>
+    (() => {
+      async function loadTeamAvatars() {
+        const list = document.getElementById("community-avatars-list");
+        if (!list) return;
+        try {
+          const res = await fetch("/team.json");
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          const members = await res.json();
+          if (!Array.isArray(members) || members.length === 0) return;
+
+          list.replaceChildren();
+          members.forEach(member => {
+            const link = document.createElement("a");
+            link.className = "community-avatar";
+            link.href = "/about#team";
+            link.setAttribute("aria-label", `${member.name}, team member`);
+            if (member.gradient) {
+              link.style.background = member.gradient;
+            }
+
+            const initial = document.createElement("span");
+            initial.className = "community-avatar__initial";
+            initial.setAttribute("aria-hidden", "true");
+            initial.textContent = member.name.trim().charAt(0).toUpperCase();
+            link.appendChild(initial);
+
+            if (member.image) {
+              const img = document.createElement("img");
+              img.className = "community-avatar__img";
+              img.src = member.image;
+              img.alt = "";
+              img.width = 72;
+              img.height = 72;
+              img.loading = "lazy";
+              img.onerror = function() {
+                this.style.display = "none";
+              };
+              img.addEventListener("error", () => {
+                img.style.display = "none";
+              });
+              link.appendChild(img);
+            }
+
+            list.appendChild(link);
+          });
+        } catch (e) {
+          console.warn("Could not load team avatars:", e);
+        }
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", loadTeamAvatars);
+      } else {
+        loadTeamAvatars();
+      }
+    })();
+  </script>
   <footer class="site-footer" aria-label="Code-Karo.dev footer">
     <img class="site-footer__art" src="/footer-gradient.jpg" alt="" aria-hidden="true">
     <div class="footer-jobs">
