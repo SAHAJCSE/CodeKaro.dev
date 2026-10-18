@@ -153,111 +153,109 @@ html[data-theme-reveal]::view-transition-new(root) {
   --token-type: #4ec9b0;
 }
 
-/* 1. One Dark Pro (Classic & Balanced Dark) */
-[data-theme="one-dark-pro"],
-[data-editor-theme="one-dark-pro"] {
-  --editor-bg: #282c34;
-  --editor-fg: #abb2bf;
-  --editor-line-number: #4b5263;
-  --editor-line-highlight: #2c313c;
-  --editor-selection: #3e4451;
-  --editor-cursor: #528bff;
-  --editor-border: #1e2227;
+/* 1. Night Owl (Italic) */
+[data-theme="night-owl"],
+[data-editor-theme="night-owl"] {
+  --editor-bg: #011627;
+  --editor-fg: #d6deeb;
+  --editor-line-number: #4b6479;
+  --editor-line-highlight: #082138;
+  --editor-selection: #1d3b53;
+  --editor-cursor: #7e57c2;
+  --editor-border: #0b253a;
 
-  --token-keyword: #c678dd;
-  --token-string: #98c379;
-  --token-function: #61afef;
-  --token-variable: #e06c75;
+  --token-keyword: #ecc48d;
+  --token-string: #addb67;
+  --token-function: #21c7a8;
+  --token-variable: #7fdbca;
+  --token-comment: #637777;
+  --token-number: #f78c6c;
+  --token-operator: #c792ea;
+  --token-type: #ffcb8b;
+}
+
+/* 2. Material Theme Darker / High Contrast */
+[data-theme="material-darker"],
+[data-editor-theme="material-darker"] {
+  --editor-bg: #0f0f0f;
+  --editor-fg: #eeffff;
+  --editor-line-number: #424242;
+  --editor-line-highlight: #1a1a1a;
+  --editor-selection: #2b2b2b;
+  --editor-cursor: #00e5ff;
+  --editor-border: #1e1e1e;
+
+  --token-keyword: #ff5370;
+  --token-string: #c3e88d;
+  --token-function: #00e5ff;
+  --token-variable: #eeffff;
+  --token-comment: #545454;
+  --token-number: #f78c6c;
+  --token-operator: #89ddff;
+  --token-type: #ffcb6b;
+}
+
+/* 3. Aura Dark Theme */
+[data-theme="aura-dark"],
+[data-editor-theme="aura-dark"] {
+  --editor-bg: #15141b;
+  --editor-fg: #edecee;
+  --editor-line-number: #4d4669;
+  --editor-line-highlight: #201e2a;
+  --editor-selection: #37324d;
+  --editor-cursor: #a277ff;
+  --editor-border: #252233;
+
+  --token-keyword: #ff679a;
+  --token-string: #a277ff;
+  --token-function: #61ffca;
+  --token-variable: #ffca85;
+  --token-comment: #6d6d8c;
+  --token-number: #ffca85;
+  --token-operator: #edecee;
+  --token-type: #82e2ff;
+}
+
+/* 4. Andromeda */
+[data-theme="andromeda"],
+[data-editor-theme="andromeda"] {
+  --editor-bg: #1e222a;
+  --editor-fg: #d5cec8;
+  --editor-line-number: #4e5666;
+  --editor-line-highlight: #262b35;
+  --editor-selection: #363d4d;
+  --editor-cursor: #00e8c6;
+  --editor-border: #2a303c;
+
+  --token-keyword: #ff4a6e;
+  --token-string: #f39c12;
+  --token-function: #98e024;
+  --token-variable: #d5cec8;
   --token-comment: #5c6370;
-  --token-number: #d19a66;
-  --token-operator: #56b6c2;
-  --token-type: #e5c07b;
+  --token-number: #ff9e64;
+  --token-operator: #00e8c6;
+  --token-type: #ffe66d;
 }
 
-/* 2. Dracula Official (Vibrant High-Contrast Purple) */
-[data-theme="dracula"],
-[data-editor-theme="dracula"] {
-  --editor-bg: #282a36;
-  --editor-fg: #f8f8f2;
-  --editor-line-number: #6272a4;
-  --editor-line-highlight: #44475a;
-  --editor-selection: #44475a;
-  --editor-cursor: #f8f8f2;
-  --editor-border: #191a21;
-
-  --token-keyword: #ff79c6;
-  --token-string: #f1fa8c;
-  --token-function: #50fa7b;
-  --token-variable: #8be9fd;
-  --token-comment: #6272a4;
-  --token-number: #bd93f9;
-  --token-operator: #ff79c6;
-  --token-type: #8be9fd;
-}
-
-/* 3. Tokyo Night (Sleek Cyberpunk/Neon Dark) */
-[data-theme="tokyo-night"],
-[data-editor-theme="tokyo-night"] {
+/* 5. Tokyo Night Storm */
+[data-theme="tokyo-night-storm"],
+[data-editor-theme="tokyo-night-storm"] {
   --editor-bg: #1a1b26;
-  --editor-fg: #a9b1d6;
-  --editor-line-number: #363b54;
-  --editor-line-highlight: #292e42;
-  --editor-selection: #33467c;
+  --editor-fg: #c0caf5;
+  --editor-line-number: #3b4261;
+  --editor-line-highlight: #24283b;
+  --editor-selection: #2e3c64;
   --editor-cursor: #c0caf5;
-  --editor-border: #10101a;
+  --editor-border: #1f2335;
 
   --token-keyword: #bb9af7;
   --token-string: #9ece6a;
-  --token-function: #7aa2f7;
-  --token-variable: #f7768e;
+  --token-function: #7dcfff;
+  --token-variable: #c0caf5;
   --token-comment: #565f89;
   --token-number: #ff9e64;
   --token-operator: #89ddff;
-  --token-type: #2ac3de;
-}
-
-/* 4. Catppuccin Mocha (Soothing Pastel Dark) */
-[data-theme="catppuccin-mocha"],
-[data-editor-theme="catppuccin-mocha"] {
-  --editor-bg: #1e1e2e;
-  --editor-fg: #cdd6f4;
-  --editor-line-number: #6c7086;
-  --editor-line-highlight: #313244;
-  --editor-selection: #45475a;
-  --editor-cursor: #f5e0dc;
-  --editor-border: #181825;
-
-  --token-keyword: #cba6f7;
-  --token-string: #a6e3a1;
-  --token-function: #89b4fa;
-  --token-variable: #f38ba8;
-  --token-comment: #6c7086;
-  --token-number: #fab387;
-  --token-operator: #94e2d5;
-  --token-type: #f9e2af;
-}
-
-/* 5. GitHub Light Default (Clean & High-Readability Light Mode) */
-[data-theme="github-light"],
-[data-theme="github-light-default"],
-[data-editor-theme="github-light"],
-[data-editor-theme="github-light-default"] {
-  --editor-bg: #ffffff;
-  --editor-fg: #24292f;
-  --editor-line-number: #8c959f;
-  --editor-line-highlight: #f6f8fa;
-  --editor-selection: #b6e3ff;
-  --editor-cursor: #0969da;
-  --editor-border: #d0d7de;
-
-  --token-keyword: #cf222e;
-  --token-string: #0a3069;
-  --token-function: #8250df;
-  --token-variable: #953800;
-  --token-comment: #6e7781;
-  --token-number: #0550ae;
-  --token-operator: #0550ae;
-  --token-type: #116329;
+  --token-type: #e0af68;
 }
 
 /* Token Highlighting Utility Classes */

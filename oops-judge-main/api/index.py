@@ -6,12 +6,14 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, unquote, urlparse
 
 try:
-    from api.problems_data import PROBLEMS
+    from api.problems_data import PROBLEMS, PATHS, COLLECTIONS
 except ImportError:
     try:
-        from problems_data import PROBLEMS
+        from problems_data import PROBLEMS, PATHS, COLLECTIONS
     except ImportError:
         PROBLEMS = {}
+        PATHS = []
+        COLLECTIONS = []
 
 MAX_REQUEST_BYTES = 1_000_000
 
@@ -95,14 +97,27 @@ class handler(BaseHTTPRequestHandler):
             problem_list = [
                 {
                     "id": p["id"],
+                    "display_number": p.get("display_number", 0),
+                    "display_id": p.get("display_id", f"{p.get('display_number', 0):02d}"),
                     "title": p["title"],
-                    "summary": p["summary"],
+                    "summary": p.get("summary", ""),
                     "difficulty": p.get("difficulty", "Easy"),
                     "topics": p.get("topics", []),
+                    "languages": p.get("languages", ["Java"]),
+                    "path_id": p.get("path_id", "java-basics"),
+                    "path_name": p.get("path_name", "Java Basics"),
+                    "order_in_path": p.get("order_in_path", 1),
+                    "collection_ids": p.get("collection_ids", []),
+                    "review_needed": p.get("review_needed", False),
                 }
-                for p in sorted(PROBLEMS.values(), key=lambda x: x["id"])
+                for p in sorted(PROBLEMS.values(), key=lambda x: x.get("display_number", 0))
             ]
-            self.send_json(200, {"problems": problem_list})
+            self.send_json(200, {
+                "problems": problem_list,
+                "paths": PATHS,
+                "collections": COLLECTIONS,
+                "status": "ok"
+            })
             return
 
         if path.startswith("/api/problems/"):
@@ -120,10 +135,21 @@ class handler(BaseHTTPRequestHandler):
             clean = clean[4:]
         if clean.startswith("public/"):
             clean = clean[7:]
-        if clean in ("", "index.html", "app.css", "app.js", "config.js"):
+        if clean in ("", "index.html", "problems", "problems.html", "problems.css", "problems.js", "practice", "practice.html", "profile", "profile.html", "app.css", "app.js", "config.js"):
             file_name = clean or "index.html"
+            if file_name == "problems":
+                file_name = "problems.html"
+            elif file_name == "practice":
+                file_name = "practice.html"
+            elif file_name == "profile":
+                file_name = "profile.html"
             content_types = {
                 "index.html": "text/html; charset=utf-8",
+                "problems.html": "text/html; charset=utf-8",
+                "problems.css": "text/css; charset=utf-8",
+                "problems.js": "application/javascript; charset=utf-8",
+                "practice.html": "text/html; charset=utf-8",
+                "profile.html": "text/html; charset=utf-8",
                 "app.css": "text/css; charset=utf-8",
                 "app.js": "application/javascript; charset=utf-8",
                 "config.js": "application/javascript; charset=utf-8",

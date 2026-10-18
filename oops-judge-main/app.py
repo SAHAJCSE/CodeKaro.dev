@@ -56,6 +56,8 @@ def get_problem(problem_id):
     meta = get_problems_meta().get(problem_id, {})
     return {
         "id": problem_id,
+        "display_number": meta.get("display_number", 0),
+        "display_id": meta.get("id", "00"),
         "title": title,
         "summary": summary,
         "readme": readme,
@@ -64,6 +66,12 @@ def get_problem(problem_id):
         "reference": reference_solution,
         "difficulty": meta.get("difficulty", "Easy"),
         "topics": meta.get("topics", []),
+        "languages": meta.get("languages", ["Java"]),
+        "path_id": meta.get("path_id", "java-basics"),
+        "path_name": meta.get("path_name", "Java Basics"),
+        "order_in_path": meta.get("order_in_path", 1),
+        "collection_ids": meta.get("collection_ids", []),
+        "review_needed": meta.get("review_needed", False),
         "hints": meta.get("hints", []),
         "sample_cases": meta.get("sample_cases", []),
     }
@@ -120,7 +128,7 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"status": "ok"})
             return
 
-        if path in ("/api/problems", "/problems"):
+        if path == "/api/problems":
             meta_all = get_problems_meta()
             problems = []
             for problem_id in get_problem_ids():
@@ -128,12 +136,27 @@ class AppHandler(BaseHTTPRequestHandler):
                 m = meta_all.get(problem_id, {})
                 problems.append({
                     "id": problem["id"],
+                    "display_number": m.get("display_number", 0),
+                    "display_id": m.get("id", "00"),
                     "title": problem["title"],
                     "summary": problem["summary"],
                     "difficulty": m.get("difficulty", "Easy"),
                     "topics": m.get("topics", []),
+                    "languages": m.get("languages", ["Java"]),
+                    "path_id": m.get("path_id", "java-basics"),
+                    "path_name": m.get("path_name", "Java Basics"),
+                    "order_in_path": m.get("order_in_path", 1),
+                    "collection_ids": m.get("collection_ids", []),
+                    "review_needed": m.get("review_needed", False),
                 })
-            self.send_json(200, {"problems": problems, "status": "ok"})
+            paths_data = meta_all.get("_paths", [])
+            collections_data = meta_all.get("_collections", [])
+            self.send_json(200, {
+                "problems": problems,
+                "paths": paths_data,
+                "collections": collections_data,
+                "status": "ok"
+            })
             return
 
         match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)
@@ -150,6 +173,10 @@ class AppHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/problems": ("problems.html", "text/html; charset=utf-8"),
+            "/problems.html": ("problems.html", "text/html; charset=utf-8"),
+            "/problems.css": ("problems.css", "text/css; charset=utf-8"),
+            "/problems.js": ("problems.js", "text/javascript; charset=utf-8"),
             "/practice": ("practice.html", "text/html; charset=utf-8"),
             "/practice.html": ("practice.html", "text/html; charset=utf-8"),
             "/profile": ("profile.html", "text/html; charset=utf-8"),

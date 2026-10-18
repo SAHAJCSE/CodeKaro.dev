@@ -1,10 +1,120 @@
 {
+  "_paths": [
+    {
+      "id": "java-basics",
+      "name": "Java Basics",
+      "description": "Syntax fundamentals, variables, conditional logic, and simple input/output."
+    },
+    {
+      "id": "strings",
+      "name": "Strings",
+      "description": "String manipulation, character arrays, parsing, formatting, and pattern matching."
+    },
+    {
+      "id": "loops-functions",
+      "name": "Loops & Functions",
+      "description": "Iteration, nested loops, star/digit patterns, modular function design."
+    },
+    {
+      "id": "oop",
+      "name": "OOP",
+      "description": "Classes, constructors, encapsulation, object state, and exception handling."
+    },
+    {
+      "id": "recursion",
+      "name": "Recursion",
+      "description": "Recursive decomposition, recursive tracking, and divide-and-conquer logic."
+    },
+    {
+      "id": "sorting-searching",
+      "name": "Sorting & Searching",
+      "description": "Linear search, array transformations, matrix traversals, and ordering."
+    }
+  ],
+  "_collections": [
+    {
+      "id": "company-tcs",
+      "name": "TCS NQT & Digital",
+      "category": "Company",
+      "description": "High-frequency coding problems asked in TCS Ninja and Digital assessments."
+    },
+    {
+      "id": "company-infosys",
+      "name": "Infosys DSE/SP",
+      "category": "Company",
+      "description": "Problem solving sets curated for Infosys Specialist Programmer hiring."
+    },
+    {
+      "id": "company-wipro",
+      "name": "Wipro Elite NTH",
+      "category": "Company",
+      "description": "Pattern, string, and array assessment challenges from Wipro Elite tests."
+    },
+    {
+      "id": "company-capgemini",
+      "name": "Capgemini Exceller",
+      "category": "Company",
+      "description": "OOP and algorithmic coding assessments frequently appearing in Capgemini drives."
+    },
+    {
+      "id": "company-amazon",
+      "name": "Amazon SDE",
+      "category": "Company",
+      "description": "Core data structure & object modeling interview problems."
+    },
+    {
+      "id": "college-placement",
+      "name": "Campus Placement Sets",
+      "category": "College",
+      "description": "Curated placement practice sets covering high-probability aptitude coding tests."
+    },
+    {
+      "id": "college-cuiet-lab",
+      "name": "Semester Lab Sets (CUIET)",
+      "category": "College",
+      "description": "Official laboratory assignments and evaluation problems from CUIET coursework."
+    },
+    {
+      "id": "exam-gate",
+      "name": "GATE CS & IT",
+      "category": "Exam",
+      "description": "Conceptual problems targeting programming methodology and complexity."
+    },
+    {
+      "id": "exam-university",
+      "name": "University Semester Exams",
+      "category": "Exam",
+      "description": "End-term theory and lab examination problems for Bachelor of Technology."
+    },
+    {
+      "id": "exam-viva",
+      "name": "OOP Viva Prep",
+      "category": "Exam",
+      "description": "Corner-case and constructor questions ideal for technical vivas."
+    }
+  ],
   "airline-ticket-concat": {
+    "display_number": 1,
+    "id": "01",
+    "slug": "airline-ticket-concat",
+    "title": "Airline Ticket Concat",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
       "Strings",
       "Arrays"
     ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 1,
+    "collection_ids": [
+      "college-placement",
+      "company-tcs",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Do not use String.concat() or the '+' string concatenation operator.",
       "Copy characters of str1 from index 0 into result, then copy str2 directly following str1."
@@ -28,10 +138,26 @@
     ]
   },
   "assignment44-analyze-sentence": {
+    "display_number": 2,
+    "id": "02",
+    "slug": "assignment44-analyze-sentence",
+    "title": "Assignment44 Analyze Sentence",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Loops"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 2,
+    "collection_ids": [
+      "company-infosys",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Iterate through the characters of sentence using Character.isDigit(c). If any digit is found, return 'Invalid Sentence'.",
       "If valid, split the sentence by whitespace using sentence.trim().split(\"\\\\s+\") and return the length as a String."
@@ -55,11 +181,27 @@
     ]
   },
   "class-box": {
+    "display_number": 3,
+    "id": "03",
+    "slug": "class-box",
+    "title": "Class Box",
     "difficulty": "Medium",
-    "topics": [
-      "Classes and Objects",
-      "Constructors"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "OOP"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 1,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university",
+      "exam-viva",
+      "company-capgemini"
+    ],
+    "review_needed": false,
     "hints": [
       "Declare length, breadth, and height as private int variables.",
       "Volume can overflow 32-bit int with dimensions up to 10^5. Cast to (long) before multiplying.",
@@ -84,12 +226,27 @@
     ]
   },
   "class-student": {
+    "display_number": 4,
+    "id": "04",
+    "slug": "class-student",
+    "title": "Class Student",
     "difficulty": "Medium",
+    "languages": [
+      "Java"
+    ],
     "topics": [
-      "Classes and Objects",
-      "Constructors",
+      "OOP",
       "Arrays"
     ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 2,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university",
+      "exam-viva"
+    ],
+    "review_needed": false,
     "hints": [
       "Save studentId, name, and marks (int array of 5 elements) into private instance fields in the constructor.",
       "printValues() prints studentId on line 1, name on line 2, and the 5 marks separated by spaces on line 3.",
@@ -114,11 +271,26 @@
     ]
   },
   "cloud-server-health": {
+    "display_number": 5,
+    "id": "05",
+    "slug": "cloud-server-health",
+    "title": "Cloud Server Health",
     "difficulty": "Easy",
-    "topics": [
-      "Collections",
-      "Classes and Objects"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 1,
+    "collection_ids": [
+      "college-placement",
+      "company-amazon"
+    ],
+    "review_needed": true,
     "hints": [
       "Iterate through the cpuUsage ArrayList and select values where usage >= 80.",
       "Preserve the original order of the servers in the returned ArrayList."
@@ -142,11 +314,26 @@
     ]
   },
   "college-seats-reserved": {
+    "display_number": 6,
+    "id": "06",
+    "slug": "college-seats-reserved",
+    "title": "College Seats Reserved",
     "difficulty": "Medium",
+    "languages": [
+      "Java"
+    ],
     "topics": [
       "Arrays",
-      "Collections"
+      "Loops"
     ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 2,
+    "collection_ids": [
+      "college-placement",
+      "exam-university"
+    ],
+    "review_needed": true,
     "hints": [
       "Sort both arrays A and B and verify whether they are identical at every index.",
       "Alternatively, tally the frequency of each age in A and B using a frequency map or array."
@@ -170,10 +357,27 @@
     ]
   },
   "compress-a-string": {
+    "display_number": 7,
+    "id": "07",
+    "slug": "compress-a-string",
+    "title": "Compress A String",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Loops"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 3,
+    "collection_ids": [
+      "company-tcs",
+      "company-wipro",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Traverse the string while counting consecutive occurrences of the current character.",
       "If a character occurs more than once, append the character followed by the count; otherwise, append just the character."
@@ -197,10 +401,27 @@
     ]
   },
   "count-pos-neg-even-odd": {
+    "display_number": 8,
+    "id": "08",
+    "slug": "count-pos-neg-even-odd",
+    "title": "Count Pos Neg Even Odd",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
+      "Loops",
       "Arrays"
     ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 1,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university",
+      "company-wipro"
+    ],
+    "review_needed": false,
     "hints": [
       "Zero (0) is an even number, but it is neither positive nor negative.",
       "Iterate through the array and track four counters: positive, negative, even, and odd.",
@@ -225,11 +446,27 @@
     ]
   },
   "custom-exception-power": {
+    "display_number": 9,
+    "id": "09",
+    "slug": "custom-exception-power",
+    "title": "Custom Exception Power",
     "difficulty": "Medium",
-    "topics": [
-      "Exceptions",
-      "Inheritance"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Functions",
+      "OOP"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 3,
+    "collection_ids": [
+      "exam-university",
+      "exam-viva",
+      "company-capgemini"
+    ],
+    "review_needed": false,
     "hints": [
       "Define a custom exception class extending Exception.",
       "If either n < 0 or p < 0, throw your custom exception with message 'Negative numbers not allowed'.",
@@ -254,10 +491,26 @@
     ]
   },
   "daily-loss-counter": {
+    "display_number": 10,
+    "id": "10",
+    "slug": "daily-loss-counter",
+    "title": "Daily Loss Counter",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
+      "Loops",
       "Arrays"
     ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 3,
+    "collection_ids": [
+      "company-tcs",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "A loss day is strictly defined as an element where value < 0.",
       "Zero represents a break-even day and does not count as a loss."
@@ -281,11 +534,27 @@
     ]
   },
   "date-class": {
+    "display_number": 11,
+    "id": "11",
+    "slug": "date-class",
+    "title": "Date Class",
     "difficulty": "Medium",
-    "topics": [
-      "Classes and Objects",
-      "Constructors"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "OOP",
+      "Functions"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 4,
+    "collection_ids": [
+      "exam-university",
+      "exam-viva",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Validate day, month, and year according to calendar rules and leap years if required.",
       "Format output with leading zeros where specified in the problem statement."
@@ -309,11 +578,27 @@
     ]
   },
   "employee": {
+    "display_number": 12,
+    "id": "12",
+    "slug": "employee",
+    "title": "Employee",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
-      "Classes and Objects",
+      "OOP",
       "Arrays"
     ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 5,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university",
+      "company-infosys"
+    ],
+    "review_needed": false,
     "hints": [
       "Store the employee ID, name, and 6 months of salary in private fields.",
       "totalSalary() sums up the salary across all 6 months.",
@@ -338,10 +623,26 @@
     ]
   },
   "exam-topper": {
+    "display_number": 13,
+    "id": "13",
+    "slug": "exam-topper",
+    "title": "Exam Topper",
     "difficulty": "Easy",
-    "topics": [
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Searching"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 1,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "company-tcs"
+    ],
+    "review_needed": false,
     "hints": [
       "Scan the marks array to find the maximum value.",
       "Return the 1-based position or highest mark as requested in the problem description."
@@ -365,10 +666,26 @@
     ]
   },
   "find-the-longest-word": {
+    "display_number": 14,
+    "id": "14",
+    "slug": "find-the-longest-word",
+    "title": "Find The Longest Word",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Searching"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 4,
+    "collection_ids": [
+      "company-wipro",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Split the sentence into words using spaces as delimiters.",
       "Track the word with the maximum length and return it."
@@ -392,10 +709,25 @@
     ]
   },
   "layered-pyramid-3": {
+    "display_number": 15,
+    "id": "15",
+    "slug": "layered-pyramid-3",
+    "title": "Layered Pyramid 3",
     "difficulty": "Easy",
-    "topics": [
-      "Patterns"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 4,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "company-tcs"
+    ],
+    "review_needed": false,
     "hints": [
       "Observe the outer loop for rows (1 to n) and inner loop for spaces and numbers.",
       "Ensure spacing aligns with the pyramid format."
@@ -419,10 +751,26 @@
     ]
   },
   "library-book-inventory": {
+    "display_number": 16,
+    "id": "16",
+    "slug": "library-book-inventory",
+    "title": "Library Book Inventory",
     "difficulty": "Easy",
-    "topics": [
-      "Collections"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "OOP",
+      "Arrays"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 6,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university"
+    ],
+    "review_needed": false,
     "hints": [
       "Manage inventory operations using appropriate Java Collections (e.g., HashMap or ArrayList).",
       "Handle case sensitivity and missing book lookups gracefully."
@@ -446,10 +794,26 @@
     ]
   },
   "lowercase-to-uppercase": {
+    "display_number": 17,
+    "id": "17",
+    "slug": "lowercase-to-uppercase",
+    "title": "Lowercase To Uppercase",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Functions"
+    ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 2,
+    "collection_ids": [
+      "company-wipro",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Convert ASCII values by subtracting 32 or using Character.toUpperCase(c).",
       "Only alter lowercase letters ('a' through 'z'); leave digits and punctuation intact."
@@ -473,11 +837,26 @@
     ]
   },
   "main-diagonal-sum": {
+    "display_number": 18,
+    "id": "18",
+    "slug": "main-diagonal-sum",
+    "title": "Main Diagonal Sum",
     "difficulty": "Easy",
-    "topics": [
-      "Matrix",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 2,
+    "collection_ids": [
+      "exam-university",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "The main diagonal contains elements where row index equals column index (matrix[i][i]).",
       "A single loop from i = 0 to n-1 is sufficient to compute the sum in O(n) time."
@@ -501,11 +880,27 @@
     ]
   },
   "matrix-multiplication": {
+    "display_number": 19,
+    "id": "19",
+    "slug": "matrix-multiplication",
+    "title": "Matrix Multiplication",
     "difficulty": "Medium",
-    "topics": [
-      "Matrix",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 3,
+    "collection_ids": [
+      "exam-university",
+      "exam-gate",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Columns of matrix A must equal rows of matrix B.",
       "Use three nested loops: result[i][j] += A[i][k] * B[k][j]."
@@ -529,11 +924,26 @@
     ]
   },
   "matrix-row-and-column-sum": {
+    "display_number": 20,
+    "id": "20",
+    "slug": "matrix-row-and-column-sum",
+    "title": "Matrix Row And Column Sum",
     "difficulty": "Easy",
-    "topics": [
-      "Matrix",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 4,
+    "collection_ids": [
+      "exam-university",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Compute row sums by iterating columns for each row.",
       "Compute column sums by iterating rows for each column."
@@ -557,11 +967,27 @@
     ]
   },
   "mycalculator-exception": {
+    "display_number": 21,
+    "id": "21",
+    "slug": "mycalculator-exception",
+    "title": "Mycalculator Exception",
     "difficulty": "Medium",
-    "topics": [
-      "Exceptions",
-      "Inheritance"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Functions",
+      "OOP"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 7,
+    "collection_ids": [
+      "exam-viva",
+      "exam-university",
+      "company-infosys"
+    ],
+    "review_needed": false,
     "hints": [
       "If either n or p is negative, throw an Exception: 'n or p should not be negative.'",
       "If both n and p are zero, throw an Exception: 'n and p should not be zero.'",
@@ -586,10 +1012,26 @@
     ]
   },
   "perfect-string": {
+    "display_number": 22,
+    "id": "22",
+    "slug": "perfect-string",
+    "title": "Perfect String",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Searching"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 5,
+    "collection_ids": [
+      "company-tcs",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "A string is perfect if all alphabetic letters appear at least once (pangram) or meet the problem's condition.",
       "Use a boolean array of size 26 or a Set<Character> to track seen letters."
@@ -613,10 +1055,25 @@
     ]
   },
   "pyramid-13": {
+    "display_number": 23,
+    "id": "23",
+    "slug": "pyramid-13",
+    "title": "Pyramid 13",
     "difficulty": "Easy",
-    "topics": [
-      "Patterns"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 5,
+    "collection_ids": [
+      "company-wipro",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Determine the row count and number of stars/numbers per line.",
       "Check prefix spaces carefully for row alignment."
@@ -640,10 +1097,25 @@
     ]
   },
   "pyramid-4": {
+    "display_number": 24,
+    "id": "24",
+    "slug": "pyramid-4",
+    "title": "Pyramid 4",
     "difficulty": "Easy",
-    "topics": [
-      "Patterns"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 6,
+    "collection_ids": [
+      "company-tcs",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Print spaces descending and characters/numbers ascending per row.",
       "Ensure each line terminates with a newline."
@@ -667,10 +1139,25 @@
     ]
   },
   "pyramid-9": {
+    "display_number": 25,
+    "id": "25",
+    "slug": "pyramid-9",
+    "title": "Pyramid 9",
     "difficulty": "Easy",
-    "topics": [
-      "Patterns"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 7,
+    "collection_ids": [
+      "company-tcs",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Inspect the symmetry of the pattern.",
       "Handle odd and even increments according to the sample specification."
@@ -694,10 +1181,26 @@
     ]
   },
   "quality-check": {
+    "display_number": 26,
+    "id": "26",
+    "slug": "quality-check",
+    "title": "Quality Check",
     "difficulty": "Easy",
-    "topics": [
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Searching"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 5,
+    "collection_ids": [
+      "company-infosys",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Check each element against the minimum threshold.",
       "Count or filter elements that pass quality inspection."
@@ -721,10 +1224,26 @@
     ]
   },
   "save-bandwidth-compression": {
+    "display_number": 27,
+    "id": "27",
+    "slug": "save-bandwidth-compression",
+    "title": "Save Bandwidth Compression",
     "difficulty": "Medium",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Loops"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 6,
+    "collection_ids": [
+      "company-amazon",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Compress repeated sequences to reduce data size.",
       "Handle single characters without unnecessary count suffixes."
@@ -748,10 +1267,27 @@
     ]
   },
   "search-an-element": {
+    "display_number": 28,
+    "id": "28",
+    "slug": "search-an-element",
+    "title": "Search An Element",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
+      "Searching",
       "Arrays"
     ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 6,
+    "collection_ids": [
+      "exam-gate",
+      "company-tcs",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Traverse the array linearly and compare each element to the target key.",
       "Return the 0-based index if found, or -1 if the key is not present."
@@ -775,10 +1311,26 @@
     ]
   },
   "separate-even-odd": {
+    "display_number": 29,
+    "id": "29",
+    "slug": "separate-even-odd",
+    "title": "Separate Even Odd",
     "difficulty": "Easy",
-    "topics": [
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 3,
+    "collection_ids": [
+      "company-wipro",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Create two sub-lists or separate passes for even numbers and odd numbers.",
       "Preserve the relative ordering of elements if stable ordering is required."
@@ -802,10 +1354,25 @@
     ]
   },
   "sequential-id-pyramid-7": {
+    "display_number": 30,
+    "id": "30",
+    "slug": "sequential-id-pyramid-7",
+    "title": "Sequential Id Pyramid 7",
     "difficulty": "Easy",
-    "topics": [
-      "Patterns"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Loops"
+    ],
+    "path_id": "loops-functions",
+    "path_name": "Loops & Functions",
+    "order_in_path": 8,
+    "collection_ids": [
+      "company-tcs",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Track a running sequence counter across rows.",
       "Print the counter formatted with required spaces."
@@ -829,10 +1396,26 @@
     ]
   },
   "stock-price-trend": {
+    "display_number": 31,
+    "id": "31",
+    "slug": "stock-price-trend",
+    "title": "Stock Price Trend",
     "difficulty": "Medium",
-    "topics": [
-      "Collections"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Searching"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 7,
+    "collection_ids": [
+      "company-amazon",
+      "company-infosys"
+    ],
+    "review_needed": false,
     "hints": [
       "Compare adjacent price points: price[i] > price[i-1] indicates an upward trend.",
       "Use a Deque or List to track running windows if required."
@@ -856,11 +1439,27 @@
     ]
   },
   "strings-are-anagram": {
+    "display_number": 32,
+    "id": "32",
+    "slug": "strings-are-anagram",
+    "title": "Strings Are Anagram",
     "difficulty": "Easy",
+    "languages": [
+      "Java"
+    ],
     "topics": [
       "Strings",
-      "Arrays"
+      "Sorting"
     ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 7,
+    "collection_ids": [
+      "company-amazon",
+      "company-tcs",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Two strings are anagrams if they have the exact same character counts.",
       "Sort both character arrays or count character frequencies in an array of size 256."
@@ -884,10 +1483,26 @@
     ]
   },
   "strong-virus": {
+    "display_number": 33,
+    "id": "33",
+    "slug": "strong-virus",
+    "title": "Strong Virus",
     "difficulty": "Medium",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Recursion"
+    ],
+    "path_id": "recursion",
+    "path_name": "Recursion",
+    "order_in_path": 1,
+    "collection_ids": [
+      "company-amazon",
+      "exam-gate"
+    ],
+    "review_needed": false,
     "hints": [
       "Find the first and last occurrence of target characters in the string.",
       "Check whether characters in between satisfy the contagion rule."
@@ -911,11 +1526,26 @@
     ]
   },
   "student-marks-get-element": {
+    "display_number": 34,
+    "id": "34",
+    "slug": "student-marks-get-element",
+    "title": "Student Marks Get Element",
     "difficulty": "Easy",
-    "topics": [
-      "Exceptions",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Functions"
+    ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 4,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-university"
+    ],
+    "review_needed": false,
     "hints": [
       "Check array bounds before indexing, or catch ArrayIndexOutOfBoundsException.",
       "Return a custom error message or fallback value when index is invalid."
@@ -939,11 +1569,26 @@
     ]
   },
   "sum-lower-triangle": {
+    "display_number": 35,
+    "id": "35",
+    "slug": "sum-lower-triangle",
+    "title": "Sum Lower Triangle",
     "difficulty": "Easy",
-    "topics": [
-      "Matrix",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 8,
+    "collection_ids": [
+      "exam-university",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "The lower triangle of an N x N matrix contains elements where row >= col (i >= j).",
       "Iterate with outer loop i from 0 to N-1 and inner loop j from 0 to i."
@@ -967,11 +1612,26 @@
     ]
   },
   "sum-of-kth-row": {
+    "display_number": 36,
+    "id": "36",
+    "slug": "sum-of-kth-row",
+    "title": "Sum Of Kth Row",
     "difficulty": "Easy",
-    "topics": [
-      "Matrix",
-      "Arrays"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Arrays",
+      "Loops"
+    ],
+    "path_id": "sorting-searching",
+    "path_name": "Sorting & Searching",
+    "order_in_path": 9,
+    "collection_ids": [
+      "exam-university",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Access row K of the matrix: matrix[K].",
       "Sum all column elements across that specific row."
@@ -995,10 +1655,26 @@
     ]
   },
   "translate-the-letter": {
+    "display_number": 37,
+    "id": "37",
+    "slug": "translate-the-letter",
+    "title": "Translate The Letter",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Functions"
+    ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 5,
+    "collection_ids": [
+      "company-wipro",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Map specific characters to their replacement translation according to rules.",
       "Use a StringBuilder for efficient in-place string transformation."
@@ -1022,11 +1698,26 @@
     ]
   },
   "tricycle-speed-manager": {
+    "display_number": 38,
+    "id": "38",
+    "slug": "tricycle-speed-manager",
+    "title": "Tricycle Speed Manager",
     "difficulty": "Easy",
-    "topics": [
-      "Classes and Objects",
-      "Constructors"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "OOP",
+      "Functions"
+    ],
+    "path_id": "oop",
+    "path_name": "OOP",
+    "order_in_path": 8,
+    "collection_ids": [
+      "college-cuiet-lab",
+      "exam-viva"
+    ],
+    "review_needed": false,
     "hints": [
       "Encapsulate speed state within the Tricycle class.",
       "Provide methods to accelerate, decelerate, and validate non-negative speed."
@@ -1050,10 +1741,26 @@
     ]
   },
   "uppercase-to-lowercase": {
+    "display_number": 39,
+    "id": "39",
+    "slug": "uppercase-to-lowercase",
+    "title": "Uppercase To Lowercase",
     "difficulty": "Easy",
-    "topics": [
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Functions"
+    ],
+    "path_id": "java-basics",
+    "path_name": "Java Basics",
+    "order_in_path": 6,
+    "collection_ids": [
+      "company-wipro",
+      "college-cuiet-lab"
+    ],
+    "review_needed": false,
     "hints": [
       "Convert ASCII values by adding 32 or using Character.toLowerCase(c).",
       "Ensure characters already in lowercase or symbols remain unchanged."
@@ -1077,11 +1784,27 @@
     ]
   },
   "valid-email-address": {
+    "display_number": 40,
+    "id": "40",
+    "slug": "valid-email-address",
+    "title": "Valid Email Address",
     "difficulty": "Medium",
-    "topics": [
-      "Exceptions",
-      "Strings"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "Strings",
+      "Functions"
+    ],
+    "path_id": "strings",
+    "path_name": "Strings",
+    "order_in_path": 8,
+    "collection_ids": [
+      "company-capgemini",
+      "company-infosys",
+      "college-placement"
+    ],
+    "review_needed": false,
     "hints": [
       "Validate format: must contain exactly one '@' followed by a valid domain with a '.'",
       "Ensure username and domain portions are non-empty and throw an exception for malformed emails."
@@ -1105,10 +1828,26 @@
     ]
   },
   "web-browser-tab-history": {
+    "display_number": 41,
+    "id": "41",
+    "slug": "web-browser-tab-history",
+    "title": "Web Browser Tab History",
     "difficulty": "Hard",
-    "topics": [
-      "Collections"
+    "languages": [
+      "Java"
     ],
+    "topics": [
+      "OOP",
+      "Recursion"
+    ],
+    "path_id": "recursion",
+    "path_name": "Recursion",
+    "order_in_path": 2,
+    "collection_ids": [
+      "company-amazon",
+      "exam-gate"
+    ],
+    "review_needed": false,
     "hints": [
       "Use two stacks: backStack and forwardStack.",
       "Visiting a new page pushes current page to backStack and clears forwardStack.",
