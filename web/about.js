@@ -122,9 +122,290 @@
     }
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadTeam);
-  } else {
+  // --- Workspace Panel ---
+  function getRunnerUrl() {
+    try {
+      const param = new URLSearchParams(window.location.search).get("runner_url");
+      if (param) {
+        const clean = param.replace(/\/+$/, "");
+        localStorage.setItem("oops_runner_url", clean);
+        return clean;
+      }
+      const stored = localStorage.getItem("oops_runner_url");
+      if (stored) return stored.replace(/\/+$/, "");
+    } catch (e) {}
+
+    if (window.CONFIG && window.CONFIG.RUNNER_URL) {
+      return window.CONFIG.RUNNER_URL.replace(/\/+$/, "");
+    }
+
+    const isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    const localUrl = window.location.port
+      ? `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
+      : `${window.location.protocol}//${window.location.hostname}:8000`;
+
+    return isLocal ? localUrl : "https://oops-judge.onrender.com";
+  }
+
+  function initWorkspace() {
+    const panel = document.getElementById("workspace-panel");
+    if (!panel) return;
+
+    const statusRow = document.getElementById("workspace-status-row");
+    const statusDot = document.getElementById("workspace-status-dot");
+    const statusText = document.getElementById("workspace-status-text");
+
+    const problemsCount = document.getElementById("workspace-problems-count");
+    const chipsContainer = document.getElementById("workspace-chips");
+
+    const progressVal = document.getElementById("workspace-progress-val");
+
+    const randomBtn = document.getElementById("workspace-random-btn");
+    const continueBtn = document.getElementById("workspace-continue-btn");
+    const firstBtn = document.getElementById("workspace-first-btn");
+
+    let problemsData = [];
+    let isCheckingHealth = false;
+    let healthAbortController = null;
+
+    function setStatus(state, message, label) {
+      if (statusDot) {
+        statusDot.className = `workspace-dot workspace-dot--${state}`;
+        statusDot.setAttribute("aria-label", label || state);
+      }
+      if (statusText) {
+        statusText.textContent = message;
+      }
+    }
+
+    async function checkCompilerHealth() {
+      if (isCheckingHealth && healthAbortController) {
+        healthAbortController.abort();
+      }
+      isCheckingHealth = true;
+      healthAbortController = new AbortController();
+      const signal = healthAbortController.signal;
+
+      setStatus("checking", "checking…", "Checking compiler status");
+
+      const runnerUrl = getRunnerUrl();
+      const startTime = performance.now();
+      let isTimedOut = false;
+
+      const wakeTimer = setTimeout(() => {
+        setStatus("waking", "Waking up…", "Compiler waking up");
+      }, 3000);
+
+      const maxTimer = setTimeout(() => {
+        isTimedOut = true;
+        if (healthAbortController) healthAbortController.abort();
+        setStatus("offline", "Compiler offline", "Compiler offline");
+        isCheckingHealth = false;
+      }, 60000);
+
+      try {
+        const res = await fetch(`${runnerUrl}/health`, {
+          method: "GET",
+          mode: "cors",
+          signal,
+        });
+        clearTimeout(wakeTimer);
+        clearTimeout(maxTimer);
+        isCheckingHealth = false;
+
+        if (res.ok) {
+          const elapsed = Math.round(performance.now() - startTime);
+          setStatus("online", `Compiler online · ${elapsed} ms`, "Compiler online");
+        } else {
+          setStatus("offline", "Compiler offline", "Compiler offline");
+        }
+      } catch (err) {
+        clearTimeout(wakeTimer);
+        clearTimeout(maxTimer);
+        isCheckingHealth = false;
+        if (err.name === "AbortError" && isTimedOut) {
+          setStatus("offline", "Compiler offline", "Compiler offline");
+        } else if (err.name !== "AbortError") {
+          setStatus("offline", "Compiler offline", "Compiler offline");
+        }
+      }
+    }
+
+    if (statusRow) {
+      statusRow.addEventListener("click", () => checkCompilerHealth());
+      statusRow.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          checkCompilerHealth();
+        }
+      });
+    }
+
+    function getSignedInUser() {
+      try {
+        const raw = localStorage.getItem("oops_session");
+        if (!raw) return null;
+        const parsed = JSON.parse(raw);
+        return parsed && typeof parsed === "object" && parsed.id ? parsed : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function updateButtons(problems, user) {
+      if (!problems || problems.length === 0) {
+        if (randomBtn) randomBtn.href = "/practice";
+        if (continueBtn) continueBtn.hidden = true;
+        if (firstBtn) {
+          firstBtn.hidden = false;
+          firstBtn.textContent = "Start with the first problem";
+          firstBtn.href = "/practice";
+        }
+        return;
+      }
+
+      // 1. "Random problem" button: link format /practice?problem=<id>
+      const pickRandomHref = () => {
+        const p = problems[Math.floor(Math.random() * problems.length)];
+        return `/practice?problem=${encodeURIComponent(p.id)}`;
+      };
+
+      if (randomBtn) {
+        randomBtn.href = pickRandomHref();
+        randomBtn.onclick = () => {
+          randomBtn.href = pickRandomHref();
+        };
+      }
+
+      // 2. "Continue" button: attempted-but-unsolved problem
+      let attemptedProblem = null;
+      if (user && user.id) {
+        attemptedProblem = problems.find(p => {
+          try {
+            const status = localStorage.getItem(`oops_status:${user.id}:${p.id}`);
+            if (status === "attempted") return true;
+            if (status !== "solved") {
+              const subs = localStorage.getItem(`oops_sub:${user.id}:${p.id}`);
+              if (subs && subs !== "[]") return true;
+              const code = localStorage.getItem(`oops_code_${p.id}`);
+              if (code) return true;
+            }
+          } catch (e) {}
+          return false;
+        });
+      }
+
+      if (attemptedProblem) {
+        if (continueBtn) {
+          continueBtn.hidden = false;
+          continueBtn.textContent = "Continue";
+          continueBtn.href = `/practice?problem=${encodeURIComponent(attemptedProblem.id)}`;
+        }
+        if (firstBtn) firstBtn.hidden = true;
+      } else {
+        if (continueBtn) continueBtn.hidden = true;
+        if (firstBtn) {
+          firstBtn.hidden = false;
+          firstBtn.textContent = "Start with the first problem";
+          firstBtn.href = `/practice?problem=${encodeURIComponent(problems[0].id)}`;
+        }
+      }
+    }
+
+    function updateProgress(problems, user) {
+      if (!progressVal) return;
+      progressVal.replaceChildren();
+
+      if (!user) {
+        const link = document.createElement("a");
+        link.className = "workspace-link";
+        link.href = "/practice?auth=signin";
+        link.textContent = "Sign in to track progress";
+        progressVal.appendChild(link);
+        return;
+      }
+
+      if (!problems || problems.length === 0) {
+        progressVal.textContent = "Progress unavailable";
+        return;
+      }
+
+      let solvedCount = 0;
+      problems.forEach(p => {
+        try {
+          const st = localStorage.getItem(`oops_status:${user.id}:${p.id}`);
+          if (st === "solved") solvedCount++;
+        } catch (e) {}
+      });
+
+      progressVal.textContent = `${solvedCount} / ${problems.length} solved`;
+    }
+
+    async function loadProblems() {
+      try {
+        const res = await fetch("/api/problems");
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        problemsData = Array.isArray(data.problems) ? data.problems : [];
+
+        if (problemsCount) {
+          problemsCount.textContent = `${problemsData.length} Java problems`;
+        }
+
+        if (chipsContainer) {
+          chipsContainer.replaceChildren();
+          const counts = { Easy: 0, Medium: 0, Hard: 0 };
+          let hasDifficulty = false;
+          problemsData.forEach(p => {
+            if (p.difficulty && Object.prototype.hasOwnProperty.call(counts, p.difficulty)) {
+              counts[p.difficulty]++;
+              hasDifficulty = true;
+            }
+          });
+
+          if (hasDifficulty) {
+            const diffs = ["Easy", "Medium", "Hard"];
+            diffs.forEach((diff, i) => {
+              if (i > 0) {
+                const sep = document.createElement("span");
+                sep.className = "workspace-chip-dot";
+                sep.textContent = "·";
+                chipsContainer.appendChild(sep);
+              }
+              const chip = document.createElement("span");
+              chip.className = `workspace-chip chip--${diff.toLowerCase()}`;
+              chip.textContent = `${diff} ${counts[diff]}`;
+              chipsContainer.appendChild(chip);
+            });
+          }
+        }
+
+        const user = getSignedInUser();
+        updateProgress(problemsData, user);
+        updateButtons(problemsData, user);
+      } catch (err) {
+        if (problemsCount) problemsCount.textContent = "Problems unavailable";
+        if (chipsContainer) chipsContainer.replaceChildren();
+        const user = getSignedInUser();
+        updateProgress(null, user);
+        updateButtons([], user);
+      }
+    }
+
+    checkCompilerHealth();
+    loadProblems();
+  }
+
+  function init() {
     loadTeam();
+    initWorkspace();
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
   }
 })();

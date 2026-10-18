@@ -1143,34 +1143,44 @@
           </div>
         </div>
 
-        <!-- Right: Code Window Panel -->
+        <!-- Right: Workspace Panel -->
         <div class="about-hero-right">
-          <div class="code-window" aria-label="Solution.java: Run">
+          <div class="code-window" aria-label="workspace">
             <div class="code-window__topbar">
               <div class="code-window__dots" aria-hidden="true">
                 <span class="code-window__dot dot--red"></span>
                 <span class="code-window__dot dot--yellow"></span>
                 <span class="code-window__dot dot--green"></span>
               </div>
-              <span class="code-window__title">Solution.java: Run</span>
+              <span class="code-window__title">workspace</span>
               <span class="code-window__spacer" aria-hidden="true"></span>
             </div>
-            <div class="code-window__body">
-              <div class="test-case test-case--pass">
-                <span class="test-case__badge">PASS</span>
-                <span class="test-case__name">Case 1 (Valid Palindrome, 2ms)</span>
+            <div class="code-window__body workspace-panel" id="workspace-panel">
+              <!-- Row 1: Compiler Status -->
+              <div class="workspace-row workspace-row--status" id="workspace-status-row" role="button" tabindex="0" title="Click to re-check compiler status">
+                <span class="workspace-dot workspace-dot--checking" id="workspace-status-dot" role="img" aria-label="checking"></span>
+                <span class="workspace-status-text" id="workspace-status-text" aria-live="polite">checking…</span>
               </div>
-              <div class="test-case test-case--pass">
-                <span class="test-case__badge">PASS</span>
-                <span class="test-case__name">Case 2 (Single Character String, 1ms)</span>
+
+              <!-- Row 2: Problems -->
+              <div class="workspace-row workspace-row--problems" id="workspace-problems-row">
+                <div class="workspace-problems-line">
+                  <span class="workspace-problems-count" id="workspace-problems-count">checking…</span>
+                  <span class="workspace-chips" id="workspace-chips" aria-label="Problem difficulties"></span>
+                </div>
               </div>
-              <div class="test-case test-case--fail">
-                <span class="test-case__badge">FAIL</span>
-                <span class="test-case__name">Case 3 (Mixed Case with Punctuation, 3ms)</span>
+
+              <!-- Row 3: Progress -->
+              <div class="workspace-row workspace-row--progress" id="workspace-progress-row">
+                <span class="workspace-progress-label">Your progress:</span>
+                <span class="workspace-progress-val" id="workspace-progress-val">checking…</span>
               </div>
-              <div class="test-case__box">
-                <div class="test-case__line"><span class="test-case__label">Expected:</span> <span class="test-case__val">true</span></div>
-                <div class="test-case__line"><span class="test-case__label">Actual:</span> <span class="test-case__val">false</span></div>
+
+              <!-- Row 4: Action Buttons -->
+              <div class="workspace-actions" id="workspace-actions">
+                <a href="/practice" class="workspace-btn" id="workspace-random-btn">Random problem</a>
+                <a href="/practice" class="workspace-btn workspace-btn--continue" id="workspace-continue-btn" hidden>Continue</a>
+                <a href="/practice" class="workspace-btn workspace-btn--first" id="workspace-first-btn">Start with the first problem</a>
               </div>
             </div>
           </div>
@@ -1355,6 +1365,7 @@
   <script src="/gooey-nav.js" defer></script>
   <script src="/gradient-ascii.js" defer></script>
   <script src="/footer-contact.js" defer></script>
+  <script src="/config.js" defer></script>
   <script src="/about.js" defer></script>
 </body>
 </html>
