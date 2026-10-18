@@ -1,9 +1,43 @@
-"""Vercel Serverless Function entry point for the Code-Karo.dev API."""
+TASK: restyle ONLY the About page main content (everything between the header and the footer) using the design direction below. Edit only about.html, about.css and about.js. Do not touch the header, footer, nav, Home, Profile, Practice or any shared file. Smallest edits needed, no new sections, no copy changes, no logic changes. Report what you changed and stop.
+
+REFERENCE: a dark landing hero with a bold white sans headline whose second line is a soft lavender-to-pink gradient, a large gray paragraph, a pastel-gradient primary button with dark text and an icon, a dark outlined secondary button, small monospace labels, and a faint grid on a near-black background. Use it for mood only. Do not copy its words, badge, logos or layout exactly.
+
+1. Fonts (one family for all main content)
+   - Load "Inter" (weights 400, 500, 600, 800) from Google Fonts with display=swap and a system-ui fallback. Use it for every heading, paragraph, button and card text between the header and the footer.
+   - Load "JetBrains Mono" (weights 400, 500) for small labels only: the "// ABOUT" and "// TEAM" labels, the workspace panel, and chips.
+   - Remove the wide display font from this page's main content. Headings: weight 800, letter-spacing -0.03em, line-height 1.05. Body: 400, line-height 1.6. No text-shadow, no all-caps except the small mono labels.
+   - Sizes: h1 clamp(44px, 7vw, 84px); h2 clamp(30px, 4vw, 48px); lead paragraph 20px; body 16px; mono labels 12 to 13px.
+
+2. Background and theme
+   - Page background near-black (#0a0a0b) with a faint grid: 1px lines at rgba(255,255,255,0.04) every 64px, faded out toward the edges and bottom with a CSS mask.
+   - Keep Home's animated character field but only inside the hero, at 8% opacity maximum, so About still feels related to Home. Remove the purple gradient and the dark rounded card behind the hero text (the card is no longer needed).
+   - Colors: headings #ffffff, paragraph #a1a1aa, hairline borders rgba(255,255,255,0.12), panel background #101012. Accent gradient: linear-gradient(90deg, #c7d2fe, #e9d5ff, #fbcfe8). Use these as CSS variables defined at the top of about.css under the About page scope.
+
+3. Hero (same text as now)
+   - Headline "Java practice, tested for real." on two lines: line 1 "Java practice," in white, line 2 "tested for real." with the accent gradient as text (background-clip: text).
+   - Paragraph max-width 52ch, color #a1a1aa.
+   - Buttons side by side, height 48px, radius 10px, Inter 600 16px, with a 20px inline SVG icon on the left:
+     - Primary "Start practicing" (links to /practice): accent gradient background, dark text #0a0a0b, 1px border rgba(255,255,255,0.25), a small code icon.
+     - Secondary "Meet the team" (scrolls to #team): background #111113, 1px border rgba(255,255,255,0.14), white text, a small people icon.
+     - Hover: brightness 1.08 on the primary, border brightens on the secondary. 150ms. No movement or glow. Visible focus rings.
+   - Between the paragraph and the buttons add one small mono row like "Runs on" followed by two small chips, "Java 17" and "Docker". Check the project code first and only include a chip if it is really true; hide the row otherwise.
+   - Do not add a badge, counters, or any new claim.
+
+4. Workspace panel (right column): keep all its data and logic. Restyle only: background #101012, hairline border, mono font for the rows, the Easy/Medium/Hard chips with muted tinted backgrounds, and its buttons using the same two button styles as the hero but 40px high. Do not change which buttons appear (a separate task handles that).
+
+5. Team section: heading "Meet the team" in the new h2 style, the mono label "// TEAM" above it. For the cards change ONLY the font-family (Inter) and colors to match this palette. Do not change their layout, content or links.
+
+6. Responsive and quality
+   - 1440, 1024 and 390 wide: no overlap, no horizontal scroll, the hero buttons fully visible with at least 48px below them. The headline wraps cleanly (two lines at 1440, up to four on a phone).
+   - Contrast of every text at least WCAG AA. Respect prefers-reduced-motion.
+   - Use the gradient text only on the h1 line 2.
+
+VERIFY (describe what you saw): screenshots of the hero at 1440 and 390; the fonts in dev tools show Inter and JetBrains Mono only (no display font) in the main content; the header and footer look exactly as before; the character animation is still faintly visible in the hero; git diff --stat lists only about.html, about.css and about.js. Then stop."""Vercel Serverless Function entry point for the Code-Karo.dev API."""
 import json
 import os
 import re
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import parse_qs, unquote, urlencode, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 try:
     from api.problems_data import PROBLEMS
@@ -105,86 +139,11 @@ class handler(BaseHTTPRequestHandler):
             self.send_json(200, {"problems": problem_list})
             return
 
-        if path == "/api/github-callback":
-            query = parse_qs(urlparse(self.path).query)
-            code_val = query.get("code", [None])[0]
-
-            if not code_val:
-                self.send_json(400, {"error": "Missing code parameter."})
-                return
-
-            client_id = os.environ.get("GITHUB_CLIENT_ID", "")
-            client_secret = os.environ.get("GITHUB_CLIENT_SECRET", "")
-
-            if not client_id or not client_secret:
-                self.send_json(501, {
-                    "error": "GitHub OAuth not configured on server. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET."
-                })
-                return
-
-            try:
-                import urllib.request
-
-                token_data = urlencode({
-                    "client_id": client_id,
-                    "client_secret": client_secret,
-                    "code": code_val,
-                }).encode("utf-8")
-
-                req = urllib.request.Request(
-                    "https://github.com/login/oauth/access_token",
-                    data=token_data,
-                    headers={"Accept": "application/json"},
-                    method="POST",
-                )
-
-                with urllib.request.urlopen(req, timeout=10) as resp:
-                    token_json = json.loads(resp.read())
-
-                access_token = token_json.get("access_token")
-
-                if not access_token:
-                    self.send_json(401, {
-                        "error": token_json.get(
-                            "error_description",
-                            "Token exchange failed."
-                        )
-                    })
-                    return
-
-                user_req = urllib.request.Request(
-                    "https://api.github.com/user",
-                    headers={
-                        "Authorization": f"Bearer {access_token}",
-                        "Accept": "application/vnd.github+json",
-                        "User-Agent": "CodeKaro-App",
-                    },
-                )
-
-                with urllib.request.urlopen(user_req, timeout=10) as resp:
-                    user_json = json.loads(resp.read())
-
-                self.send_json(200, {
-                    "access_token": access_token,
-                    "user": user_json
-                })
-                return
-
-            except Exception as exc:
-                self.send_json(500, {
-                    "error": f"GitHub OAuth error: {exc}"
-                })
-                return
-
         if path.startswith("/api/problems/"):
             problem_id = path[len("/api/problems/"):]
             problem = PROBLEMS.get(problem_id)
-
             if problem is None:
-                self.send_json(
-                    404,
-                    {"error": f"Problem '{problem_id}' not found."}
-                )
+                self.send_json(404, {"error": f"Problem '{problem_id}' not found."})
                 return
             self.send_json(200, problem)
             return
@@ -195,37 +154,10 @@ class handler(BaseHTTPRequestHandler):
             clean = clean[4:]
         if clean.startswith("public/"):
             clean = clean[7:]
-        if clean in (
-            "", "index.html",
-            "auth", "auth.html",
-            "problems", "problems.html", "problems.css", "problems.js",
-            "practice", "practice.html",
-            "profile", "profile.html",
-            "about", "about.html", "about.css", "about.js",
-            "team.js", "team.json",
-            "app.css", "app.js", "config.js",
-        ):
-            file_name = clean or "index.html"
-
-            if file_name in ("auth",):
-                file_name = "auth.html"
-            elif file_name == "problems":
-                file_name = "problems.html"
-            elif file_name == "practice":
-                file_name = "practice.html"
-            elif file_name == "profile":
-                file_name = "profile.html"
-            elif file_name == "about":
-                file_name = "about.html"
-
+        if clean in ("", "index.html", "about.html", "about", "about.css", "about.js", "team.js", "team.json", "app.css", "app.js", "config.js"):
+            file_name = "index.html" if clean == "" else "about.html" if clean == "about" else clean
             content_types = {
                 "index.html": "text/html; charset=utf-8",
-                "auth.html": "text/html; charset=utf-8",
-                "problems.html": "text/html; charset=utf-8",
-                "problems.css": "text/css; charset=utf-8",
-                "problems.js": "application/javascript; charset=utf-8",
-                "practice.html": "text/html; charset=utf-8",
-                "profile.html": "text/html; charset=utf-8",
                 "about.html": "text/html; charset=utf-8",
                 "about.css": "text/css; charset=utf-8",
                 "about.js": "application/javascript; charset=utf-8",

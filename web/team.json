@@ -27,13 +27,14 @@
     "year": "2nd Year",
     "branch": "B.E. CSE",
     "college": "Chitkara University (CUIET)",
-    "did": "Currently working on CodeKaro (Java practice platform) and a React + Vite team project",
+    "did": "Projects: CodeKaro (Java practice platform), CookFusion. Currently exploring Full-Stack Development.",
     "skills": [
       "Java",
       "Python",
       "React",
       "Node.js",
-      "SQL"
+      "SQL",
+      "DSA"
     ],
     "photoPosition": "center 20%",
     "image": "/assets/team/shubham.jpg",
