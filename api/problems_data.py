@@ -1,4 +1,7 @@
 """Pre-bundled problem data for Vercel serverless execution."""
+false = False
+true = True
+null = None
 
 PATHS = [
   {
@@ -142,7 +145,7 @@ PROBLEMS = {
       "company-tcs",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "assignment44-analyze-sentence": {
     "id": "assignment44-analyze-sentence",
@@ -188,7 +191,7 @@ PROBLEMS = {
       "company-infosys",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "class-box": {
     "id": "class-box",
@@ -236,7 +239,7 @@ PROBLEMS = {
       "exam-viva",
       "company-capgemini"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "class-student": {
     "id": "class-student",
@@ -284,7 +287,7 @@ PROBLEMS = {
       "exam-university",
       "exam-viva"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "cloud-server-health": {
     "id": "cloud-server-health",
@@ -330,7 +333,7 @@ PROBLEMS = {
       "college-placement",
       "company-amazon"
     ],
-    "review_needed": true
+    "review_needed": True
   },
   "college-seats-reserved": {
     "id": "college-seats-reserved",
@@ -376,7 +379,7 @@ PROBLEMS = {
       "college-placement",
       "exam-university"
     ],
-    "review_needed": true
+    "review_needed": True
   },
   "compress-a-string": {
     "id": "compress-a-string",
@@ -423,7 +426,7 @@ PROBLEMS = {
       "company-wipro",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "count-pos-neg-even-odd": {
     "id": "count-pos-neg-even-odd",
@@ -471,7 +474,7 @@ PROBLEMS = {
       "exam-university",
       "company-wipro"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "custom-exception-power": {
     "id": "custom-exception-power",
@@ -519,7 +522,7 @@ PROBLEMS = {
       "exam-viva",
       "company-capgemini"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "daily-loss-counter": {
     "id": "daily-loss-counter",
@@ -565,7 +568,7 @@ PROBLEMS = {
       "company-tcs",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "date-class": {
     "id": "date-class",
@@ -612,7 +615,7 @@ PROBLEMS = {
       "exam-viva",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "employee": {
     "id": "employee",
@@ -660,7 +663,7 @@ PROBLEMS = {
       "exam-university",
       "company-infosys"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "exam-topper": {
     "id": "exam-topper",
@@ -706,7 +709,7 @@ PROBLEMS = {
       "college-cuiet-lab",
       "company-tcs"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "find-the-longest-word": {
     "id": "find-the-longest-word",
@@ -752,7 +755,7 @@ PROBLEMS = {
       "company-wipro",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "layered-pyramid-3": {
     "id": "layered-pyramid-3",
@@ -797,7 +800,7 @@ PROBLEMS = {
       "college-cuiet-lab",
       "company-tcs"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "library-book-inventory": {
     "id": "library-book-inventory",
@@ -843,7 +846,7 @@ PROBLEMS = {
       "college-cuiet-lab",
       "exam-university"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "lowercase-to-uppercase": {
     "id": "lowercase-to-uppercase",
@@ -889,7 +892,7 @@ PROBLEMS = {
       "company-wipro",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "main-diagonal-sum": {
     "id": "main-diagonal-sum",
@@ -935,7 +938,7 @@ PROBLEMS = {
       "exam-university",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "matrix-multiplication": {
     "id": "matrix-multiplication",
@@ -982,7 +985,7 @@ PROBLEMS = {
       "exam-gate",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "matrix-row-and-column-sum": {
     "id": "matrix-row-and-column-sum",
@@ -1028,7 +1031,7 @@ PROBLEMS = {
       "exam-university",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "mycalculator-exception": {
     "id": "mycalculator-exception",
@@ -1076,7 +1079,7 @@ PROBLEMS = {
       "exam-university",
       "company-infosys"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "perfect-string": {
     "id": "perfect-string",
@@ -1122,7 +1125,7 @@ PROBLEMS = {
       "company-tcs",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "pyramid-13": {
     "id": "pyramid-13",
@@ -1167,7 +1170,7 @@ PROBLEMS = {
       "company-wipro",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "pyramid-4": {
     "id": "pyramid-4",
@@ -1212,7 +1215,7 @@ PROBLEMS = {
       "company-tcs",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "pyramid-9": {
     "id": "pyramid-9",
@@ -1257,7 +1260,7 @@ PROBLEMS = {
       "company-tcs",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "quality-check": {
     "id": "quality-check",
@@ -1303,7 +1306,7 @@ PROBLEMS = {
       "company-infosys",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "save-bandwidth-compression": {
     "id": "save-bandwidth-compression",
@@ -1349,7 +1352,7 @@ PROBLEMS = {
       "company-amazon",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "search-an-element": {
     "id": "search-an-element",
@@ -1396,7 +1399,7 @@ PROBLEMS = {
       "company-tcs",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "separate-even-odd": {
     "id": "separate-even-odd",
@@ -1442,7 +1445,7 @@ PROBLEMS = {
       "company-wipro",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "sequential-id-pyramid-7": {
     "id": "sequential-id-pyramid-7",
@@ -1487,7 +1490,7 @@ PROBLEMS = {
       "company-tcs",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "stock-price-trend": {
     "id": "stock-price-trend",
@@ -1533,7 +1536,7 @@ PROBLEMS = {
       "company-amazon",
       "company-infosys"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "strings-are-anagram": {
     "id": "strings-are-anagram",
@@ -1580,7 +1583,7 @@ PROBLEMS = {
       "company-tcs",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "strong-virus": {
     "id": "strong-virus",
@@ -1626,7 +1629,7 @@ PROBLEMS = {
       "company-amazon",
       "exam-gate"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "student-marks-get-element": {
     "id": "student-marks-get-element",
@@ -1672,7 +1675,7 @@ PROBLEMS = {
       "college-cuiet-lab",
       "exam-university"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "sum-lower-triangle": {
     "id": "sum-lower-triangle",
@@ -1718,7 +1721,7 @@ PROBLEMS = {
       "exam-university",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "sum-of-kth-row": {
     "id": "sum-of-kth-row",
@@ -1764,7 +1767,7 @@ PROBLEMS = {
       "exam-university",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "translate-the-letter": {
     "id": "translate-the-letter",
@@ -1810,7 +1813,7 @@ PROBLEMS = {
       "company-wipro",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "tricycle-speed-manager": {
     "id": "tricycle-speed-manager",
@@ -1856,7 +1859,7 @@ PROBLEMS = {
       "college-cuiet-lab",
       "exam-viva"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "uppercase-to-lowercase": {
     "id": "uppercase-to-lowercase",
@@ -1902,7 +1905,7 @@ PROBLEMS = {
       "company-wipro",
       "college-cuiet-lab"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "valid-email-address": {
     "id": "valid-email-address",
@@ -1949,7 +1952,7 @@ PROBLEMS = {
       "company-infosys",
       "college-placement"
     ],
-    "review_needed": false
+    "review_needed": False
   },
   "web-browser-tab-history": {
     "id": "web-browser-tab-history",
@@ -1996,6 +1999,6 @@ PROBLEMS = {
       "company-amazon",
       "exam-gate"
     ],
-    "review_needed": false
+    "review_needed": False
   }
 }

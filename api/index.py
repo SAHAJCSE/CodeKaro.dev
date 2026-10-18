@@ -7,10 +7,10 @@ from urllib.parse import parse_qs, unquote, urlparse
 
 try:
     from api.problems_data import PROBLEMS, PATHS, COLLECTIONS
-except ImportError:
+except Exception:
     try:
         from problems_data import PROBLEMS, PATHS, COLLECTIONS
-    except ImportError:
+    except Exception:
         PROBLEMS = {}
         PATHS = []
         COLLECTIONS = []
@@ -48,7 +48,7 @@ class handler(BaseHTTPRequestHandler):
         # 1. From rewrite query ?path=$1
         if "path" in query and query["path"] and query["path"][0]:
             subpath = query["path"][0].strip("/")
-            return f"/api/{subpath}"
+            return f"/api/{subpath}".rstrip("/") if subpath else "/api"
 
         # 2. From Vercel routing headers
         for h in ("x-matched-path", "x-invoke-path", "x-forwarded-uri"):
