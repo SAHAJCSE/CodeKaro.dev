@@ -505,6 +505,85 @@
       color: #202126;
     }
 
+    .home-auth__user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, .1);
+      text-align: left;
+    }
+    :root[data-theme="light"] .home-auth__user-pill {
+      border-bottom-color: rgba(32, 33, 38, .12);
+    }
+    .home-auth__avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #784bff, #26d7f4);
+      color: #fff;
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .home-auth__avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .home-auth__user-meta {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+    .home-auth__user-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    :root[data-theme="light"] .home-auth__user-name {
+      color: #202126;
+    }
+    .home-auth__user-handle {
+      font-size: 11px;
+      color: rgba(255, 255, 255, .6);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    :root[data-theme="light"] .home-auth__user-handle {
+      color: #696b74;
+    }
+    .home-auth__link--logout {
+      background: none;
+      border: 1px solid rgba(255, 74, 110, .25);
+      color: #ff6b8b;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .home-auth__link--logout:hover {
+      background: rgba(255, 74, 110, .12);
+      border-color: #ff4a6e;
+      color: #ff4a6e;
+    }
+    :root[data-theme="light"] .home-auth__link--logout {
+      border-color: rgba(214, 51, 88, .2);
+      color: #c92a4f;
+    }
+    :root[data-theme="light"] .home-auth__link--logout:hover {
+      background: rgba(214, 51, 88, .08);
+      border-color: #c92a4f;
+      color: #a81c3c;
+    }
+
     .hero-title {
       align-self: center;
       justify-self: center;
@@ -1364,8 +1443,8 @@
         <div class="home-auth__panel">
           <p class="home-auth__prompt">Join Code-Karo</p>
           <div class="home-auth__actions">
-            <a class="home-auth__link" href="/practice?auth=signup">Sign up</a>
-            <a class="home-auth__link" href="/practice?auth=signin">Log in</a>
+            <a class="home-auth__link" href="/auth?auth=signup">Sign up</a>
+            <a class="home-auth__link" href="/auth">Log in</a>
           </div>
         </div>
       </div>

@@ -2,11 +2,13 @@
 """Start the local browser app for Code-Karo.dev Java practice problems."""
 import argparse
 import json
+import os
 import re
 import sys
+import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import unquote, urlencode, urlparse
 
 from runner.core import (
     MAX_REQUEST_BYTES,
@@ -146,10 +148,68 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_json(200, problem)
             return
 
+        # ── GitHub OAuth callback (server-side token exchange) ──
+        if path == "/api/github-callback":
+            code = urlparse(self.path).query
+            code_val = next(
+                (v for k, v in (p.split("=", 1) for p in code.split("&") if "=" in p) if k == "code"),
+                None,
+            )
+            if not code_val:
+                self.send_json(400, {"error": "Missing code parameter."})
+                return
+            client_id     = os.environ.get("GITHUB_CLIENT_ID", "")
+            client_secret = os.environ.get("GITHUB_CLIENT_SECRET", "")
+            if not client_id or not client_secret:
+                self.send_json(501, {
+                    "error": "GitHub OAuth not configured. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET env vars."
+                })
+                return
+            try:
+                # Exchange code for access token
+                token_data = urlencode({
+                    "client_id":     client_id,
+                    "client_secret": client_secret,
+                    "code":          code_val,
+                }).encode("utf-8")
+                req = urllib.request.Request(
+                    "https://github.com/login/oauth/access_token",
+                    data=token_data,
+                    headers={"Accept": "application/json"},
+                    method="POST",
+                )
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    token_json = json.loads(resp.read())
+                access_token = token_json.get("access_token")
+                if not access_token:
+                    self.send_json(401, {"error": token_json.get("error_description", "Token exchange failed.")})
+                    return
+                # Fetch GitHub user profile
+                user_req = urllib.request.Request(
+                    "https://api.github.com/user",
+                    headers={
+                        "Authorization": f"Bearer {access_token}",
+                        "Accept": "application/vnd.github+json",
+                        "User-Agent": "CodeKaro-App",
+                    },
+                )
+                with urllib.request.urlopen(user_req, timeout=10) as resp:
+                    user_json = json.loads(resp.read())
+                self.send_json(200, {"access_token": access_token, "user": user_json})
+            except Exception as exc:
+                self.send_json(500, {"error": f"GitHub OAuth error: {exc}"})
+            return
+
         norm_path = "/" if not path else path
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/auth": ("auth.html", "text/html; charset=utf-8"),
+            "/auth.html": ("auth.html", "text/html; charset=utf-8"),
+            "/problems": ("problems.html", "text/html; charset=utf-8"),
+            "/problems.html": ("problems.html", "text/html; charset=utf-8"),
+            "/problems.css": ("problems.css", "text/css; charset=utf-8"),
+            "/problems.js": ("problems.js", "text/javascript; charset=utf-8"),
             "/practice": ("practice.html", "text/html; charset=utf-8"),
             "/practice.html": ("practice.html", "text/html; charset=utf-8"),
             "/profile": ("profile.html", "text/html; charset=utf-8"),
@@ -184,11 +244,22 @@ class AppHandler(BaseHTTPRequestHandler):
         }
         if norm_path in static_files:
             filename, content_type = static_files[norm_path]
+            target = WEB / filename
+
+            if not target.is_file():
+                target = ROOT / "public" / filename
         else:
             rel_path = norm_path.lstrip("/")
-            file_candidate = (WEB / rel_path).resolve()
-            if file_candidate.is_file() and str(file_candidate).startswith(str(WEB.resolve())):
+            web_root = WEB.resolve()
+            file_candidate = (web_root / rel_path).resolve()
+
+            if (
+                file_candidate.is_file()
+                and file_candidate.is_relative_to(web_root)
+            ):
+                target = file_candidate
                 ext = file_candidate.suffix.lower()
+
                 mime_types = {
                     ".html": "text/html; charset=utf-8",
                     ".css": "text/css; charset=utf-8",
@@ -201,13 +272,15 @@ class AppHandler(BaseHTTPRequestHandler):
                     ".svg": "image/svg+xml",
                     ".woff2": "font/woff2",
                 }
-                content_type = mime_types.get(ext, "application/octet-stream")
-                filename = rel_path
+
+                content_type = mime_types.get(
+                    ext, "application/octet-stream"
+                )
             else:
                 self.send_json(404, {"error": "Page not found."})
                 return
         try:
-            body = (WEB / filename).read_bytes()
+            body = target.read_bytes()
         except OSError as error:
             self.send_json(500, {"error": f"Could not read app file: {error}"})
             return

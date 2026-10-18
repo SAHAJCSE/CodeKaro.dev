@@ -3,7 +3,7 @@ import json
 import os
 import re
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import parse_qs, unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlencode, urlparse
 
 try:
     from api.problems_data import PROBLEMS
@@ -105,11 +105,86 @@ class handler(BaseHTTPRequestHandler):
             self.send_json(200, {"problems": problem_list})
             return
 
+        if path == "/api/github-callback":
+            query = parse_qs(urlparse(self.path).query)
+            code_val = query.get("code", [None])[0]
+
+            if not code_val:
+                self.send_json(400, {"error": "Missing code parameter."})
+                return
+
+            client_id = os.environ.get("GITHUB_CLIENT_ID", "")
+            client_secret = os.environ.get("GITHUB_CLIENT_SECRET", "")
+
+            if not client_id or not client_secret:
+                self.send_json(501, {
+                    "error": "GitHub OAuth not configured on server. Set GITHUB_CLIENT_ID and GITHUB_CLIENT_SECRET."
+                })
+                return
+
+            try:
+                import urllib.request
+
+                token_data = urlencode({
+                    "client_id": client_id,
+                    "client_secret": client_secret,
+                    "code": code_val,
+                }).encode("utf-8")
+
+                req = urllib.request.Request(
+                    "https://github.com/login/oauth/access_token",
+                    data=token_data,
+                    headers={"Accept": "application/json"},
+                    method="POST",
+                )
+
+                with urllib.request.urlopen(req, timeout=10) as resp:
+                    token_json = json.loads(resp.read())
+
+                access_token = token_json.get("access_token")
+
+                if not access_token:
+                    self.send_json(401, {
+                        "error": token_json.get(
+                            "error_description",
+                            "Token exchange failed."
+                        )
+                    })
+                    return
+
+                user_req = urllib.request.Request(
+                    "https://api.github.com/user",
+                    headers={
+                        "Authorization": f"Bearer {access_token}",
+                        "Accept": "application/vnd.github+json",
+                        "User-Agent": "CodeKaro-App",
+                    },
+                )
+
+                with urllib.request.urlopen(user_req, timeout=10) as resp:
+                    user_json = json.loads(resp.read())
+
+                self.send_json(200, {
+                    "access_token": access_token,
+                    "user": user_json
+                })
+                return
+
+            except Exception as exc:
+                self.send_json(500, {
+                    "error": f"GitHub OAuth error: {exc}"
+                })
+                return
+
         if path.startswith("/api/problems/"):
             problem_id = path[len("/api/problems/"):]
             problem = PROBLEMS.get(problem_id)
+
             if problem is None:
-                self.send_json(404, {"error": f"Problem '{problem_id}' not found."})
+                self.send_json(
+                    404,
+                    {"error": f"Problem '{problem_id}' not found."}
+                )
                 return
             self.send_json(200, problem)
             return
@@ -120,10 +195,37 @@ class handler(BaseHTTPRequestHandler):
             clean = clean[4:]
         if clean.startswith("public/"):
             clean = clean[7:]
-        if clean in ("", "index.html", "about.html", "about", "about.css", "about.js", "team.js", "team.json", "app.css", "app.js", "config.js"):
-            file_name = "index.html" if clean == "" else "about.html" if clean == "about" else clean
+        if clean in (
+            "", "index.html",
+            "auth", "auth.html",
+            "problems", "problems.html", "problems.css", "problems.js",
+            "practice", "practice.html",
+            "profile", "profile.html",
+            "about", "about.html", "about.css", "about.js",
+            "team.js", "team.json",
+            "app.css", "app.js", "config.js",
+        ):
+            file_name = clean or "index.html"
+
+            if file_name in ("auth",):
+                file_name = "auth.html"
+            elif file_name == "problems":
+                file_name = "problems.html"
+            elif file_name == "practice":
+                file_name = "practice.html"
+            elif file_name == "profile":
+                file_name = "profile.html"
+            elif file_name == "about":
+                file_name = "about.html"
+
             content_types = {
                 "index.html": "text/html; charset=utf-8",
+                "auth.html": "text/html; charset=utf-8",
+                "problems.html": "text/html; charset=utf-8",
+                "problems.css": "text/css; charset=utf-8",
+                "problems.js": "application/javascript; charset=utf-8",
+                "practice.html": "text/html; charset=utf-8",
+                "profile.html": "text/html; charset=utf-8",
                 "about.html": "text/html; charset=utf-8",
                 "about.css": "text/css; charset=utf-8",
                 "about.js": "application/javascript; charset=utf-8",
