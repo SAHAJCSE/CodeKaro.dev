@@ -33,35 +33,11 @@ def get_problems_meta():
 
 
 def get_problem(problem_id):
-    if not PROBLEM_ID.fullmatch(problem_id):
+    if not PROBLEM_ID.fullmatch(problem_id) or problem_id not in get_problem_ids():
         return None
 
-    meta = get_problems_meta().get(problem_id, {})
     problem_dir = PROBLEMS / problem_id
-
-    readme = ""
-    solution = ""
-    if (problem_dir / "README.md").is_file():
-        try:
-            readme = (problem_dir / "README.md").read_text(encoding="utf-8")
-        except Exception:
-            readme = ""
-    if (problem_dir / "Solution.java").is_file():
-        try:
-            solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
-        except Exception:
-            solution = ""
-
-    # Fallback to pre-bundled data if available
-    if not readme or not solution:
-        try:
-            from api.problems_data import PROBLEMS as BUNDLED
-            bundled = BUNDLED.get(problem_id)
-            if bundled:
-                return bundled
-        except Exception:
-            pass
-
+    readme = (problem_dir / "README.md").read_text(encoding="utf-8")
     title = next(
         (line[2:].strip() for line in readme.splitlines() if line.startswith("# ")),
         problem_id.replace("-", " ").title(),
@@ -72,28 +48,16 @@ def get_problem(problem_id):
             for line in readme.splitlines()
             if line.strip() and not line.startswith("#") and not line.startswith("*Source:")
         ),
-        meta.get("summary", ""),
+        "",
     )
+    solution = (problem_dir / "Solution.java").read_text(encoding="utf-8")
     reference_path = ROOT / "reference" / problem_id / "Solution.java"
-    reference_solution = ""
-    if reference_path.is_file():
-        try:
-            reference_solution = reference_path.read_text(encoding="utf-8")
-        except Exception:
-            reference_solution = ""
-
+    reference_solution = reference_path.read_text(encoding="utf-8") if reference_path.is_file() else ""
     starter_path = ROOT / "starters" / problem_id / "Solution.java"
-    starter_solution = solution
-    if starter_path.is_file():
-        try:
-            starter_solution = starter_path.read_text(encoding="utf-8")
-        except Exception:
-            starter_solution = solution
-
+    starter_solution = starter_path.read_text(encoding="utf-8") if starter_path.is_file() else solution
+    meta = get_problems_meta().get(problem_id, {})
     return {
         "id": problem_id,
-        "display_number": meta.get("display_number", 0),
-        "display_id": meta.get("id", "00"),
         "title": title,
         "summary": summary,
         "readme": readme,
@@ -102,12 +66,6 @@ def get_problem(problem_id):
         "reference": reference_solution,
         "difficulty": meta.get("difficulty", "Easy"),
         "topics": meta.get("topics", []),
-        "languages": meta.get("languages", ["Java"]),
-        "path_id": meta.get("path_id", "java-basics"),
-        "path_name": meta.get("path_name", "Java Basics"),
-        "order_in_path": meta.get("order_in_path", 1),
-        "collection_ids": meta.get("collection_ids", []),
-        "review_needed": meta.get("review_needed", False),
         "hints": meta.get("hints", []),
         "sample_cases": meta.get("sample_cases", []),
     }
@@ -158,47 +116,26 @@ class AppHandler(BaseHTTPRequestHandler):
         return payload
 
     def do_GET(self):
-        try:
-            path = unquote(urlparse(self.path).path).rstrip("/")
+        path = unquote(urlparse(self.path).path).rstrip("/")
 
-            if path in ("/health", "/api/health"):
-                self.send_json(200, {"status": "ok"})
-                return
+        if path in ("/health", "/api/health"):
+            self.send_json(200, {"status": "ok"})
+            return
 
-            if path == "/api/problems":
-                meta_all = get_problems_meta()
-                problems = []
-                for problem_id in get_problem_ids():
-                    problem = get_problem(problem_id)
-                    if not problem:
-                        continue
-                    m = meta_all.get(problem_id, {})
-                    problems.append({
-                        "id": problem["id"],
-                        "display_number": m.get("display_number", problem.get("display_number", 0)),
-                        "display_id": m.get("id", problem.get("display_id", "00")),
-                        "title": problem.get("title", problem_id),
-                        "summary": problem.get("summary", ""),
-                        "difficulty": m.get("difficulty", problem.get("difficulty", "Easy")),
-                        "topics": m.get("topics", problem.get("topics", [])),
-                        "languages": m.get("languages", problem.get("languages", ["Java"])),
-                        "path_id": m.get("path_id", problem.get("path_id", "java-basics")),
-                        "path_name": m.get("path_name", problem.get("path_name", "Java Basics")),
-                        "order_in_path": m.get("order_in_path", problem.get("order_in_path", 1)),
-                        "collection_ids": m.get("collection_ids", problem.get("collection_ids", [])),
-                        "review_needed": m.get("review_needed", problem.get("review_needed", False)),
-                    })
-                paths_data = meta_all.get("_paths", [])
-                collections_data = meta_all.get("_collections", [])
-                self.send_json(200, {
-                    "problems": problems,
-                    "paths": paths_data,
-                    "collections": collections_data,
-                    "status": "ok"
+        if path in ("/api/problems", "/problems"):
+            meta_all = get_problems_meta()
+            problems = []
+            for problem_id in get_problem_ids():
+                problem = get_problem(problem_id)
+                m = meta_all.get(problem_id, {})
+                problems.append({
+                    "id": problem["id"],
+                    "title": problem["title"],
+                    "summary": problem["summary"],
+                    "difficulty": m.get("difficulty", "Easy"),
+                    "topics": m.get("topics", []),
                 })
-                return
-        except Exception as error:
-            self.send_json(500, {"error": str(error), "status": "error"})
+            self.send_json(200, {"problems": problems, "status": "ok"})
             return
 
         match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)
@@ -277,6 +214,16 @@ class AppHandler(BaseHTTPRequestHandler):
             "/practice.html": ("practice.html", "text/html; charset=utf-8"),
             "/profile": ("profile.html", "text/html; charset=utf-8"),
             "/profile.html": ("profile.html", "text/html; charset=utf-8"),
+            "/about": ("about.html", "text/html; charset=utf-8"),
+            "/about.html": ("about.html", "text/html; charset=utf-8"),
+            "/about.css": ("about.css", "text/css; charset=utf-8"),
+            "/about.js": ("about.js", "text/javascript; charset=utf-8"),
+            "/team.js": ("team.js", "text/javascript; charset=utf-8"),
+            "/team.json": ("team.json", "application/json; charset=utf-8"),
+            "/assets/team/rajeev.jpg": ("assets/team/rajeev.jpg", "image/jpeg"),
+            "/assets/team/shubham.jpg": ("assets/team/shubham.jpg", "image/jpeg"),
+            "/assets/team/duwarka.jpg": ("assets/team/duwarka.jpg", "image/jpeg"),
+            "/assets/team/sahaj.jpg": ("assets/team/sahaj.jpg", "image/jpeg"),
             "/navbar.css": ("navbar.css", "text/css; charset=utf-8"),
             "/navbar.js": ("navbar.js", "text/javascript; charset=utf-8"),
             "/gooey-nav.css": ("gooey-nav.css", "text/css; charset=utf-8"),
@@ -295,13 +242,43 @@ class AppHandler(BaseHTTPRequestHandler):
             "/app.js": ("app.js", "text/javascript; charset=utf-8"),
             "/config.js": ("config.js", "text/javascript; charset=utf-8"),
         }
-        if norm_path not in static_files:
-            self.send_json(404, {"error": "Page not found."})
-            return
-        filename, content_type = static_files[norm_path]
-        target = WEB / filename
-        if not target.is_file():
-            target = ROOT / "public" / filename
+        if norm_path in static_files:
+            filename, content_type = static_files[norm_path]
+            target = WEB / filename
+
+            if not target.is_file():
+                target = ROOT / "public" / filename
+        else:
+            rel_path = norm_path.lstrip("/")
+            web_root = WEB.resolve()
+            file_candidate = (web_root / rel_path).resolve()
+
+            if (
+                file_candidate.is_file()
+                and file_candidate.is_relative_to(web_root)
+            ):
+                target = file_candidate
+                ext = file_candidate.suffix.lower()
+
+                mime_types = {
+                    ".html": "text/html; charset=utf-8",
+                    ".css": "text/css; charset=utf-8",
+                    ".js": "text/javascript; charset=utf-8",
+                    ".json": "application/json; charset=utf-8",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".png": "image/png",
+                    ".webp": "image/webp",
+                    ".svg": "image/svg+xml",
+                    ".woff2": "font/woff2",
+                }
+
+                content_type = mime_types.get(
+                    ext, "application/octet-stream"
+                )
+            else:
+                self.send_json(404, {"error": "Page not found."})
+                return
         try:
             body = target.read_bytes()
         except OSError as error:

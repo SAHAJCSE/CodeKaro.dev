@@ -25,6 +25,3 @@ desktop.ini
 .vscode/
 .idea/
 *.iml
-
-# Local unzipped folder
-oops-judge-main/

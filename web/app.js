@@ -2,30 +2,9 @@ const problemList = document.querySelector("#problem-list");
 const searchInput = document.querySelector("#problem-search");
 const difficultyFilter = document.querySelector("#difficulty-filter");
 const statusFilter = document.querySelector("#status-filter");
-const languageFilter = document.querySelector("#language-filter");
-const sortFilter = document.querySelector("#sort-filter");
-const topicChipsContainer = document.querySelector("#topic-chips-container");
-const activeFiltersBar = document.querySelector("#active-filters-bar");
-const activeChipsList = document.querySelector("#active-chips-list");
-const clearAllFiltersBtn = document.querySelector("#clear-all-filters-btn");
+const topicFilter = document.querySelector("#topic-filter");
 const problemCount = document.querySelector("#problem-count");
 const visibleCount = document.querySelector("#visible-count");
-const miniEasyCount = document.querySelector("#mini-easy-count");
-const miniMedCount = document.querySelector("#mini-med-count");
-const miniHardCount = document.querySelector("#mini-hard-count");
-
-const tabBtnProblems = document.querySelector("#tab-btn-problems");
-const tabBtnPaths = document.querySelector("#tab-btn-paths");
-const tabBtnCollections = document.querySelector("#tab-btn-collections");
-const pathsList = document.querySelector("#paths-list");
-const collectionsList = document.querySelector("#collections-list");
-
-const problemPathBadge = document.querySelector("#problem-path-badge");
-const problemCollectionBadges = document.querySelector("#problem-collection-badges");
-const problemBookmarkBtn = document.querySelector("#problem-bookmark-btn");
-const solvedCelebrationBanner = document.querySelector("#solved-celebration-banner");
-const bannerNextBtn = document.querySelector("#banner-next-btn");
-const bannerNextName = document.querySelector("#banner-next-name");
 
 const editor = document.querySelector("#code-editor");
 const runButton = document.querySelector("#run-button");
@@ -34,7 +13,6 @@ const saveButton = document.querySelector("#save-button");
 const resetButton = document.querySelector("#reset-button");
 const fontDecreaseButton = document.querySelector("#font-decrease");
 const fontIncreaseButton = document.querySelector("#font-increase");
-const editorThemeSelect = document.querySelector("#editor-theme-select");
 const monacoContainer = document.querySelector("#monaco-editor");
 const fallbackEditorWrap = document.querySelector("#fallback-editor-wrap");
 const fallbackBanner = document.querySelector("#fallback-banner");
@@ -84,20 +62,6 @@ const testcaseSampleContent = document.querySelector("#testcase-sample-content")
 const mobileTabBar = document.querySelector("#mobile-tab-bar");
 const mobileTabBtns = document.querySelectorAll(".mobile-tab-btn");
 
-// Structured Library State
-const CANONICAL_TOPICS = ["Arrays", "Strings", "Loops", "Functions", "OOP", "Recursion", "Sorting", "Searching"];
-let catalogPaths = [];
-let catalogCollections = [];
-let selectedTopics = new Set();
-let currentLanguage = "all";
-let currentDifficulty = "all";
-let currentStatus = "all";
-let currentSort = "alphabetical";
-let currentCollectionFilter = null;
-let currentDrawerTab = "problems";
-let searchDebounceTimer = null;
-let focusedProblemIndex = -1;
-
 function getRunnerUrl() {
   try {
     const param = new URLSearchParams(window.location.search).get("runner_url");
@@ -123,93 +87,17 @@ let lastExecutionMode = "run";
 // Session drafts: in-memory draft retention across problem switching within session
 const sessionDrafts = new Map();
 
-// Current User State & Guest Progress
+// Current User State
 let currentUser = null;
 
-function getEffectiveUserId() {
-  return currentUser ? currentUser.id : "guest";
-}
-
 function getUserProblemStatus(userId, problemId) {
-  const uid = userId || getEffectiveUserId();
-  if (!uid || !problemId) return null;
-  return localStorage.getItem(`oops_status:${uid}:${problemId}`) || null;
+  if (!userId || !problemId) return null;
+  return localStorage.getItem(`oops_status:${userId}:${problemId}`) || null;
 }
 
 function setUserProblemStatus(userId, problemId, status) {
-  const uid = userId || getEffectiveUserId();
-  if (!uid || !problemId) return;
-  localStorage.setItem(`oops_status:${uid}:${problemId}`, status);
-  localStorage.setItem(`oops_attempt_time:${uid}:${problemId}`, new Date().toISOString());
-}
-
-function getBookmarks(userId) {
-  const uid = userId || getEffectiveUserId();
-  try {
-    return JSON.parse(localStorage.getItem(`oops_bookmarks:${uid}`) || "[]");
-  } catch (e) {
-    return [];
-  }
-}
-
-function isBookmarked(problemId, userId) {
-  const bookmarks = getBookmarks(userId);
-  return bookmarks.includes(problemId);
-}
-
-function toggleBookmark(problemId, userId) {
-  const uid = userId || getEffectiveUserId();
-  const bookmarks = getBookmarks(uid);
-  const idx = bookmarks.indexOf(problemId);
-  if (idx !== -1) {
-    bookmarks.splice(idx, 1);
-  } else {
-    bookmarks.push(problemId);
-  }
-  localStorage.setItem(`oops_bookmarks:${uid}`, JSON.stringify(bookmarks));
-  return idx === -1;
-}
-
-function mergeGuestProgress(targetUserId) {
-  if (!targetUserId || targetUserId === "guest") return;
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (!key) continue;
-      if (key.startsWith("oops_status:guest:")) {
-        const probId = key.replace("oops_status:guest:", "");
-        const guestStatus = localStorage.getItem(key);
-        const userStatus = localStorage.getItem(`oops_status:${targetUserId}:${probId}`);
-        if (!userStatus || (guestStatus === "solved" && userStatus !== "solved")) {
-          localStorage.setItem(`oops_status:${targetUserId}:${probId}`, guestStatus);
-        }
-      } else if (key.startsWith("oops_attempt_time:guest:")) {
-        const probId = key.replace("oops_attempt_time:guest:", "");
-        const guestTime = localStorage.getItem(key);
-        if (!localStorage.getItem(`oops_attempt_time:${targetUserId}:${probId}`)) {
-          localStorage.setItem(`oops_attempt_time:${targetUserId}:${probId}`, guestTime);
-        }
-      }
-    }
-    const guestBm = JSON.parse(localStorage.getItem("oops_bookmarks:guest") || "[]");
-    if (guestBm.length > 0) {
-      const userBm = JSON.parse(localStorage.getItem(`oops_bookmarks:${targetUserId}`) || "[]");
-      const merged = Array.from(new Set([...userBm, ...guestBm]));
-      localStorage.setItem(`oops_bookmarks:${targetUserId}`, JSON.stringify(merged));
-    }
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i);
-      if (key && key.startsWith("oops_sub:guest:")) {
-        const probId = key.replace("oops_sub:guest:", "");
-        const guestSubs = JSON.parse(localStorage.getItem(key) || "[]");
-        const userSubs = JSON.parse(localStorage.getItem(`oops_sub:${targetUserId}:${probId}`) || "[]");
-        const combined = [...userSubs, ...guestSubs].slice(0, 20);
-        localStorage.setItem(`oops_sub:${targetUserId}:${probId}`, JSON.stringify(combined));
-      }
-    }
-  } catch (e) {
-    console.warn("Could not merge guest progress:", e);
-  }
+  if (!userId || !problemId) return;
+  localStorage.setItem(`oops_status:${userId}:${problemId}`, status);
 }
 
 function getSubmissions(userId, problemId) {
@@ -269,246 +157,18 @@ async function hashPassword(password, salt) {
 }
 
 let monacoEditor = null;
-let isMonacoReady = false;
-
-const EDITOR_THEMES = {
-  "night-owl": {
-    id: "night-owl",
-    name: "Night Owl (Italic)",
-    base: "vs-dark",
-    isDark: true,
-    keywordFontStyle: "italic",
-    ui: {
-      bg: "#011627",
-      fg: "#d6deeb",
-      lineNumber: "#4b6479",
-      lineHighlight: "#082138",
-      selection: "#1d3b53",
-      cursor: "#7e57c2",
-      border: "#0b253a",
-    },
-    tokens: {
-      keyword: "ecc48d",
-      string: "addb67",
-      function: "21c7a8",
-      variable: "7fdbca",
-      comment: "637777",
-      number: "f78c6c",
-      operator: "c792ea",
-      type: "ffcb8b",
-    }
-  },
-  "material-darker": {
-    id: "material-darker",
-    name: "Material Theme Darker",
-    base: "vs-dark",
-    isDark: true,
-    ui: {
-      bg: "#0f0f0f",
-      fg: "#eeffff",
-      lineNumber: "#424242",
-      lineHighlight: "#1a1a1a",
-      selection: "#2b2b2b",
-      cursor: "#00e5ff",
-      border: "#1e1e1e",
-    },
-    tokens: {
-      keyword: "ff5370",
-      string: "c3e88d",
-      function: "00e5ff",
-      variable: "eeffff",
-      comment: "545454",
-      number: "f78c6c",
-      operator: "89ddff",
-      type: "ffcb6b",
-    }
-  },
-  "aura-dark": {
-    id: "aura-dark",
-    name: "Aura Dark Theme",
-    base: "vs-dark",
-    isDark: true,
-    ui: {
-      bg: "#15141b",
-      fg: "#edecee",
-      lineNumber: "#4d4669",
-      lineHighlight: "#201e2a",
-      selection: "#37324d",
-      cursor: "#a277ff",
-      border: "#252233",
-    },
-    tokens: {
-      keyword: "ff679a",
-      string: "a277ff",
-      function: "61ffca",
-      variable: "ffca85",
-      comment: "6d6d8c",
-      number: "ffca85",
-      operator: "edecee",
-      type: "82e2ff",
-    }
-  },
-  "andromeda": {
-    id: "andromeda",
-    name: "Andromeda",
-    base: "vs-dark",
-    isDark: true,
-    ui: {
-      bg: "#1e222a",
-      fg: "#d5cec8",
-      lineNumber: "#4e5666",
-      lineHighlight: "#262b35",
-      selection: "#363d4d",
-      cursor: "#00e8c6",
-      border: "#2a303c",
-    },
-    tokens: {
-      keyword: "ff4a6e",
-      string: "f39c12",
-      function: "98e024",
-      variable: "d5cec8",
-      comment: "5c6370",
-      number: "ff9e64",
-      operator: "00e8c6",
-      type: "ffe66d",
-    }
-  },
-  "tokyo-night-storm": {
-    id: "tokyo-night-storm",
-    name: "Tokyo Night Storm",
-    base: "vs-dark",
-    isDark: true,
-    ui: {
-      bg: "#1a1b26",
-      fg: "#c0caf5",
-      lineNumber: "#3b4261",
-      lineHighlight: "#24283b",
-      selection: "#2e3c64",
-      cursor: "#c0caf5",
-      border: "#1f2335",
-    },
-    tokens: {
-      keyword: "bb9af7",
-      string: "9ece6a",
-      function: "7dcfff",
-      variable: "c0caf5",
-      comment: "565f89",
-      number: "ff9e64",
-      operator: "89ddff",
-      type: "e0af68",
-    }
-  }
-};
-
-let currentEditorTheme = (() => {
-  try {
-    const saved = localStorage.getItem("code_karo_editor_theme");
-    if (saved && EDITOR_THEMES[saved]) return saved;
-  } catch (e) {}
-  return "night-owl";
-})();
-
-function setEditorTheme(themeKey, persist = true) {
-  if (!EDITOR_THEMES[themeKey]) themeKey = "night-owl";
-  currentEditorTheme = themeKey;
-
-  document.documentElement.dataset.editorTheme = themeKey;
-  if (editorPanel) {
-    editorPanel.setAttribute("data-editor-theme", themeKey);
-  }
-
-  const select = document.querySelector("#editor-theme-select");
-  if (select && select.value !== themeKey) {
-    select.value = themeKey;
-  }
-
-  if (monacoEditor && window.monaco) {
-    window.monaco.editor.setTheme(themeKey);
-  }
-
-  if (persist) {
-    try {
-      localStorage.setItem("code_karo_editor_theme", themeKey);
-      if (EDITOR_THEMES[themeKey].isDark) {
-        localStorage.setItem("code_karo_dark_theme", themeKey);
-      }
-    } catch (e) {}
-  }
-
-  document.dispatchEvent(new CustomEvent("code-karo-editor-theme-change", { detail: { theme: themeKey } }));
-}
-
-function registerMonacoThemes() {
-  if (!window.monaco) return;
-  Object.keys(EDITOR_THEMES).forEach(key => {
-    const theme = EDITOR_THEMES[key];
-    const kwStyle = theme.keywordFontStyle || "bold";
-    monaco.editor.defineTheme(key, {
-      base: theme.base,
-      inherit: true,
-      rules: [
-        { token: "keyword", foreground: theme.tokens.keyword, fontStyle: kwStyle },
-        { token: "keyword.java", foreground: theme.tokens.keyword, fontStyle: kwStyle },
-        { token: "type", foreground: theme.tokens.type, fontStyle: "bold" },
-        { token: "type.identifier", foreground: theme.tokens.type, fontStyle: "bold" },
-        { token: "class", foreground: theme.tokens.type, fontStyle: "bold" },
-        { token: "annotation", foreground: theme.tokens.type },
-        { token: "string", foreground: theme.tokens.string },
-        { token: "string.escape", foreground: theme.tokens.number },
-        { token: "comment", foreground: theme.tokens.comment, fontStyle: "italic" },
-        { token: "number", foreground: theme.tokens.number },
-        { token: "delimiter", foreground: theme.tokens.operator },
-        { token: "operator", foreground: theme.tokens.operator },
-        { token: "identifier", foreground: theme.tokens.variable },
-        { token: "variable", foreground: theme.tokens.variable },
-        { token: "function", foreground: theme.tokens.function },
-        { token: "function.call", foreground: theme.tokens.function },
-        { token: "method", foreground: theme.tokens.function }
-      ],
-      colors: {
-        "editor.background": theme.ui.bg,
-        "editor.foreground": theme.ui.fg,
-        "editorLineNumber.foreground": theme.ui.lineNumber,
-        "editorLineNumber.activeForeground": theme.ui.fg,
-        "editorGutter.background": theme.ui.bg,
-        "editorCursor.foreground": theme.ui.cursor,
-        "editor.selectionBackground": theme.ui.selection + "aa",
-        "editor.inactiveSelectionBackground": theme.ui.selection + "55",
-        "editor.lineHighlightBackground": theme.ui.lineHighlight,
-        "editor.lineHighlightBorder": "#00000000",
-        "editorOverviewRuler.border": theme.ui.border,
-        "editorWidget.background": theme.ui.bg,
-        "editorWidget.border": theme.ui.border
-      }
-    });
-  });
-
-  // Aliases for backwards compatibility
-  monaco.editor.defineTheme("code-karo-dark", { base: "vs-dark", inherit: true, rules: [], colors: {} });
-  monaco.editor.defineTheme("code-karo-light", { base: "vs", inherit: true, rules: [], colors: {} });
-}
-
 document.addEventListener("code-karo-theme-change", event => {
-  let savedDark = "night-owl";
-  try {
-    savedDark = localStorage.getItem("code_karo_dark_theme") || "night-owl";
-    if (!EDITOR_THEMES[savedDark]) savedDark = "night-owl";
-  } catch (e) {}
-  setEditorTheme(savedDark);
+  if (!monacoEditor || !window.monaco) return;
+  const theme = event.detail.theme === "light" ? "code-karo-light" : "code-karo-dark";
+  window.monaco.editor.setTheme(theme);
 });
+let isMonacoReady = false;
 let isFallbackActive = false;
 let currentFontSize = parseInt(localStorage.getItem("oops_font_size") || "14", 10);
 
 async function requestJson(url, options) {
   const response = await fetch(url, options);
-  const text = await response.text();
-  let result;
-  try {
-    result = JSON.parse(text);
-  } catch {
-    const cleanSnippet = text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 80);
-    throw new Error(response.ok ? "Server sent non-JSON response." : `Server error (${response.status}): ${cleanSnippet || "Unknown error"}`);
-  }
+  const result = await response.json();
   if (!response.ok) throw new Error(result.error || `Request failed (${response.status}).`);
   return result;
 }
@@ -755,467 +415,80 @@ function renderMarkdown(markdown, problemTitle = "") {
   return html.join("\n");
 }
 
-function highlightMatch(text, query) {
-  if (!query || !text) return escapeHtml(text);
-  const escapedText = escapeHtml(text);
-  const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const regex = new RegExp(`(${escapedQuery})`, "gi");
-  return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
-}
-
-function syncFiltersToUrl() {
-  const url = new URL(window.location);
-  if (selectedTopics.size > 0) {
-    url.searchParams.set("topic", Array.from(selectedTopics).join(",").toLowerCase());
-  } else {
-    url.searchParams.delete("topic");
-  }
-  if (currentDifficulty && currentDifficulty !== "all") {
-    url.searchParams.set("difficulty", currentDifficulty.toLowerCase());
-  } else {
-    url.searchParams.delete("difficulty");
-  }
-  if (currentStatus && currentStatus !== "all") {
-    url.searchParams.set("status", currentStatus.toLowerCase());
-  } else {
-    url.searchParams.delete("status");
-  }
-  if (currentLanguage && currentLanguage !== "all") {
-    url.searchParams.set("lang", currentLanguage.toLowerCase());
-  } else {
-    url.searchParams.delete("lang");
-  }
-  if (currentCollectionFilter) {
-    url.searchParams.set("collection", currentCollectionFilter);
-  } else {
-    url.searchParams.delete("collection");
-  }
-  window.history.replaceState({ ...window.history.state }, "", url);
-}
-
-function initFiltersFromUrl() {
-  const params = new URLSearchParams(window.location.search);
-  const topicParam = params.get("topic");
-  if (topicParam) {
-    topicParam.split(",").map(t => t.trim()).filter(Boolean).forEach(t => {
-      const canonical = CANONICAL_TOPICS.find(ct => ct.toLowerCase() === t.toLowerCase());
-      if (canonical) selectedTopics.add(canonical);
-    });
-  }
-  const diffParam = params.get("difficulty");
-  if (diffParam) {
-    const dLower = diffParam.toLowerCase();
-    if (dLower === "easy") currentDifficulty = "Easy";
-    else if (dLower === "medium") currentDifficulty = "Medium";
-    else if (dLower === "hard") currentDifficulty = "Hard";
-    if (difficultyFilter) difficultyFilter.value = currentDifficulty;
-  }
-  const statParam = params.get("status");
-  if (statParam) {
-    const sLower = statParam.toLowerCase();
-    if (["solved", "attempted", "unsolved", "bookmarked"].includes(sLower)) {
-      currentStatus = sLower;
-      if (statusFilter) statusFilter.value = sLower;
-    }
-  }
-  const langParam = params.get("lang");
-  if (langParam && languageFilter) {
-    const lLower = langParam.toLowerCase();
-    if (lLower === "java") currentLanguage = "Java";
-    else if (lLower === "python") currentLanguage = "Python";
-    else if (lLower === "c++") currentLanguage = "C++";
-    else if (lLower === "c") currentLanguage = "C";
-    languageFilter.value = currentLanguage;
-  }
-  const collParam = params.get("collection");
-  if (collParam) {
-    currentCollectionFilter = collParam;
-  }
-}
-
-function renderTopicFilterChips() {
-  if (!topicChipsContainer) return;
-  topicChipsContainer.innerHTML = CANONICAL_TOPICS.map(topic => {
-    const count = problems.filter(p => (p.topics || []).includes(topic)).length;
-    const isSelected = selectedTopics.has(topic);
-    return `
-      <button type="button" class="topic-filter-chip${isSelected ? " selected" : ""}" data-topic="${escapeHtml(topic)}">
-        ${escapeHtml(topic)} <span class="chip-count">(${count})</span>
-      </button>
-    `;
-  }).join("");
-}
-
-function renderActiveFiltersBar() {
-  if (!activeFiltersBar || !activeChipsList) return;
-  const chips = [];
-
-  if (currentLanguage !== "all") {
-    chips.push({ label: `Language: ${currentLanguage}`, type: "lang" });
-  }
-  if (currentDifficulty !== "all") {
-    chips.push({ label: `Difficulty: ${currentDifficulty}`, type: "diff" });
-  }
-  if (currentStatus !== "all") {
-    const labels = { solved: "Solved", attempted: "Attempted", unsolved: "Unsolved", bookmarked: "Bookmarked" };
-    chips.push({ label: `Status: ${labels[currentStatus] || currentStatus}`, type: "status" });
-  }
-  selectedTopics.forEach(top => {
-    chips.push({ label: `Topic: ${top}`, type: "topic", value: top });
-  });
-  if (currentCollectionFilter) {
-    const colObj = catalogCollections.find(c => c.id === currentCollectionFilter);
-    const colName = colObj ? colObj.name : currentCollectionFilter;
-    chips.push({ label: `Collection: ${colName}`, type: "coll" });
-  }
-  const query = searchInput ? searchInput.value.trim() : "";
-  if (query) {
-    chips.push({ label: `Search: "${query}"`, type: "search" });
-  }
-
-  if (chips.length === 0) {
-    activeFiltersBar.hidden = true;
-    activeChipsList.innerHTML = "";
-    return;
-  }
-
-  activeFiltersBar.hidden = false;
-  activeChipsList.innerHTML = chips.map(c => `
-    <span class="active-chip">
-      <span class="active-chip-text">${escapeHtml(c.label)}</span>
-      <button type="button" class="active-chip-remove" data-chip-type="${c.type}" data-chip-val="${escapeHtml(c.value || '')}" aria-label="Remove filter">✕</button>
-    </span>
-  `).join("");
-}
-
-function updateMiniCounts() {
-  let easyTotal = 0, easySolved = 0;
-  let medTotal = 0, medSolved = 0;
-  let hardTotal = 0, hardSolved = 0;
-
-  const uid = getEffectiveUserId();
-  problems.forEach(p => {
-    const d = (p.difficulty || "Easy").toLowerCase();
-    const isSolved = getUserProblemStatus(uid, p.id) === "solved";
-    if (d === "easy") {
-      easyTotal++;
-      if (isSolved) easySolved++;
-    } else if (d === "medium") {
-      medTotal++;
-      if (isSolved) medSolved++;
-    } else if (d === "hard") {
-      hardTotal++;
-      if (isSolved) hardSolved++;
-    }
-  });
-
-  if (miniEasyCount) miniEasyCount.textContent = `${easySolved}/${easyTotal} Easy`;
-  if (miniMedCount) miniMedCount.textContent = `${medSolved}/${medTotal} Med`;
-  if (miniHardCount) miniHardCount.textContent = `${hardSolved}/${hardTotal} Hard`;
-}
-
-function resetAllFilters() {
-  if (searchInput) searchInput.value = "";
-  if (difficultyFilter) difficultyFilter.value = "all";
-  if (statusFilter) statusFilter.value = "all";
-  if (languageFilter) languageFilter.value = "all";
-  if (sortFilter) sortFilter.value = "alphabetical";
-  currentDifficulty = "all";
-  currentStatus = "all";
-  currentLanguage = "all";
-  currentSort = "alphabetical";
-  currentCollectionFilter = null;
-  selectedTopics.clear();
-  syncFiltersToUrl();
-  renderProblemList();
-}
-
 function renderProblemList() {
-  if (currentDrawerTab !== "problems") return;
-  const rawQuery = searchInput ? searchInput.value.trim() : "";
-  const query = rawQuery.toLowerCase();
-  const diffVal = difficultyFilter ? difficultyFilter.value : currentDifficulty;
-  const statVal = statusFilter ? statusFilter.value : currentStatus;
-  const langVal = languageFilter ? languageFilter.value : currentLanguage;
-  currentDifficulty = diffVal;
-  currentStatus = statVal;
-  currentLanguage = langVal;
-  if (sortFilter) currentSort = sortFilter.value;
+  const query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+  const diffVal = difficultyFilter ? difficultyFilter.value : "all";
+  const statVal = statusFilter ? statusFilter.value : "all";
+  const topicVal = topicFilter ? topicFilter.value : "all";
 
-  const uid = getEffectiveUserId();
-
-  // Solved counts
   let solvedCount = 0;
   problems.forEach(p => {
-    if (getUserProblemStatus(uid, p.id) === "solved") solvedCount++;
+    if (currentUser && getUserProblemStatus(currentUser.id, p.id) === "solved") solvedCount++;
   });
   if (problemCount) {
     problemCount.textContent = `${solvedCount} / ${problems.length} solved`;
   }
-  updateMiniCounts();
-  renderTopicFilterChips();
-  renderActiveFiltersBar();
-  syncFiltersToUrl();
-
-  const isNumericQuery = /^#?\d+$/.test(rawQuery);
-  const numericVal = isNumericQuery ? parseInt(rawQuery.replace("#", ""), 10) : null;
 
   const filtered = problems.filter(problem => {
     if (query) {
-      let matches = false;
-      if (isNumericQuery && numericVal !== null) {
-        if (problem.display_number === numericVal) matches = true;
-        if (problem.display_id && problem.display_id.replace(/^0+/, "") === String(numericVal)) matches = true;
-      }
-      if (!matches) {
-        const titleMatch = (problem.title || "").toLowerCase().includes(query);
-        const slugMatch = (problem.id || "").toLowerCase().includes(query);
-        const idMatch = (problem.display_id || "").toLowerCase().includes(query);
-        const topicMatch = (problem.topics || []).some(t => t.toLowerCase().includes(query));
-        matches = titleMatch || slugMatch || idMatch || topicMatch;
-      }
-      if (!matches) return false;
+      const matchText = (problem.title || "").toLowerCase().includes(query) ||
+        (problem.id || "").toLowerCase().includes(query) ||
+        (problem.summary || "").toLowerCase().includes(query);
+      if (!matchText) return false;
     }
-
     if (diffVal !== "all" && problem.difficulty !== diffVal) {
       return false;
     }
-
-    if (langVal !== "all") {
-      const langs = problem.languages || ["Java"];
-      if (!langs.some(l => l.toLowerCase() === langVal.toLowerCase())) return false;
-    }
-
     if (statVal !== "all") {
-      const st = getUserProblemStatus(uid, problem.id);
+      const st = currentUser ? getUserProblemStatus(currentUser.id, problem.id) : null;
       if (statVal === "solved" && st !== "solved") return false;
       if (statVal === "attempted" && st !== "attempted") return false;
-      if (statVal === "unsolved" && st === "solved") return false;
-      if (statVal === "bookmarked" && !isBookmarked(problem.id, uid)) return false;
+      if (statVal === "todo" && st) return false;
     }
-
-    if (selectedTopics.size > 0) {
-      const pTopics = problem.topics || [];
-      const hasTopic = Array.from(selectedTopics).some(t => pTopics.includes(t));
-      if (!hasTopic) return false;
+    if (topicVal !== "all") {
+      if (!problem.topics || !problem.topics.includes(topicVal)) return false;
     }
-
-    if (currentCollectionFilter) {
-      const colIds = problem.collection_ids || [];
-      if (!colIds.includes(currentCollectionFilter)) return false;
-    }
-
     return true;
   });
 
-  // Sorting
-  let sorted = [...filtered];
-  if (currentSort === "alphabetical") {
-    sorted.sort((a, b) => (a.title || "").localeCompare(b.title || ""));
-  } else if (currentSort === "path") {
-    const pathOrder = ["java-basics", "strings", "loops-functions", "oop", "recursion", "sorting-searching"];
-    sorted.sort((a, b) => {
-      const aPathIdx = pathOrder.indexOf(a.path_id);
-      const bPathIdx = pathOrder.indexOf(b.path_id);
-      if (aPathIdx !== bPathIdx) return (aPathIdx === -1 ? 99 : aPathIdx) - (bPathIdx === -1 ? 99 : bPathIdx);
-      return (a.order_in_path || 0) - (b.order_in_path || 0);
-    });
-  } else if (currentSort === "difficulty") {
-    const diffRank = { "Easy": 1, "Medium": 2, "Hard": 3 };
-    sorted.sort((a, b) => (diffRank[a.difficulty] || 1) - (diffRank[b.difficulty] || 1));
-  }
-
   if (visibleCount) {
-    const isFiltered = query || diffVal !== "all" || statVal !== "all" || langVal !== "all" || selectedTopics.size > 0 || currentCollectionFilter;
-    visibleCount.textContent = isFiltered ? `${sorted.length} shown` : "";
+    visibleCount.textContent = (query || diffVal !== "all" || statVal !== "all" || topicVal !== "all")
+      ? `${filtered.length} shown`
+      : "";
   }
 
-  if (!sorted.length) {
-    problemList.innerHTML = `
-      <div class="empty-list-card">
-        <div class="empty-icon">🔍</div>
-        <div class="empty-title">No problems match your filters</div>
-        <p class="empty-desc">Try clearing selected filters or search terms.</p>
-        <button id="reset-filters-btn" class="button button-outline-cyan" type="button">Reset filters</button>
-      </div>
-    `;
-    const rBtn = document.querySelector("#reset-filters-btn");
-    if (rBtn) {
-      rBtn.addEventListener("click", resetAllFilters);
-    }
-    focusedProblemIndex = -1;
+  if (!filtered.length) {
+    problemList.innerHTML = '<div class="empty-list">No matching problems found.</div>';
     return;
   }
 
-  problemList.innerHTML = sorted.map((problem, index) => {
-    const status = getUserProblemStatus(uid, problem.id);
+  problemList.innerHTML = filtered.map(problem => {
+    const status = currentUser ? getUserProblemStatus(currentUser.id, problem.id) : null;
     let markerHtml = "";
     if (status === "solved") {
       markerHtml = '<span class="status-marker solved" title="Solved">✓</span>';
     } else if (status === "attempted") {
-      markerHtml = '<span class="status-marker attempted" title="Attempted">◐</span>';
+      markerHtml = '<span class="status-marker attempted" title="Attempted">●</span>';
     } else {
-      markerHtml = '<span class="status-marker unsolved" title="Unsolved">○</span>';
+      markerHtml = `<span class="problem-number">${String(problems.indexOf(problem) + 1).padStart(2, "0")}</span>`;
     }
 
     const diffClass = (problem.difficulty || "Easy").toLowerCase();
     const diffLabel = problem.difficulty || "Easy";
-    const displayId = problem.display_id || String(problem.display_number || (index + 1)).padStart(2, "0");
-    const bookmarked = isBookmarked(problem.id, uid);
-
-    const titleHighlighted = query ? highlightMatch(problem.title, query) : escapeHtml(problem.title);
-    const slugHighlighted = query ? highlightMatch(problem.id, query) : escapeHtml(problem.id);
-
-    const topicChipsHtml = (problem.topics || []).slice(0, 3).map(t =>
-      `<span class="problem-item-topic-chip" title="${escapeHtml(t)}">${escapeHtml(t)}</span>`
-    ).join("");
 
     return `
-      <div class="problem-item-wrapper${index === focusedProblemIndex ? " keyboard-focused" : ""}">
-        <button class="problem-item${problem.id === currentProblem ? " selected" : ""}" data-problem="${escapeHtml(problem.id)}">
-          <div class="problem-item-left">
-            <span class="problem-status-col">${markerHtml}</span>
-            <span class="problem-num-badge">#${escapeHtml(displayId)}</span>
-            <span class="problem-title" title="${escapeHtml(problem.title)}">${titleHighlighted}</span>
-          </div>
-          <div class="problem-item-right">
-            <span class="problem-item-diff ${diffClass}">${diffLabel.toUpperCase()}</span>
-            <div class="problem-topics-mini">
-              ${topicChipsHtml}
-            </div>
-          </div>
-        </button>
-        <button class="problem-bookmark-star${bookmarked ? " active" : ""}" data-bookmark-problem="${escapeHtml(problem.id)}" title="${bookmarked ? "Remove bookmark" : "Bookmark problem"}" aria-label="Bookmark">
-          ${bookmarked ? "★" : "☆"}
-        </button>
-      </div>
+      <button class="problem-item${problem.id === currentProblem ? " selected" : ""}" data-problem="${escapeHtml(problem.id)}">
+        ${markerHtml}
+        <span class="problem-item-text">
+          <span class="problem-title">${escapeHtml(problem.title)}</span>
+          <span class="problem-item-sub">
+            <span class="problem-slug">${escapeHtml(problem.id)}</span>
+            <span class="problem-item-diff ${diffClass}">${diffLabel}</span>
+          </span>
+        </span>
+      </button>
     `;
   }).join("");
-}
-
-function renderPathsTab() {
-  if (!pathsList) return;
-  const uid = getEffectiveUserId();
-  const paths = catalogPaths.length ? catalogPaths : [
-    { id: "java-basics", title: "Java Basics", description: "Core syntax, data types, operators, and basic logic." },
-    { id: "strings", title: "Strings", description: "String manipulation, parsing, concatenation, and analysis." },
-    { id: "loops-functions", title: "Loops & Functions", description: "Iteration, nested loops, helper methods, and recursion basics." },
-    { id: "oop", title: "OOP", description: "Classes, encapsulation, constructors, and object-oriented modeling." },
-    { id: "recursion", title: "Recursion", description: "Recursive decomposition, base cases, and call stacks." },
-    { id: "sorting-searching", title: "Sorting & Searching", description: "Linear and binary search, comparison sorts, and array scans." }
-  ];
-
-  pathsList.innerHTML = paths.map((p, idx) => {
-    const pProblems = problems.filter(prob => prob.path_id === p.id).sort((a, b) => (a.order_in_path || 0) - (b.order_in_path || 0));
-    const solvedCount = pProblems.filter(prob => getUserProblemStatus(uid, prob.id) === "solved").length;
-    const totalCount = pProblems.length;
-    const pct = totalCount > 0 ? Math.round((solvedCount / totalCount) * 100) : 0;
-    const nextUnsolved = pProblems.find(prob => getUserProblemStatus(uid, prob.id) !== "solved") || pProblems[0];
-
-    return `
-      <div class="path-card">
-        <div class="path-card-header">
-          <div class="path-card-title">${idx + 1}. ${escapeHtml(p.title)}</div>
-          <span class="path-card-count">${solvedCount} / ${totalCount} solved</span>
-        </div>
-        <div class="path-card-desc">${escapeHtml(p.description)}</div>
-        <div class="path-progress-bar-bg">
-          <div class="path-progress-bar-fill" style="width: ${pct}%"></div>
-        </div>
-        <div class="path-card-footer">
-          <span class="path-step-info">${totalCount} exercises • ${pct}% complete</span>
-          <button class="button button-primary path-continue-btn" type="button" data-path-target="${escapeHtml(nextUnsolved ? nextUnsolved.id : "")}">
-            ${solvedCount === totalCount ? "Review Path ➔" : "Continue ➔"}
-          </button>
-        </div>
-      </div>
-    `;
-  }).join("");
-}
-
-function renderCollectionsTab() {
-  if (!collectionsList) return;
-  const uid = getEffectiveUserId();
-  const cols = catalogCollections.length ? catalogCollections : [];
-
-  const categories = ["Company", "College", "Exam"];
-  let html = "";
-
-  categories.forEach(cat => {
-    const catCols = cols.filter(c => c.category === cat);
-    if (!catCols.length) return;
-
-    html += `<div class="collections-category-header">${escapeHtml(cat.toUpperCase())} COLLECTIONS</div>`;
-    html += `<div class="collections-grid">`;
-
-    catCols.forEach(c => {
-      const cProblems = problems.filter(p => (p.collection_ids || []).includes(c.id));
-      const solvedCount = cProblems.filter(p => getUserProblemStatus(uid, p.id) === "solved").length;
-      const totalCount = cProblems.length;
-      const pct = totalCount > 0 ? Math.round((solvedCount / totalCount) * 100) : 0;
-
-      html += `
-        <div class="collection-card" data-collection-filter="${escapeHtml(c.id)}">
-          <div class="collection-card-top">
-            <span class="collection-cat-tag ${cat.toLowerCase()}">${escapeHtml(cat)}</span>
-            <span class="collection-card-count">${solvedCount}/${totalCount}</span>
-          </div>
-          <div class="collection-card-title">${escapeHtml(c.name)}</div>
-          <div class="collection-card-desc">${escapeHtml(c.description || "")}</div>
-          <div class="path-progress-bar-bg" style="margin-top: 8px;">
-            <div class="path-progress-bar-fill" style="width: ${pct}%;"></div>
-          </div>
-        </div>
-      `;
-    });
-
-    html += `</div>`;
-  });
-
-  collectionsList.innerHTML = html;
-}
-
-function switchDrawerTab(tabName) {
-  currentDrawerTab = tabName;
-  document.querySelectorAll(".drawer-nav-tab").forEach(btn => {
-    const isActive = btn.dataset.tab === tabName;
-    btn.classList.toggle("active", isActive);
-    btn.setAttribute("aria-selected", String(isActive));
-  });
-
-  const filtersSec = document.querySelector("#drawer-filters-section");
-  const listLabelRow = document.querySelector("#list-label-row");
-  const tabTitle = document.querySelector("#list-tab-title");
-
-  const probView = document.querySelector("#problem-list");
-  const pathsView = document.querySelector("#paths-list");
-  const collView = document.querySelector("#collections-list");
-
-  if (tabName === "problems") {
-    if (filtersSec) filtersSec.hidden = false;
-    if (listLabelRow) listLabelRow.hidden = false;
-    if (tabTitle) tabTitle.textContent = currentCollectionFilter ? "COLLECTION PROBLEMS" : "ALL PROBLEMS";
-    if (probView) { probView.hidden = false; probView.classList.add("active"); }
-    if (pathsView) { pathsView.hidden = true; pathsView.classList.remove("active"); }
-    if (collView) { collView.hidden = true; collView.classList.remove("active"); }
-    renderProblemList();
-  } else if (tabName === "paths") {
-    if (filtersSec) filtersSec.hidden = true;
-    if (listLabelRow) listLabelRow.hidden = false;
-    if (tabTitle) tabTitle.textContent = "LEARNING PATHS";
-    if (probView) { probView.hidden = true; probView.classList.remove("active"); }
-    if (pathsView) { pathsView.hidden = false; pathsView.classList.add("active"); }
-    if (collView) { collView.hidden = true; collView.classList.remove("active"); }
-    renderPathsTab();
-  } else if (tabName === "collections") {
-    if (filtersSec) filtersSec.hidden = true;
-    if (listLabelRow) listLabelRow.hidden = false;
-    if (tabTitle) tabTitle.textContent = "CURATED COLLECTIONS";
-    if (probView) { probView.hidden = true; probView.classList.remove("active"); }
-    if (pathsView) { pathsView.hidden = true; pathsView.classList.remove("active"); }
-    if (collView) { collView.hidden = false; collView.classList.add("active"); }
-    renderCollectionsTab();
-  }
 }
 
 function updateDirtyState() {
@@ -1248,39 +521,28 @@ function enableFallbackEditor() {
 
 let monacoInitPromise = null;
 
-function waitForRequire(maxWaitMs = 4000) {
-  const start = Date.now();
-  return new Promise((resolve) => {
-    const check = () => {
-      if (typeof window.require !== "undefined") {
-        resolve(true);
-      } else if (window.monacoLoadError || Date.now() - start > maxWaitMs) {
-        resolve(false);
-      } else {
-        setTimeout(check, 50);
-      }
-    };
-    check();
-  });
-}
-
 function initMonaco() {
   if (monacoInitPromise) return monacoInitPromise;
 
-  monacoInitPromise = new Promise(async (resolve) => {
-    const hasRequire = await waitForRequire(4000);
-    if (!hasRequire || window.monacoLoadError) {
-      console.warn("Monaco loader failed or timed out; falling back to textarea editor.");
+  monacoInitPromise = new Promise((resolve) => {
+    // 5-second CDN timeout fallback
+    const timeout = setTimeout(() => {
+      console.warn("Monaco loader timed out after 5s; falling back to textarea editor.");
+      enableFallbackEditor();
+      resolve(null);
+    }, 5000);
+
+    if (window.monacoLoadError || typeof window.require === "undefined") {
+      clearTimeout(timeout);
       enableFallbackEditor();
       resolve(null);
       return;
     }
 
     try {
-      const monacoBase = "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min";
       window.require.config({
         paths: {
-          vs: `${monacoBase}/vs`
+          vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs"
         }
       });
 
@@ -1288,9 +550,9 @@ function initMonaco() {
         getWorker: function (workerId, label) {
           const workerScript = `
             self.MonacoEnvironment = {
-              baseUrl: '${monacoBase}/'
+              baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/'
             };
-            importScripts('${monacoBase}/vs/base/worker/workerMain.js');
+            importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/base/worker/workerMain.js');
           `;
           const blob = new Blob([workerScript], { type: "application/javascript" });
           return new Worker(URL.createObjectURL(blob));
@@ -1298,13 +560,89 @@ function initMonaco() {
       };
 
       window.require(["vs/editor/editor.main"], function () {
+        clearTimeout(timeout);
         try {
-          registerMonacoThemes();
+          // Define the dark editor theme to match the neutral workspace palette
+          monaco.editor.defineTheme("code-karo-dark", {
+            base: "vs-dark",
+            inherit: true,
+            rules: [
+              { token: "keyword", foreground: "e87998", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "e87998", fontStyle: "bold" },
+              { token: "type", foreground: "c3c5cc" },
+              { token: "type.identifier", foreground: "c3c5cc" },
+              { token: "string", foreground: "a3c77b" },
+              { token: "string.escape", foreground: "d9b978" },
+              { token: "comment", foreground: "858792", fontStyle: "italic" },
+              { token: "number", foreground: "d9b978" },
+              { token: "delimiter", foreground: "c3c5cc" },
+              { token: "operator", foreground: "c3c5cc" },
+              { token: "identifier", foreground: "e4e4e8" }
+            ],
+            colors: {
+              "editor.background": "#17181e",
+              "editor.foreground": "#e4e4e8",
+              "editorLineNumber.foreground": "#62646e",
+              "editorLineNumber.activeForeground": "#c3c5cc",
+              "editorGutter.background": "#17181e",
+              "editorCursor.foreground": "#e4e4e8",
+              "editor.selectionBackground": "#85879233",
+              "editor.inactiveSelectionBackground": "#8587921a",
+              "editor.lineHighlightBackground": "#202127",
+              "editor.lineHighlightBorder": "#00000000",
+              "editorBracketMatch.background": "#85879222",
+              "editorBracketMatch.border": "#858792",
+              "editorOverviewRuler.border": "#202127",
+              "editorIndentGuide.background": "#292a31",
+              "editorIndentGuide.activeBackground": "#85879266",
+              "scrollbarSlider.background": "#62646e66",
+              "scrollbarSlider.hoverBackground": "#85879266",
+              "scrollbarSlider.activeBackground": "#aeb1ba88"
+            }
+          });
+
+          monaco.editor.defineTheme("code-karo-light", {
+            base: "vs",
+            inherit: true,
+            rules: [
+              { token: "keyword", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "keyword.java", foreground: "b75e7b", fontStyle: "bold" },
+              { token: "type", foreground: "686a73" },
+              { token: "type.identifier", foreground: "686a73" },
+              { token: "string", foreground: "36775f" },
+              { token: "string.escape", foreground: "8f701c" },
+              { token: "comment", foreground: "888a92", fontStyle: "italic" },
+              { token: "number", foreground: "8f701c" },
+              { token: "delimiter", foreground: "565860" },
+              { token: "operator", foreground: "565860" },
+              { token: "identifier", foreground: "202126" }
+            ],
+            colors: {
+              "editor.background": "#ffffff",
+              "editor.foreground": "#202126",
+              "editorLineNumber.foreground": "#888a92",
+              "editorLineNumber.activeForeground": "#565860",
+              "editorGutter.background": "#ffffff",
+              "editorCursor.foreground": "#64666e",
+              "editor.selectionBackground": "#aeb1ba55",
+              "editor.inactiveSelectionBackground": "#aeb1ba33",
+              "editor.lineHighlightBackground": "#f0f0f2",
+              "editor.lineHighlightBorder": "#00000000",
+              "editorBracketMatch.background": "#aeb1ba33",
+              "editorBracketMatch.border": "#aeb1ba",
+              "editorOverviewRuler.border": "#d0d0d6",
+              "editorIndentGuide.background": "#d6d6dc",
+              "editorIndentGuide.activeBackground": "#888a92",
+              "scrollbarSlider.background": "#888a9255",
+              "scrollbarSlider.hoverBackground": "#696b7488",
+              "scrollbarSlider.activeBackground": "#42434a88"
+            }
+          });
 
           monacoEditor = monaco.editor.create(monacoContainer, {
             value: "",
             language: "java",
-            theme: currentEditorTheme,
+            theme: document.documentElement.dataset.theme === "light" ? "code-karo-light" : "code-karo-dark",
             automaticLayout: true,
             tabSize: 4,
             insertSpaces: true,
@@ -1331,7 +669,7 @@ function initMonaco() {
             acceptSuggestionOnEnter: "on",
             renderWhitespace: "none",
             fixedOverflowWidgets: true,
-            readOnly: false
+            readOnly: true
           });
 
           // Hotkeys inside Monaco
@@ -1355,22 +693,19 @@ function initMonaco() {
           });
 
           monacoEditor.onDidChangeCursorPosition((e) => {
-            const posEl = document.querySelector("#cursor-position");
-            if (posEl) posEl.textContent = `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
+            document.querySelector("#cursor-position").textContent =
+              `Ln ${e.position.lineNumber}, Col ${e.position.column}`;
           });
 
           // Auto-resize
           const wrap = document.querySelector("#editor-container-wrap");
           if (wrap && window.ResizeObserver) {
             new ResizeObserver(() => {
-              if (monacoEditor) monacoEditor.layout();
+              monacoEditor.layout();
             }).observe(wrap);
           }
 
           isMonacoReady = true;
-          isFallbackActive = false;
-          if (monacoContainer) monacoContainer.hidden = false;
-          if (fallbackEditorWrap) fallbackEditorWrap.hidden = true;
           resolve(monacoEditor);
         } catch (err) {
           console.error("Monaco create error:", err);
@@ -1378,11 +713,13 @@ function initMonaco() {
           resolve(null);
         }
       }, function (err) {
+        clearTimeout(timeout);
         console.error("RequireJS failed:", err);
         enableFallbackEditor();
         resolve(null);
       });
     } catch (err) {
+      clearTimeout(timeout);
       console.error("Monaco init exception:", err);
       enableFallbackEditor();
       resolve(null);
@@ -2643,46 +1980,13 @@ function initPanelActions() {
   }
 }
 
-function showSolvedCelebrationBanner(problemId) {
-  if (!solvedCelebrationBanner) return;
-  const currentObj = problems.find(p => p.id === problemId);
-  const uid = getEffectiveUserId();
-
-  let nextProb = null;
-  // 1. Next problem in the same learning path
-  if (currentObj && currentObj.path_id) {
-    const pathProbs = problems.filter(p => p.path_id === currentObj.path_id)
-      .sort((a, b) => (a.order_in_path || 0) - (b.order_in_path || 0));
-    nextProb = pathProbs.find(p => p.order_in_path > currentObj.order_in_path && getUserProblemStatus(uid, p.id) !== "solved")
-      || pathProbs.find(p => p.order_in_path > currentObj.order_in_path);
-  }
-  // 2. Or next unsolved problem in current problem list
-  if (!nextProb) {
-    nextProb = problems.find(p => p.id !== problemId && getUserProblemStatus(uid, p.id) !== "solved");
-  }
-
-  if (nextProb) {
-    if (bannerNextName) bannerNextName.textContent = `Up next: ${nextProb.title}`;
-    if (bannerNextBtn) {
-      bannerNextBtn.style.display = "";
-      bannerNextBtn.onclick = () => selectProblem(nextProb.id);
-    }
-  } else {
-    if (bannerNextName) bannerNextName.textContent = "All exercises in this track completed! Outstanding!";
-    if (bannerNextBtn) bannerNextBtn.style.display = "none";
-  }
-  solvedCelebrationBanner.hidden = false;
-}
-
 async function selectProblem(problemId, pushState = true) {
   if (currentProblem && currentProblem !== problemId) {
-    const draft = getCode();
-    if (draft && draft.trim()) sessionDrafts.set(currentProblem, draft);
+    sessionDrafts.set(currentProblem, getCode());
   }
   const version = ++requestVersion;
   currentProblem = problemId;
   highlightedLine = null;
-  if (solvedCelebrationBanner) solvedCelebrationBanner.hidden = true;
   renderProblemList();
   updateNavButtons();
   closeDrawer();
@@ -2730,48 +2034,11 @@ async function selectProblem(problemId, pushState = true) {
       titleEl.textContent = `${displayNum}${problem.title}`;
     }
 
-    // 2. Metadata row: difficulty pill, Topics chip, Hint chip, Path step, Collections, Bookmark
+    // 2. Metadata row: difficulty pill, Topics chip, Hint chip
     if (problemMetaHeader && problemDiffBadge) {
       const diff = problem.difficulty || "Easy";
       problemDiffBadge.className = `diff-badge ${diff.toLowerCase()}`;
       problemDiffBadge.textContent = diff;
-
-      // Path badge: path name + step ("Strings • 3/8")
-      if (problemPathBadge) {
-        const pathProbs = problems.filter(p => p.path_id === (problem.path_id || "java-basics"));
-        const stepNum = problem.order_in_path || 1;
-        const totalSteps = pathProbs.length || 1;
-        const pName = problem.path_name || (catalogPaths.find(p => p.id === problem.path_id)?.title) || "Path";
-        problemPathBadge.textContent = `${pName} • ${stepNum}/${totalSteps}`;
-        problemPathBadge.hidden = false;
-      }
-
-      // Collections badges
-      if (problemCollectionBadges) {
-        const cIds = problem.collection_ids || [];
-        if (cIds.length > 0) {
-          problemCollectionBadges.innerHTML = cIds.map(cid => {
-            const col = catalogCollections.find(c => c.id === cid);
-            const name = col ? col.name : cid;
-            const catClass = col ? col.category.toLowerCase() : "company";
-            return `<span class="col-badge ${catClass}">${escapeHtml(name)}</span>`;
-          }).join("");
-          problemCollectionBadges.hidden = false;
-        } else {
-          problemCollectionBadges.innerHTML = "";
-          problemCollectionBadges.hidden = true;
-        }
-      }
-
-      // Bookmark button
-      if (problemBookmarkBtn) {
-        const bm = isBookmarked(problem.id, getEffectiveUserId());
-        const starIcon = problemBookmarkBtn.querySelector(".bookmark-icon");
-        const starText = problemBookmarkBtn.querySelector(".bookmark-text");
-        if (starIcon) starIcon.textContent = bm ? "★" : "☆";
-        if (starText) starText.textContent = bm ? "Bookmarked" : "Bookmark";
-        problemBookmarkBtn.classList.toggle("active", bm);
-      }
 
       // Topics chip
       const topics = problem.topics || [];
@@ -2820,9 +2087,8 @@ async function selectProblem(problemId, pushState = true) {
     renderSampleTestcases(problem, 0);
 
     // 6. Starter code & Editor setup
-    currentStarterCode = problem.starter || problem.solution;
-    const savedDraft = sessionDrafts.has(problemId) ? sessionDrafts.get(problemId) : null;
-    const codeToShow = (savedDraft && savedDraft.trim()) ? savedDraft : (problem.starter || problem.solution);
+    currentStarterCode = problem.solution;
+    const codeToShow = sessionDrafts.has(problemId) ? sessionDrafts.get(problemId) : problem.solution;
 
     await initMonaco();
 
@@ -2889,6 +2155,13 @@ let isFirstRequest = true;
 
 async function executeCode(mode = "run") {
   if (!currentProblem) return;
+
+  // Guest submit guard
+  if (mode === "submit" && !currentUser) {
+    showToast("Sign in to submit and save your progress", "runner", 3500);
+    openAuthModal("signin");
+    return;
+  }
 
   clearHighlights();
   lastExecutionMode = mode;
@@ -2959,15 +2232,13 @@ async function executeCode(mode = "run") {
 
     const duration = ((performance.now() - runStartedAt) / 1000).toFixed(2);
 
-    // Update problem status and record submission on Submit (Guests: localStorage, Users: database/account)
-    if (mode === "submit") {
-      const uid = getEffectiveUserId();
+    // Update problem status and record submission in localStorage on Submit
+    if (mode === "submit" && currentUser) {
       const runtimeMs = (result.runtimeMs !== undefined && result.runtimeMs !== null)
         ? result.runtimeMs
         : Math.round(parseFloat(duration) * 1000);
       const passedCount = result.passedTests ?? 0;
       const totalCount = result.totalTests ?? (result.testCases ? result.testCases.length : 0);
-      const isAccepted = result.status === "ACCEPTED" || (totalCount > 0 && passedCount === totalCount);
 
       const subRecord = {
         id: "sub_" + Date.now(),
@@ -2979,14 +2250,12 @@ async function executeCode(mode = "run") {
         runtimeMs,
         time: new Date().toISOString()
       };
-      saveSubmission(uid, problemId, subRecord);
+      saveSubmission(currentUser.id, problemId, subRecord);
 
-      if (isAccepted) {
-        setUserProblemStatus(uid, problemId, "solved");
-        showSolvedCelebrationBanner(problemId);
-        showToast("Accepted! Problem solved 🎉", "saved", 3000);
-      } else if (getUserProblemStatus(uid, problemId) !== "solved") {
-        setUserProblemStatus(uid, problemId, "attempted");
+      if (result.status === "ACCEPTED") {
+        setUserProblemStatus(currentUser.id, problemId, "solved");
+      } else if (getUserProblemStatus(currentUser.id, problemId) !== "solved") {
+        setUserProblemStatus(currentUser.id, problemId, "attempted");
       }
       renderProblemList();
       updateFooterBarStatus(problemId);
@@ -3100,138 +2369,17 @@ async function executeCode(mode = "run") {
   }
 }
 
-if (problemList) {
-  problemList.addEventListener("click", event => {
-    const starBtn = event.target.closest("[data-bookmark-problem]");
-    if (starBtn) {
-      event.stopPropagation();
-      const pId = starBtn.dataset.bookmarkProblem;
-      const isNowBookmarked = toggleBookmark(pId);
-      renderProblemList();
-      if (currentProblem === pId && problemBookmarkBtn) {
-        const starIcon = problemBookmarkBtn.querySelector(".bookmark-icon");
-        const starText = problemBookmarkBtn.querySelector(".bookmark-text");
-        if (starIcon) starIcon.textContent = isNowBookmarked ? "★" : "☆";
-        if (starText) starText.textContent = isNowBookmarked ? "Bookmarked" : "Bookmark";
-        problemBookmarkBtn.classList.toggle("active", isNowBookmarked);
-      }
-      return;
-    }
+problemList.addEventListener("click", event => {
+  const button = event.target.closest("[data-problem]");
+  if (!button || button.dataset.problem === currentProblem) return;
+  if (getCode() !== savedCode && !window.confirm("You have unsaved changes. Discard them and open another problem?")) return;
+  selectProblem(button.dataset.problem);
+});
 
-    const button = event.target.closest("[data-problem]");
-    if (!button || button.dataset.problem === currentProblem) return;
-    if (getCode() !== savedCode && !window.confirm("You have unsaved changes. Discard them and open another problem?")) return;
-    selectProblem(button.dataset.problem);
-  });
-}
-
-// Search debounce
-if (searchInput) {
-  searchInput.addEventListener("input", () => {
-    if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
-    searchDebounceTimer = setTimeout(() => {
-      focusedProblemIndex = -1;
-      renderProblemList();
-    }, 120);
-  });
-}
-
-// Filter Dropdowns
+if (searchInput) searchInput.addEventListener("input", renderProblemList);
 if (difficultyFilter) difficultyFilter.addEventListener("change", renderProblemList);
 if (statusFilter) statusFilter.addEventListener("change", renderProblemList);
-if (languageFilter) languageFilter.addEventListener("change", renderProblemList);
-if (sortFilter) sortFilter.addEventListener("change", renderProblemList);
-
-// Topic Multi-Select Chips
-if (topicChipsContainer) {
-  topicChipsContainer.addEventListener("click", event => {
-    const chip = event.target.closest(".topic-filter-chip");
-    if (!chip) return;
-    const topic = chip.dataset.topic;
-    if (selectedTopics.has(topic)) {
-      selectedTopics.delete(topic);
-    } else {
-      selectedTopics.add(topic);
-    }
-    renderProblemList();
-  });
-}
-
-// Active Filter Chips Removal
-if (activeChipsList) {
-  activeChipsList.addEventListener("click", event => {
-    const removeBtn = event.target.closest(".active-chip-remove");
-    if (!removeBtn) return;
-    const type = removeBtn.dataset.chipType;
-    const val = removeBtn.dataset.chipVal;
-    if (type === "topic" && val) {
-      selectedTopics.delete(val);
-    } else if (type === "diff") {
-      currentDifficulty = "all";
-      if (difficultyFilter) difficultyFilter.value = "all";
-    } else if (type === "status") {
-      currentStatus = "all";
-      if (statusFilter) statusFilter.value = "all";
-    } else if (type === "lang") {
-      currentLanguage = "all";
-      if (languageFilter) languageFilter.value = "all";
-    } else if (type === "coll") {
-      currentCollectionFilter = null;
-    } else if (type === "search") {
-      if (searchInput) searchInput.value = "";
-    }
-    renderProblemList();
-  });
-}
-
-if (clearAllFiltersBtn) {
-  clearAllFiltersBtn.addEventListener("click", resetAllFilters);
-}
-
-// Drawer Tabs: Problems | Paths | Collections
-if (tabBtnProblems) tabBtnProblems.addEventListener("click", () => switchDrawerTab("problems"));
-if (tabBtnPaths) tabBtnPaths.addEventListener("click", () => switchDrawerTab("paths"));
-if (tabBtnCollections) tabBtnCollections.addEventListener("click", () => switchDrawerTab("collections"));
-
-// Paths view continue action
-if (pathsList) {
-  pathsList.addEventListener("click", event => {
-    const btn = event.target.closest(".path-continue-btn");
-    if (!btn) return;
-    const targetProblem = btn.dataset.pathTarget;
-    if (targetProblem) {
-      selectProblem(targetProblem);
-      closeDrawer();
-    }
-  });
-}
-
-// Collections view click-to-filter action
-if (collectionsList) {
-  collectionsList.addEventListener("click", event => {
-    const card = event.target.closest(".collection-card");
-    if (!card) return;
-    const colId = card.dataset.collectionFilter;
-    if (colId) {
-      currentCollectionFilter = colId;
-      switchDrawerTab("problems");
-    }
-  });
-}
-
-// Practice Page bookmark button
-if (problemBookmarkBtn) {
-  problemBookmarkBtn.addEventListener("click", () => {
-    if (!currentProblem) return;
-    const isNowBookmarked = toggleBookmark(currentProblem);
-    const starIcon = problemBookmarkBtn.querySelector(".bookmark-icon");
-    const starText = problemBookmarkBtn.querySelector(".bookmark-text");
-    if (starIcon) starIcon.textContent = isNowBookmarked ? "★" : "☆";
-    if (starText) starText.textContent = isNowBookmarked ? "Bookmarked" : "Bookmark";
-    problemBookmarkBtn.classList.toggle("active", isNowBookmarked);
-    renderProblemList();
-  });
-}
+if (topicFilter) topicFilter.addEventListener("change", renderProblemList);
 
 // Drawer Toggles
 if (problemListBtn) problemListBtn.addEventListener("click", openDrawer);
@@ -3294,25 +2442,8 @@ if (submitButton) submitButton.addEventListener("click", () => executeCode("subm
 if (resetButton) resetButton.addEventListener("click", resetSolution);
 if (fontDecreaseButton) fontDecreaseButton.addEventListener("click", () => setFontSize(currentFontSize - 1));
 if (fontIncreaseButton) fontIncreaseButton.addEventListener("click", () => setFontSize(currentFontSize + 1));
-if (editorThemeSelect) {
-  editorThemeSelect.value = currentEditorTheme;
-  editorThemeSelect.addEventListener("change", (e) => setEditorTheme(e.target.value, true));
-}
-setEditorTheme(currentEditorTheme, false);
 const refreshBtn = document.querySelector("#refresh-button");
 if (refreshBtn) refreshBtn.addEventListener("click", loadProblems);
-const retryMonacoBtn = document.querySelector("#retry-monaco-btn");
-if (retryMonacoBtn) {
-  retryMonacoBtn.addEventListener("click", () => {
-    monacoInitPromise = null;
-    initMonaco().then(m => {
-      if (m && currentProblem) {
-        const val = getSavedCode(currentProblem) || currentStarter || "";
-        setCode(val);
-      }
-    });
-  });
-}
 
 if (problemDescription) {
   problemDescription.addEventListener("click", event => {
@@ -3323,23 +2454,11 @@ if (problemDescription) {
   });
 }
 
-function renderKeyboardFocus(items) {
-  const wrappers = document.querySelectorAll(".problem-item-wrapper");
-  wrappers.forEach((el, idx) => {
-    const isFocused = idx === focusedProblemIndex;
-    el.classList.toggle("keyboard-focused", isFocused);
-    if (isFocused) {
-      el.scrollIntoView({ block: "nearest", behavior: "smooth" });
-    }
-  });
-}
-
 document.addEventListener("keydown", event => {
   const isEditorFocused = (document.activeElement === editor) ||
     (monacoContainer && monacoContainer.contains(document.activeElement));
 
   const modal = document.querySelector("#shortcuts-modal");
-  const isDrawerOpen = problemDrawer && problemDrawer.classList.contains("open");
 
   if (event.key === "Escape") {
     const authModal = document.querySelector("#auth-modal");
@@ -3366,7 +2485,7 @@ document.addEventListener("keydown", event => {
       if (monacoEditor) monacoEditor.layout();
       return;
     }
-    if (isDrawerOpen) {
+    if (problemDrawer && problemDrawer.classList.contains("open")) {
       event.preventDefault();
       closeDrawer();
       return;
@@ -3386,45 +2505,10 @@ document.addEventListener("keydown", event => {
     return;
   }
 
-  // Quick slash '/' search shortcut
   if (event.key === "/" && document.activeElement !== searchInput && !isEditorFocused) {
     event.preventDefault();
     openDrawer();
-    if (searchInput) {
-      setTimeout(() => {
-        searchInput.focus();
-        searchInput.select();
-      }, 50);
-    }
-    return;
   }
-
-  // In-drawer keyboard navigation: Up/Down moves selection, Enter opens
-  if (isDrawerOpen && currentDrawerTab === "problems") {
-    const items = problemList ? Array.from(problemList.querySelectorAll(".problem-item")) : [];
-    if (items.length > 0) {
-      if (event.key === "ArrowDown") {
-        event.preventDefault();
-        focusedProblemIndex = Math.min(focusedProblemIndex + 1, items.length - 1);
-        renderKeyboardFocus(items);
-        return;
-      }
-      if (event.key === "ArrowUp") {
-        event.preventDefault();
-        focusedProblemIndex = Math.max(focusedProblemIndex - 1, 0);
-        renderKeyboardFocus(items);
-        return;
-      }
-      if (event.key === "Enter" && focusedProblemIndex >= 0 && focusedProblemIndex < items.length) {
-        if (document.activeElement === searchInput || document.activeElement === document.body) {
-          event.preventDefault();
-          items[focusedProblemIndex].click();
-          return;
-        }
-      }
-    }
-  }
-
   if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "s") {
     if (!isEditorFocused) {
       event.preventDefault();
@@ -3506,8 +2590,6 @@ function initMetaChips() {
 }
 
 window.addEventListener("popstate", () => {
-  initFiltersFromUrl();
-  renderProblemList();
   const urlParams = new URLSearchParams(window.location.search);
   const problemParam = urlParams.get("problem");
   if (problemParam) {
@@ -3537,9 +2619,6 @@ async function loadProblems() {
   try {
     const result = await requestJson("/api/problems");
     problems = result.problems;
-    catalogPaths = result.paths || [];
-    catalogCollections = result.collections || [];
-    initFiltersFromUrl();
     renderProblemList();
 
     const urlParams = new URLSearchParams(window.location.search);
@@ -3721,7 +2800,6 @@ function showAuthError(msg) {
 function setCurrentUser(userObj) {
   currentUser = { id: userObj.id, username: userObj.username };
   localStorage.setItem("oops_session", JSON.stringify(currentUser));
-  mergeGuestProgress(userObj.id);
   updateAuthUI();
   renderProblemList();
   if (currentProblem) updateFooterBarStatus(currentProblem);
