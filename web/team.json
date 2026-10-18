@@ -1,46 +1,54 @@
 [
   {
     "name": "Rajeev Ranjan",
-    "role": "Full Stack Developer",
-    "description": "Building scalable web applications with modern technologies and clean code.",
-    "followers": "",
-    "codeCount": "",
+    "role": "",
+    "year": "2nd year",
+    "branch": "",
+    "college": "",
+    "did": "",
+    "skills": [],
+    "photoPosition": "center 20%",
     "image": "/assets/team/rajeev.jpg",
     "linkedin": "https://www.linkedin.com/in/rajeev-ranjan-51b163372",
-    "github": "https://github.com/rajeevranjan4812-star",
-    "gradient": "linear-gradient(145deg, #1e3a8a, #2563eb, #06b6d4)"
+    "github": "https://github.com/rajeevranjan4812-star"
   },
   {
     "name": "Shubham Thakur",
-    "role": "Full Stack Developer",
-    "description": "Building scalable web applications with modern technologies and clean code.",
-    "followers": "",
-    "codeCount": "",
+    "role": "",
+    "year": "2nd year",
+    "branch": "",
+    "college": "",
+    "did": "",
+    "skills": [],
+    "photoPosition": "center 20%",
     "image": "/assets/team/shubham.jpg",
     "linkedin": "https://www.linkedin.com/in/shubham-thakur-61a82737b",
-    "github": "https://github.com/shubham716259",
-    "gradient": "linear-gradient(145deg, #4c1d95, #7c3aed, #ec4899)"
+    "github": "https://github.com/shubham716259"
   },
   {
     "name": "Duwarka Gupta",
-    "role": "Full Stack Developer",
-    "description": "Building scalable web applications with modern technologies and clean code.",
-    "followers": "",
-    "codeCount": "",
+    "role": "",
+    "year": "2nd year",
+    "branch": "",
+    "college": "",
+    "did": "",
+    "skills": [],
+    "photoPosition": "center 20%",
     "image": "/assets/team/duwarka.jpg",
     "linkedin": "https://www.linkedin.com/in/duwarka-gupta-42b620396",
-    "github": "https://github.com/duwarkagupta123-maker/",
-    "gradient": "linear-gradient(145deg, #064e3b, #059669, #14b8a6)"
+    "github": "https://github.com/duwarkagupta123-maker/"
   },
   {
     "name": "Sahaj",
-    "role": "Full Stack Developer",
-    "description": "Building scalable web applications with modern technologies and clean code.",
-    "followers": "",
-    "codeCount": "",
+    "role": "",
+    "year": "2nd year",
+    "branch": "",
+    "college": "",
+    "did": "",
+    "skills": [],
+    "photoPosition": "center 25%",
     "image": "/assets/team/sahaj.jpg",
     "linkedin": "https://www.linkedin.com/in/sahaj-%E2%98%86-91a1b8419",
-    "github": "https://github.com/SAHAJCSE",
-    "gradient": "linear-gradient(145deg, #7c2d12, #ea580c, #f59e0b)"
+    "github": "https://github.com/SAHAJCSE"
   }
 ]
