@@ -324,6 +324,11 @@ class AppHandler(BaseHTTPRequestHandler):
         print(f"[app] {self.address_string()} - {format_string % args}")
 
 
+# Entrypoint alias for Vercel / serverless runtimes
+handler = AppHandler
+app = AppHandler
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--port", type=int, default=8000, help="local web server port (default: 8000)")
