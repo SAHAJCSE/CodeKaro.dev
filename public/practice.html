@@ -27,10 +27,6 @@
         <span class="btn-icon">☰</span>
         <span>Problem List</span>
       </button>
-      <a href="/dashboard" class="topbar-btn" title="Open Dashboard" style="text-decoration:none;">
-        <span class="btn-icon">📊</span>
-        <span>Dashboard</span>
-      </a>
       <div class="problem-nav-group">
         <button id="prev-problem-btn" class="topbar-icon-btn" title="Previous problem" disabled aria-label="Previous problem">‹</button>
         <button id="next-problem-btn" class="topbar-icon-btn" title="Next problem" disabled aria-label="Next problem">›</button>
@@ -89,6 +85,10 @@
               <span class="user-menu-badge" id="user-dropdown-solved">0 / 41 solved</span>
             </div>
             <div class="user-menu-sep"></div>
+            <a class="user-menu-item" href="/dashboard">
+              <span class="item-icon">▦</span>
+              <span>Dashboard</span>
+            </a>
             <a class="user-menu-item" href="/profile">
               <span class="item-icon">◷</span>
               <span>Profile</span>
@@ -110,93 +110,50 @@
     <div class="drawer-header">
       <div class="drawer-title-row">
         <div>
-          <div class="eyebrow">STRUCTURED LIBRARY</div>
+          <div class="eyebrow">WORKSPACE</div>
           <h2>Problems <span id="problem-count" class="count-pill">0 / 41 solved</span></h2>
-          <div id="difficulty-mini-counts" class="difficulty-mini-counts">
-            <span class="mini-easy" id="mini-easy-count">0/14 Easy</span> • 
-            <span class="mini-med" id="mini-med-count">0/21 Med</span> • 
-            <span class="mini-hard" id="mini-hard-count">0/6 Hard</span>
-          </div>
         </div>
         <div class="drawer-header-actions">
           <button id="refresh-button" class="icon-button" title="Refresh problem list" aria-label="Refresh problem list">↻</button>
           <button id="drawer-close-btn" class="icon-button drawer-close-btn" title="Close drawer (Esc)" aria-label="Close drawer">✕</button>
         </div>
       </div>
-
-      <!-- Drawer Tabs: Problems | Paths | Collections -->
-      <div class="drawer-nav-tabs" role="tablist">
-        <button id="tab-btn-problems" class="drawer-nav-tab active" data-tab="problems" type="button" role="tab" aria-selected="true">Problems</button>
-        <button id="tab-btn-paths" class="drawer-nav-tab" data-tab="paths" type="button" role="tab" aria-selected="false">Learning Paths</button>
-        <button id="tab-btn-collections" class="drawer-nav-tab" data-tab="collections" type="button" role="tab" aria-selected="false">Collections</button>
-      </div>
-
-      <!-- Search Bar -->
       <label class="search-box">
         <span aria-hidden="true">⌕</span>
-        <input id="problem-search" type="search" placeholder="Search by name, topic, slug, or #ID (/)" autocomplete="off">
+        <input id="problem-search" type="search" placeholder="Search problems (/)" autocomplete="off">
         <kbd>/</kbd>
       </label>
-
-      <!-- Filter Controls (for Problems tab) -->
-      <div id="drawer-filters-section" class="drawer-filters-section">
-        <div class="filter-controls">
-          <div class="filter-row">
-            <select id="language-filter" class="filter-select" aria-label="Filter by language">
-              <option value="all">Language: All</option>
-              <option value="Java">Java</option>
-              <option value="Python">Python</option>
-              <option value="C++">C++</option>
-              <option value="C">C</option>
-            </select>
-            <select id="difficulty-filter" class="filter-select" aria-label="Filter by difficulty">
-              <option value="all">Difficulty: All</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
-          <div class="filter-row">
-            <select id="status-filter" class="filter-select" aria-label="Filter by status">
-              <option value="all">Status: All</option>
-              <option value="solved">Solved</option>
-              <option value="attempted">Attempted</option>
-              <option value="unsolved">Unsolved</option>
-              <option value="bookmarked">Bookmarked</option>
-            </select>
-            <select id="sort-filter" class="filter-select" aria-label="Sort problems">
-              <option value="alphabetical">Sort: Alphabetical</option>
-              <option value="path">Sort: Path Order</option>
-              <option value="difficulty">Sort: Difficulty</option>
-            </select>
-          </div>
+      <div class="filter-controls">
+        <div class="filter-row">
+          <select id="difficulty-filter" class="filter-select" aria-label="Filter by difficulty">
+            <option value="all">Difficulty</option>
+            <option value="Easy">Easy</option>
+            <option value="Medium">Medium</option>
+            <option value="Hard">Hard</option>
+          </select>
+          <select id="status-filter" class="filter-select" aria-label="Filter by status">
+            <option value="all">Status</option>
+            <option value="solved">Solved</option>
+            <option value="attempted">Attempted</option>
+            <option value="todo">Todo</option>
+          </select>
         </div>
-
-        <!-- Topics Multi-Select Chips Container with counts -->
-        <div class="topic-filter-chips-wrap">
-          <div class="topic-chips-label">Topics:</div>
-          <div id="topic-chips-container" class="topic-chips-container"></div>
-        </div>
-
-        <!-- Active Filter Chips -->
-        <div id="active-filters-bar" class="active-filters-bar" hidden>
-          <div id="active-chips-list" class="active-chips-list"></div>
-          <button id="clear-all-filters-btn" class="clear-filters-btn" type="button">Clear all</button>
-        </div>
+        <select id="topic-filter" class="filter-select topic-select" aria-label="Filter by topic">
+          <option value="all">All Topics</option>
+          <option value="Strings">Strings</option>
+          <option value="Arrays">Arrays</option>
+          <option value="Matrix">Matrix</option>
+          <option value="Constructors">Constructors</option>
+          <option value="Classes and Objects">Classes and Objects</option>
+          <option value="Inheritance">Inheritance</option>
+          <option value="Exceptions">Exceptions</option>
+          <option value="Collections">Collections</option>
+          <option value="Patterns">Patterns</option>
+        </select>
       </div>
-
-      <div class="list-label" id="list-label-row">
-        <span id="list-tab-title">ALL PROBLEMS</span> <span id="visible-count"></span>
-      </div>
+      <div class="list-label">ALL PROBLEMS <span id="visible-count"></span></div>
     </div>
-
-    <!-- Drawer Body -->
-    <div class="drawer-body">
-      <nav id="problem-list" class="problem-list drawer-view active" aria-label="Problems"></nav>
-      <div id="paths-list" class="paths-list drawer-view" aria-label="Learning Paths" hidden></div>
-      <div id="collections-list" class="collections-list drawer-view" aria-label="Collections" hidden></div>
-    </div>
-
+    <nav id="problem-list" class="problem-list" aria-label="Problems"></nav>
     <div class="drawer-footer">
       <span class="footer-icon">⌘</span>
       <div><strong>Java 11+</strong><span>Local compiler</span></div>
@@ -247,11 +204,6 @@
             <div class="problem-title-header">
               <h1 id="problem-display-title" class="problem-display-title"></h1>
             </div>
-            <!-- Path & Collection Badges -->
-            <div id="problem-context-row" class="problem-context-row">
-              <span id="problem-path-badge" class="path-step-badge" hidden></span>
-              <div id="problem-collection-badges" class="problem-collection-badges"></div>
-            </div>
             <div class="problem-meta-controls">
               <span id="problem-diff-badge" class="diff-badge"></span>
               <button id="topics-toggle-btn" class="meta-chip topics-chip" type="button" aria-expanded="false" title="Click to view topics">
@@ -264,25 +216,9 @@
                 <span id="hints-chip-label">Hint</span>
                 <span class="chip-arrow">▾</span>
               </button>
-              <button id="problem-bookmark-btn" class="meta-chip bookmark-chip" type="button" title="Bookmark problem" aria-label="Bookmark problem">
-                <span class="bookmark-icon">☆</span>
-                <span class="bookmark-text">Bookmark</span>
-              </button>
             </div>
             <div id="problem-topics-list" class="topic-tags-list" hidden></div>
             <div id="problem-hints-drawer" class="hints-drawer" hidden></div>
-
-            <!-- Next Problem Celebration Banner on Solved -->
-            <div id="solved-celebration-banner" class="solved-celebration-banner" hidden>
-              <div class="banner-left">
-                <span class="celebration-icon">🎉</span>
-                <div>
-                  <div class="banner-title">Problem Solved!</div>
-                  <div class="banner-sub" id="banner-next-name">Up next: Next Challenge</div>
-                </div>
-              </div>
-              <button id="banner-next-btn" class="button button-success-neon" type="button">Next problem ➔</button>
-            </div>
           </div>
 
           <div id="welcome-state" class="welcome-state">
@@ -354,23 +290,6 @@
           </div>
           <div class="editor-toolbar-actions">
             <span id="save-status" class="save-status" aria-live="polite"></span>
-            <div class="theme-select-wrap" title="Editor Theme">
-              <svg class="theme-select-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/>
-                <circle cx="17.5" cy="10.5" r=".5" fill="currentColor"/>
-                <circle cx="8.5" cy="7.5" r=".5" fill="currentColor"/>
-                <circle cx="6.5" cy="12.5" r=".5" fill="currentColor"/>
-                <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 9.5 10c.93 0 1.5-.68 1.5-1.5 0-.38-.15-.74-.39-1.01-.24-.26-.38-.61-.38-1 0-.83.67-1.5 1.5-1.5H16c3.31 0 6-2.69 6-6 0-5.52-4.5-10-10-10z"/>
-              </svg>
-              <select id="editor-theme-select" class="editor-theme-select" aria-label="Select Editor Theme">
-                <option value="night-owl" selected>Night Owl (Italic)</option>
-                <option value="material-darker">Material Theme Darker</option>
-                <option value="aura-dark">Aura Dark Theme</option>
-                <option value="andromeda">Andromeda</option>
-                <option value="tokyo-night-storm">Tokyo Night Storm</option>
-              </select>
-              <span class="theme-select-chevron" aria-hidden="true">▼</span>
-            </div>
             <div class="font-controls" title="Adjust font size">
               <button id="font-decrease" class="font-btn" aria-label="Decrease font size">A−</button>
               <button id="font-increase" class="font-btn" aria-label="Increase font size">A+</button>
@@ -384,9 +303,8 @@
         <div class="code-area" id="editor-container-wrap">
           <div id="monaco-editor" class="monaco-container"></div>
           <div id="fallback-editor-wrap" class="fallback-wrap" hidden>
-            <div id="fallback-banner" class="fallback-banner" style="display:flex;align-items:center;justify-content:space-between;">
+            <div id="fallback-banner" class="fallback-banner">
               <span>⚠ Monaco Editor could not be loaded from CDN. Using fallback textarea editor.</span>
-              <button type="button" id="retry-monaco-btn" class="button button-ghost" style="height:20px;padding:0 8px;font-size:11px;margin-left:8px;border-color:currentColor;">↺ Retry Monaco</button>
             </div>
             <div class="fallback-textarea-row">
               <div id="line-numbers" class="line-numbers" aria-hidden="true">1</div>
@@ -580,8 +498,8 @@
     <button class="mobile-tab-btn" data-mobile-view="result"><span class="mobile-tab-icon">📊</span><span>Result</span></button>
   </nav>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/11.1.1/marked.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.8/purify.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.8/dist/purify.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.js" onerror="window.monacoLoadError = true;"></script>
   <script src="/config.js"></script>
   <script src="/app.js"></script>
