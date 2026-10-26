@@ -25,9 +25,3 @@ desktop.ini
 .vscode/
 .idea/
 *.iml
-
-# Local artifacts
-oops-judge-main/
-node_modules/
-dist/
-
