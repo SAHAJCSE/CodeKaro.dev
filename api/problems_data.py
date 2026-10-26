@@ -314,3 +314,40 @@ for _pid, _pdata in PROBLEMS.items():
     _pdata["hints"] = _m.get("hints", [])
     _pdata["sample_cases"] = _m.get("sample_cases", [])
 
+PATHS = [
+    {
+        "id": "java-basics",
+        "name": "Java Basics & Control Flow",
+        "tier": "Fundamental",
+        "icon": "☕",
+        "description": "Master variables, loops, conditionals, and standard I/O in core Java.",
+    },
+    {
+        "id": "arrays-and-strings",
+        "name": "Arrays & Strings Mastery",
+        "tier": "Core",
+        "icon": "🔡",
+        "description": "Index manipulation, string transformations, anagrams, and frequency counting.",
+    },
+    {
+        "id": "oop-mastery",
+        "name": "Object-Oriented Programming",
+        "tier": "Advanced",
+        "icon": "📦",
+        "description": "Constructors, encapsulation, member methods, inheritance, and custom classes.",
+    },
+    {
+        "id": "exceptions-collections",
+        "name": "Exceptions & Collections",
+        "tier": "Interview-Ready",
+        "icon": "⚡",
+        "description": "Custom exceptions, try-catch hierarchies, ArrayLists, and LinkedLists.",
+    },
+]
+
+COLLECTIONS = [
+    {"id": "placement-favorites", "name": "Campus Placement Favorites", "count": 15},
+    {"id": "oop-essentials", "name": "OOP Design Essentials", "count": 12},
+    {"id": "arrays-matrix", "name": "Arrays & Matrix Challenges", "count": 14},
+]
+

@@ -122,7 +122,7 @@ class AppHandler(BaseHTTPRequestHandler):
             self.send_json(200, {"status": "ok"})
             return
 
-        if path in ("/api/problems", "/problems"):
+        if path == "/api/problems":
             meta_all = get_problems_meta()
             problems = []
             for problem_id in get_problem_ids():
@@ -135,7 +135,15 @@ class AppHandler(BaseHTTPRequestHandler):
                     "difficulty": m.get("difficulty", "Easy"),
                     "topics": m.get("topics", []),
                 })
-            self.send_json(200, {"problems": problems, "status": "ok"})
+            paths = []
+            collections = []
+            try:
+                from api.problems_data import PATHS, COLLECTIONS
+                paths = PATHS
+                collections = COLLECTIONS
+            except Exception:
+                pass
+            self.send_json(200, {"problems": problems, "paths": paths, "collections": collections, "status": "ok"})
             return
 
         match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)", path)
@@ -204,6 +212,8 @@ class AppHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
+            "/dashboard.html": ("dashboard.html", "text/html; charset=utf-8"),
             "/auth": ("auth.html", "text/html; charset=utf-8"),
             "/auth.html": ("auth.html", "text/html; charset=utf-8"),
             "/problems": ("problems.html", "text/html; charset=utf-8"),

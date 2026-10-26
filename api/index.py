@@ -6,12 +6,19 @@ from http.server import BaseHTTPRequestHandler
 from urllib.parse import parse_qs, unquote, urlencode, urlparse
 
 try:
-    from api.problems_data import PROBLEMS
-except ImportError:
+    from api.problems_data import PROBLEMS, PATHS, COLLECTIONS
+except Exception:
     try:
-        from problems_data import PROBLEMS
-    except ImportError:
-        PROBLEMS = {}
+        from problems_data import PROBLEMS, PATHS, COLLECTIONS
+    except Exception:
+        try:
+            from api.problems_data import PROBLEMS
+            PATHS = []
+            COLLECTIONS = []
+        except Exception:
+            PROBLEMS = {}
+            PATHS = []
+            COLLECTIONS = []
 
 MAX_REQUEST_BYTES = 1_000_000
 
@@ -102,7 +109,12 @@ class handler(BaseHTTPRequestHandler):
                 }
                 for p in sorted(PROBLEMS.values(), key=lambda x: x["id"])
             ]
-            self.send_json(200, {"problems": problem_list})
+            self.send_json(200, {
+                "problems": problem_list,
+                "paths": PATHS,
+                "collections": COLLECTIONS,
+                "status": "ok"
+            })
             return
 
         if path == "/api/github-callback":
@@ -177,7 +189,7 @@ class handler(BaseHTTPRequestHandler):
                 return
 
         if path.startswith("/api/problems/"):
-            problem_id = path[len("/api/problems/"):]
+            problem_id = path[len("/api/problems/"):].strip("/")
             problem = PROBLEMS.get(problem_id)
 
             if problem is None:
@@ -198,6 +210,7 @@ class handler(BaseHTTPRequestHandler):
         if clean in (
             "", "index.html",
             "auth", "auth.html",
+            "dashboard", "dashboard.html",
             "problems", "problems.html", "problems.css", "problems.js",
             "practice", "practice.html",
             "profile", "profile.html",
@@ -209,6 +222,8 @@ class handler(BaseHTTPRequestHandler):
 
             if file_name in ("auth",):
                 file_name = "auth.html"
+            elif file_name == "dashboard":
+                file_name = "dashboard.html"
             elif file_name == "problems":
                 file_name = "problems.html"
             elif file_name == "practice":
@@ -221,6 +236,7 @@ class handler(BaseHTTPRequestHandler):
             content_types = {
                 "index.html": "text/html; charset=utf-8",
                 "auth.html": "text/html; charset=utf-8",
+                "dashboard.html": "text/html; charset=utf-8",
                 "problems.html": "text/html; charset=utf-8",
                 "problems.css": "text/css; charset=utf-8",
                 "problems.js": "application/javascript; charset=utf-8",
