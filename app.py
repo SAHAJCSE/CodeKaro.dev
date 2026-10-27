@@ -113,10 +113,23 @@ class AppHandler(BaseHTTPRequestHandler):
         if not isinstance(payload, dict):
             self.send_json(400, {"error": "Request body must be a JSON object."})
             return None
-        return payload
+    def send_redirect(self, location, status=302):
+        self.send_response(status)
+        self.send_header("Location", location)
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
 
     def do_GET(self):
         path = unquote(urlparse(self.path).path).rstrip("/")
+
+        if path in ("/dashboard", "/dashboard.html"):
+            self.send_redirect("/")
+            return
+
+        if path in ("/problems", "/problems.html"):
+            self.send_redirect("/practice")
+            return
 
         if path in ("/health", "/api/health"):
             self.send_json(200, {"status": "ok"})
@@ -212,14 +225,8 @@ class AppHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
-            "/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
-            "/dashboard.html": ("dashboard.html", "text/html; charset=utf-8"),
             "/auth": ("auth.html", "text/html; charset=utf-8"),
             "/auth.html": ("auth.html", "text/html; charset=utf-8"),
-            "/problems": ("problems.html", "text/html; charset=utf-8"),
-            "/problems.html": ("problems.html", "text/html; charset=utf-8"),
-            "/problems.css": ("problems.css", "text/css; charset=utf-8"),
-            "/problems.js": ("problems.js", "text/javascript; charset=utf-8"),
             "/practice": ("practice.html", "text/html; charset=utf-8"),
             "/practice.html": ("practice.html", "text/html; charset=utf-8"),
             "/profile": ("profile.html", "text/html; charset=utf-8"),

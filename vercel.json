@@ -1,15 +1,29 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "rewrites": [
+  "redirects": [
     {
       "source": "/dashboard",
-      "destination": "/dashboard.html"
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/dashboard.html",
+      "destination": "/",
+      "permanent": false
     },
     {
       "source": "/problems",
-      "destination": "/problems.html"
+      "destination": "/practice",
+      "permanent": false
     },
+    {
+      "source": "/problems.html",
+      "destination": "/practice",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
     {
       "source": "/practice",
       "destination": "/practice.html"

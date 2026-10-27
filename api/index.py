@@ -39,6 +39,13 @@ class handler(BaseHTTPRequestHandler):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_bytes(status, body, "application/json; charset=utf-8")
 
+    def send_redirect(self, location, status=302):
+        self.send_response(status)
+        self.send_header("Location", location)
+        self.send_header("Cache-Control", "no-store, max-age=0")
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.end_headers()
+
     def do_OPTIONS(self):
         self.send_response(204)
         self.send_header("Access-Control-Allow-Origin", "*")
@@ -90,6 +97,14 @@ class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         path = self.get_effective_path()
+        if path in ("/dashboard", "/dashboard.html", "/api/dashboard"):
+            self.send_redirect("/")
+            return
+
+        if path in ("/problems", "/problems.html"):
+            self.send_redirect("/practice")
+            return
+
         if path in ("", "/api"):
             self.send_json(200, {
                 "status": "ok",
@@ -210,8 +225,6 @@ class handler(BaseHTTPRequestHandler):
         if clean in (
             "", "index.html",
             "auth", "auth.html",
-            "dashboard", "dashboard.html",
-            "problems", "problems.html", "problems.css", "problems.js",
             "practice", "practice.html",
             "profile", "profile.html",
             "about", "about.html", "about.css", "about.js",
@@ -222,10 +235,6 @@ class handler(BaseHTTPRequestHandler):
 
             if file_name in ("auth",):
                 file_name = "auth.html"
-            elif file_name == "dashboard":
-                file_name = "dashboard.html"
-            elif file_name == "problems":
-                file_name = "problems.html"
             elif file_name == "practice":
                 file_name = "practice.html"
             elif file_name == "profile":
@@ -236,10 +245,6 @@ class handler(BaseHTTPRequestHandler):
             content_types = {
                 "index.html": "text/html; charset=utf-8",
                 "auth.html": "text/html; charset=utf-8",
-                "dashboard.html": "text/html; charset=utf-8",
-                "problems.html": "text/html; charset=utf-8",
-                "problems.css": "text/css; charset=utf-8",
-                "problems.js": "application/javascript; charset=utf-8",
                 "practice.html": "text/html; charset=utf-8",
                 "profile.html": "text/html; charset=utf-8",
                 "about.html": "text/html; charset=utf-8",
