@@ -1,44 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "cleanUrls": true,
-  "redirects": [
-    {
-      "source": "/dashboard",
-      "destination": "/",
-      "permanent": false
-    },
-    {
-      "source": "/dashboard.html",
-      "destination": "/",
-      "permanent": false
-    },
-    {
-      "source": "/problems",
-      "destination": "/practice",
-      "permanent": false
-    },
-    {
-      "source": "/problems.html",
-      "destination": "/practice",
-      "permanent": false
-    }
-  ],
   "rewrites": [
-    {
-      "source": "/practice",
-      "destination": "/practice.html"
-    },
-    {
-      "source": "/profile",
-      "destination": "/profile.html"
-    },
     {
       "source": "/about",
       "destination": "/about.html"
-    },
-    {
-      "source": "/auth",
-      "destination": "/auth.html"
     },
     {
       "source": "/api/(.*)",
