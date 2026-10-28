@@ -47,7 +47,6 @@
         const avatarSrc = user.picture || user.avatar || "";
 
         authButton.setAttribute("aria-label", `Account: ${displayName}`);
-        authButton.title = `Signed in as @${handle}`;
         if (avatarSrc) {
           authButton.innerHTML = `<img src="${avatarSrc}" alt="${displayName}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`;
         } else {
@@ -85,7 +84,6 @@
         }
       } else {
         authButton.setAttribute("aria-label", "Account options");
-        authButton.title = "Account options";
         authButton.innerHTML = `
           <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="8" r="3.5" stroke="currentColor" stroke-width="1.7"/>
@@ -111,13 +109,21 @@
       authButton.setAttribute("aria-expanded", String(open));
       authMenu.dataset.open = String(open);
     };
-    authMenu.addEventListener("pointerenter", () => setAuthMenuOpen(true));
-    authMenu.addEventListener("pointerleave", () => {
-      if (!authMenu.contains(document.activeElement)) setAuthMenuOpen(false);
+    setAuthMenuOpen(false);
+    authButton.addEventListener("click", () => {
+      setAuthMenuOpen(authMenu.dataset.open !== "true");
     });
-    authMenu.addEventListener("focusin", () => setAuthMenuOpen(true));
     authMenu.addEventListener("focusout", event => {
       if (!authMenu.contains(event.relatedTarget)) setAuthMenuOpen(false);
+    });
+    document.addEventListener("click", event => {
+      if (!authMenu.contains(event.target)) setAuthMenuOpen(false);
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && authMenu.dataset.open === "true") {
+        setAuthMenuOpen(false);
+        authButton.focus();
+      }
     });
   }
 
