@@ -394,8 +394,7 @@
 
     .home-auth__button svg { width: 19px; height: 19px; }
 
-    .home-auth:hover .home-auth__button,
-    .home-auth:focus-within .home-auth__button,
+    .home-auth__button:focus-visible,
     .home-auth[data-open="true"] .home-auth__button {
       border-color: rgba(180, 155, 255, .72);
       background: rgba(31, 24, 48, .94);
@@ -421,8 +420,6 @@
       backdrop-filter: blur(18px);
     }
 
-    .home-auth:hover .home-auth__panel,
-    .home-auth:focus-within .home-auth__panel,
     .home-auth[data-open="true"] .home-auth__panel {
       opacity: 1;
       pointer-events: auto;
