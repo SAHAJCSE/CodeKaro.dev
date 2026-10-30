@@ -1275,10 +1275,14 @@
         </svg>
       </button>
       <div class="home-auth__panel">
-        <p class="home-auth__prompt">Join Code-Karo</p>
-        <div class="home-auth__actions">
-          <a class="home-auth__link" href="/practice?auth=signup">Sign up</a>
-          <a class="home-auth__link" href="/practice?auth=signin">Log in</a>
+        <p class="home-auth__prompt">Code-Karo Account</p>
+        <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px;">
+          <a class="home-auth__link" href="/dashboard#profile">Profile &amp; Stats</a>
+          <a class="home-auth__link" href="/practice">Practice IDE</a>
+          <div style="display:flex;gap:8px;">
+            <a class="home-auth__link" href="/auth?auth=signup">Sign up</a>
+            <a class="home-auth__link" href="/auth">Log in</a>
+          </div>
         </div>
       </div>
     </div>
@@ -1309,9 +1313,8 @@
   <main>
     <!-- Section 1: Hero -->
     <section class="about-hero" aria-labelledby="about-hero-heading">
-      <canvas class="gradient-ascii-canvas" aria-hidden="true"></canvas>
       <div class="about-hero-container">
-        <!-- Left: Editorial Pitch & Actions -->
+        <!-- Editorial Pitch & Actions -->
         <div class="about-hero-left">
           <span class="about-eyebrow">// ABOUT</span>
           <h1 id="about-hero-heading" class="about-hero-heading"><span class="hero-heading-line1">Java practice,</span><br><span class="hero-heading-gradient">tested for real.</span></h1>
@@ -1330,49 +1333,6 @@
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
               <span>Meet the team</span>
             </a>
-          </div>
-        </div>
-
-        <!-- Right: Workspace Panel -->
-        <div class="about-hero-right">
-          <div class="code-window" aria-label="workspace">
-            <div class="code-window__topbar">
-              <div class="code-window__dots" aria-hidden="true">
-                <span class="code-window__dot dot--red"></span>
-                <span class="code-window__dot dot--yellow"></span>
-                <span class="code-window__dot dot--green"></span>
-              </div>
-              <span class="code-window__title">workspace</span>
-              <span class="code-window__spacer" aria-hidden="true"></span>
-            </div>
-            <div class="code-window__body workspace-panel" id="workspace-panel">
-              <!-- Row 1: Compiler Status -->
-              <div class="workspace-row workspace-row--status" id="workspace-status-row" role="button" tabindex="0" title="Click to re-check compiler status">
-                <span class="workspace-dot workspace-dot--checking" id="workspace-status-dot" role="img" aria-label="checking"></span>
-                <span class="workspace-status-text" id="workspace-status-text" aria-live="polite">checking…</span>
-              </div>
-
-              <!-- Row 2: Problems -->
-              <div class="workspace-row workspace-row--problems" id="workspace-problems-row">
-                <div class="workspace-problems-line">
-                  <span class="workspace-problems-count" id="workspace-problems-count">checking…</span>
-                  <span class="workspace-chips" id="workspace-chips" aria-label="Problem difficulties"></span>
-                </div>
-              </div>
-
-              <!-- Row 3: Progress -->
-              <div class="workspace-row workspace-row--progress" id="workspace-progress-row">
-                <span class="workspace-progress-label">Your progress:</span>
-                <span class="workspace-progress-val" id="workspace-progress-val">checking…</span>
-              </div>
-
-              <!-- Row 4: Action Buttons -->
-              <div class="workspace-actions" id="workspace-actions">
-                <a href="/practice" class="workspace-btn" id="workspace-random-btn">Random problem</a>
-                <a href="/practice" class="workspace-btn workspace-btn--continue" id="workspace-continue-btn" hidden>Continue</a>
-                <a href="/practice" class="workspace-btn workspace-btn--first" id="workspace-first-btn">Start with the first problem</a>
-              </div>
-            </div>
           </div>
         </div>
       </div>
