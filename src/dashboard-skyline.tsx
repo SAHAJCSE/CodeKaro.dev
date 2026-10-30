@@ -482,11 +482,11 @@ function DashboardProfileSection() {
               type="button"
               onClick={() => setShowPicker((v) => !v)}
               aria-expanded={showPicker}
-              className="inline-flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
+              className="inline-flex cursor-pointer items-center justify-center rounded-lg border px-4 py-2 text-sm font-semibold transition-all hover:opacity-90"
               style={{
-                background: showPicker ? "#8b5cf6" : "var(--bg-sunken)",
-                color: showPicker ? "#ffffff" : "var(--text-main)",
-                borderColor: showPicker ? "#8b5cf6" : "var(--border-card)",
+                background: showPicker ? "var(--text-main)" : "var(--bg-sunken)",
+                color: showPicker ? "var(--bg-card)" : "var(--text-main)",
+                borderColor: showPicker ? "var(--text-main)" : "var(--border-card)",
               }}
             >
               {showPicker ? "Hide Avatar" : "Edit Avatar"}

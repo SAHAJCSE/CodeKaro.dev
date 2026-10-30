@@ -168,8 +168,15 @@
     });
 
     authButton.addEventListener("click", e => {
-      e.preventDefault();
       e.stopPropagation();
+      let user = null;
+      try {
+        user = JSON.parse(localStorage.getItem("oops_session") || localStorage.getItem("ck_user") || "null");
+      } catch (err) {}
+      if (user && (user.username || user.name || user.email)) {
+        window.location.href = url('/dashboard#profile');
+        return;
+      }
       lockedOpen = !lockedOpen;
       setAuthMenuOpen(lockedOpen);
     });

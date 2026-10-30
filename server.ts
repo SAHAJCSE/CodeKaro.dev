@@ -358,8 +358,30 @@ async function startServer() {
     '/404': '404.html',
   };
 
+  // Always support Tailwind CSS stylesheet request in both dev & production
+  app.get(['/assets/tailwind.css', '/assets/index.css'], (_req, res) => {
+    const builtTailwind = path.join(__dirname, 'dist', 'assets', 'tailwind.css');
+    const builtIndex = path.join(__dirname, 'dist', 'assets', 'index.css');
+    if (fs.existsSync(builtTailwind)) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      res.sendFile(builtTailwind);
+      return;
+    }
+    if (fs.existsSync(builtIndex)) {
+      res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      res.sendFile(builtIndex);
+      return;
+    }
+    res.status(404).end();
+  });
+
   if (process.env.NODE_ENV !== 'production') {
-    app.use((req, res, next) => {
+    const vite = await createViteServer({
+      server: { middlewareMode: true, hmr: false },
+      appType: 'custom',
+    });
+
+    app.use(async (req, res, next) => {
       if (req.method !== 'GET') {
         next();
         return;
@@ -381,7 +403,12 @@ async function startServer() {
 
         if (targetPath) {
           try {
-            const rawHtml = fs.readFileSync(targetPath, 'utf-8');
+            let rawHtml = fs.readFileSync(targetPath, 'utf-8');
+            try {
+              rawHtml = await vite.transformIndexHtml(req.originalUrl || req.url, rawHtml);
+            } catch (transformErr) {
+              console.warn('Vite transformIndexHtml skipped:', transformErr);
+            }
             const status = htmlFile === '404.html' ? 404 : 200;
             res.status(status).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(rawHtml);
             return;
@@ -392,11 +419,6 @@ async function startServer() {
         }
       }
       next();
-    });
-
-    const vite = await createViteServer({
-      server: { middlewareMode: true, hmr: false },
-      appType: 'custom',
     });
 
     app.use(vite.middlewares);
@@ -465,14 +487,14 @@ async function startServer() {
       const reqPath = req.path.replace(/\/+$/, '') || '/';
       const htmlFile = cleanHtmlRoutes[reqPath] || (reqPath.endsWith('.html') ? reqPath.slice(1) : null);
       if (htmlFile) {
-        const candidateDist = path.join(distDir, htmlFile);
         const candidatePublic = path.join(PUBLIC_DIR, htmlFile);
+        const candidateDist = path.join(distDir, htmlFile);
         const status = htmlFile === '404.html' ? 404 : 200;
-        if (fs.existsSync(candidateDist)) {
-          res.status(status).sendFile(candidateDist);
-          return;
-        } else if (fs.existsSync(candidatePublic)) {
+        if (fs.existsSync(candidatePublic)) {
           res.status(status).sendFile(candidatePublic);
+          return;
+        } else if (fs.existsSync(candidateDist)) {
+          res.status(status).sendFile(candidateDist);
           return;
         }
       }

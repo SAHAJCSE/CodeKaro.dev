@@ -4,6 +4,8 @@ import {
   GoogleAuthProvider,
   GithubAuthProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -191,11 +193,7 @@ export async function syncUserProfileToFirestore(
     }
     await batch.commit();
   } catch (error) {
-    handleFirestoreError(
-      error,
-      exists ? OperationType.UPDATE : OperationType.CREATE,
-      `users/${rawUid}`
-    );
+    console.warn('Firestore sync profile batch error (continuing with local profile):', error);
   }
 
   return {
@@ -214,6 +212,8 @@ export async function syncUserProfileToFirestore(
 export {
   firebaseConfig,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
