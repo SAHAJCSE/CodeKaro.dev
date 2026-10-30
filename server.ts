@@ -355,6 +355,7 @@ async function startServer() {
     '/profile': 'profile.html',
     '/about': 'about.html',
     '/problems': 'problems.html',
+    '/404': '404.html',
   };
 
   if (process.env.NODE_ENV !== 'production') {
@@ -381,7 +382,8 @@ async function startServer() {
         if (targetPath) {
           try {
             const rawHtml = fs.readFileSync(targetPath, 'utf-8');
-            res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(rawHtml);
+            const status = htmlFile === '404.html' ? 404 : 200;
+            res.status(status).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(rawHtml);
             return;
           } catch (err) {
             next(err);
@@ -393,16 +395,61 @@ async function startServer() {
     });
 
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'custom',
     });
 
     app.use(vite.middlewares);
+
+    // Fallback 404 page for unmatched routes in dev
+    app.use((req, res, next) => {
+      if (req.method !== 'GET') {
+        next();
+        return;
+      }
+      const notFoundPath = path.join(PUBLIC_DIR, '404.html');
+      if (fs.existsSync(notFoundPath)) {
+        const rawHtml = fs.readFileSync(notFoundPath, 'utf-8');
+        res.status(404).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(rawHtml);
+        return;
+      }
+      res.status(404).send('Not Found');
+    });
   } else {
     const distDir = path.join(__dirname, 'dist');
-    // If production requests /src/auth-client.ts, serve the compiled /assets/auth-client.js
+    // If production requests /src/auth-client.ts or /src/dashboard-skyline.tsx, serve the compiled bundle
     app.get('/src/auth-client.ts', (_req, res) => {
       const builtPath = path.join(distDir, 'assets', 'auth-client.js');
+      if (fs.existsSync(builtPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.sendFile(builtPath);
+        return;
+      }
+      res.status(404).end();
+    });
+
+    app.get('/src/dashboard-skyline.tsx', (_req, res) => {
+      const builtPath = path.join(distDir, 'assets', 'dashboard-skyline.js');
+      if (fs.existsSync(builtPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.sendFile(builtPath);
+        return;
+      }
+      res.status(404).end();
+    });
+
+    app.get('/src/testimonials-entry.tsx', (_req, res) => {
+      const builtPath = path.join(distDir, 'assets', 'testimonials-entry.js');
+      if (fs.existsSync(builtPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.sendFile(builtPath);
+        return;
+      }
+      res.status(404).end();
+    });
+
+    app.get('/src/not-found-entry.tsx', (_req, res) => {
+      const builtPath = path.join(distDir, 'assets', 'not-found-entry.js');
       if (fs.existsSync(builtPath)) {
         res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
         res.sendFile(builtPath);
@@ -416,13 +463,22 @@ async function startServer() {
 
     app.use((req, res) => {
       const reqPath = req.path.replace(/\/+$/, '') || '/';
-      const htmlFile = cleanHtmlRoutes[reqPath] || (reqPath.endsWith('.html') ? reqPath.slice(1) : 'index.html');
-      const candidateDist = path.join(distDir, htmlFile);
-      const candidatePublic = path.join(PUBLIC_DIR, htmlFile);
-      if (fs.existsSync(candidateDist)) {
-        res.sendFile(candidateDist);
-      } else if (fs.existsSync(candidatePublic)) {
-        res.sendFile(candidatePublic);
+      const htmlFile = cleanHtmlRoutes[reqPath] || (reqPath.endsWith('.html') ? reqPath.slice(1) : null);
+      if (htmlFile) {
+        const candidateDist = path.join(distDir, htmlFile);
+        const candidatePublic = path.join(PUBLIC_DIR, htmlFile);
+        const status = htmlFile === '404.html' ? 404 : 200;
+        if (fs.existsSync(candidateDist)) {
+          res.status(status).sendFile(candidateDist);
+          return;
+        } else if (fs.existsSync(candidatePublic)) {
+          res.status(status).sendFile(candidatePublic);
+          return;
+        }
+      }
+      const notFoundPublic = path.join(PUBLIC_DIR, '404.html');
+      if (fs.existsSync(notFoundPublic)) {
+        res.status(404).sendFile(notFoundPublic);
       } else {
         res.status(404).json({ error: 'Page not found.' });
       }

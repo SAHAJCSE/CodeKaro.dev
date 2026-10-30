@@ -219,6 +219,12 @@ class AppHandler(BaseHTTPRequestHandler):
         static_files = {
             "/": ("index.html", "text/html; charset=utf-8"),
             "/index.html": ("index.html", "text/html; charset=utf-8"),
+            "/auth": ("auth.html", "text/html; charset=utf-8"),
+            "/auth.html": ("auth.html", "text/html; charset=utf-8"),
+            "/about": ("about.html", "text/html; charset=utf-8"),
+            "/about.html": ("about.html", "text/html; charset=utf-8"),
+            "/about.css": ("about.css", "text/css; charset=utf-8"),
+            "/about.js": ("about.js", "text/javascript; charset=utf-8"),
             "/dashboard": ("dashboard.html", "text/html; charset=utf-8"),
             "/dashboard.html": ("dashboard.html", "text/html; charset=utf-8"),
             "/practice": ("practice.html", "text/html; charset=utf-8"),
@@ -244,6 +250,7 @@ class AppHandler(BaseHTTPRequestHandler):
             "/config.js": ("config.js", "text/javascript; charset=utf-8"),
             "/assets/index.js": ("assets/index.js", "application/javascript; charset=utf-8"),
             "/assets/index.css": ("assets/index.css", "text/css; charset=utf-8"),
+            "/assets/auth-client.js": ("assets/auth-client.js", "application/javascript; charset=utf-8"),
         }
         if norm_path.startswith("/assets/"):
             rel_asset = norm_path.lstrip("/")
@@ -268,7 +275,72 @@ class AppHandler(BaseHTTPRequestHandler):
         self.send_bytes(200, body, content_type)
 
     def do_POST(self):
+        import base64
+        import hashlib
+        import hmac
+        import os
+        import secrets
+        import time
+
         path = unquote(urlparse(self.path).path).rstrip("/")
+        otp_secret = os.environ.get("OTP_SECRET", "codekaro-otp-hmac-secret-2026").encode("utf-8")
+
+        if path == "/api/auth/send-otp":
+            payload = self.read_json()
+            if payload is None:
+                return
+            email_raw = str(payload.get("email") or "").strip().lower()
+            if not email_raw or not re.fullmatch(r"[^\s@]+@[^\s@]+\.[^\s@]+", email_raw):
+                self.send_json(400, {"error": "Please provide a valid email address."})
+                return
+            otp = f"{secrets.randbelow(900000) + 100000:06d}"
+            expires_at = int(time.time() * 1000) + 10 * 60 * 1000
+            msg = f"{email_raw}|{otp}|{expires_at}"
+            sig = hmac.new(otp_secret, msg.encode("utf-8"), hashlib.sha256).hexdigest()
+            otp_token = base64.urlsafe_b64encode(f"{msg}|{sig}".encode("utf-8")).decode("utf-8").rstrip("=")
+            self.send_json(200, {
+                "ok": True,
+                "email": email_raw,
+                "expiresInSeconds": 600,
+                "otpToken": otp_token,
+                "deliveryMode": "preview",
+                "previewOtp": otp,
+                "message": f"Verification code generated for {email_raw}."
+            })
+            return
+
+        if path == "/api/auth/verify-otp":
+            payload = self.read_json()
+            if payload is None:
+                return
+            email_raw = str(payload.get("email") or "").strip().lower()
+            otp_input = str(payload.get("otp") or "").strip()
+            otp_token = str(payload.get("otpToken") or "").strip()
+            if not email_raw or not otp_input or not otp_token:
+                self.send_json(400, {"error": "Email and 6-digit OTP code are required."})
+                return
+            try:
+                padded = otp_token + "=" * (-len(otp_token) % 4)
+                decoded = base64.urlsafe_b64decode(padded.encode("utf-8")).decode("utf-8")
+                t_email, t_otp, t_exp_str, t_sig = decoded.split("|", 3)
+                expires_at = int(t_exp_str)
+                expected_msg = f"{t_email}|{t_otp}|{expires_at}"
+                expected_sig = hmac.new(otp_secret, expected_msg.encode("utf-8"), hashlib.sha256).hexdigest()
+                if not hmac.compare_digest(t_sig, expected_sig) or t_email != email_raw:
+                    self.send_json(400, {"error": "Invalid verification session."})
+                    return
+                if int(time.time() * 1000) > expires_at:
+                    self.send_json(400, {"error": "Your verification code has expired."})
+                    return
+                if t_otp != otp_input:
+                    self.send_json(400, {"error": "Invalid OTP code."})
+                    return
+                self.send_json(200, {"ok": True, "verified": True, "email": email_raw})
+                return
+            except Exception:
+                self.send_json(400, {"error": "Invalid OTP code."})
+                return
+
         match = re.fullmatch(r"(?:/api)?/problems/([a-z0-9-]+)/(save|run)", path)
         if match is None:
             self.send_json(404, {"error": "Endpoint not found."})

@@ -21,6 +21,11 @@ export interface CodeKaroAuthAPI {
   firebaseConfig: typeof firebaseConfig;
   signInWithGoogle: () => Promise<SyncedUserProfile>;
   signInWithGitHub: () => Promise<SyncedUserProfile>;
+  signUpWithEmail: (
+    name: string,
+    email: string,
+    password: string
+  ) => Promise<SyncedUserProfile>;
   signUpWithEmailAfterOtp: (
     name: string,
     email: string,
@@ -32,6 +37,27 @@ export interface CodeKaroAuthAPI {
   ) => Promise<SyncedUserProfile>;
   sendPasswordReset: (email: string) => Promise<void>;
   logout: () => Promise<void>;
+}
+
+async function registerEmailUser(
+  name: string,
+  email: string,
+  password: string
+): Promise<SyncedUserProfile> {
+  const cred = await createUserWithEmailAndPassword(auth, email, password);
+  try {
+    await updateProfile(cred.user, { displayName: name });
+  } catch (err) {
+    console.warn('Could not update Firebase Auth displayName:', err);
+  }
+  const profile = await syncUserProfileToFirestore(
+    cred.user,
+    'email',
+    true,
+    name,
+    email
+  );
+  return profile;
 }
 
 const CodeKaroAuth: CodeKaroAuthAPI = {
@@ -69,26 +95,8 @@ const CodeKaroAuth: CodeKaroAuthAPI = {
     return profile;
   },
 
-  async signUpWithEmailAfterOtp(
-    name: string,
-    email: string,
-    password: string
-  ): Promise<SyncedUserProfile> {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    try {
-      await updateProfile(cred.user, { displayName: name });
-    } catch (err) {
-      console.warn('Could not update Firebase Auth displayName:', err);
-    }
-    const profile = await syncUserProfileToFirestore(
-      cred.user,
-      'email',
-      true,
-      name,
-      email
-    );
-    return profile;
-  },
+  signUpWithEmail: registerEmailUser,
+  signUpWithEmailAfterOtp: registerEmailUser,
 
   async signInWithEmail(
     email: string,

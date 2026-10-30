@@ -25,33 +25,62 @@
     const url = p => {
       if (isFile) {
         const clean = p.replace(/^\//, "") || "index";
-        const query = clean.includes("?") ? "?" + clean.split("?")[1] : "";
-        const base = clean.split("?")[0];
-        return "./" + (base.endsWith(".html") ? base : base + ".html") + query;
+        const hash = clean.includes("#") ? "#" + clean.split("#")[1] : "";
+        const query = clean.includes("?") ? "?" + clean.split("?")[1].split("#")[0] : "";
+        const base = clean.split("?")[0].split("#")[0];
+        return "./" + (base.endsWith(".html") ? base : base + ".html") + query + hash;
       }
       return p;
     };
 
+    function bindPanelLinks() {
+      if (!authPanel) return;
+      authPanel.querySelectorAll("a.home-auth__link").forEach(link => {
+        link.addEventListener("click", e => {
+          const targetHref = link.getAttribute("href");
+          if (targetHref) {
+            e.stopPropagation();
+            window.location.href = targetHref;
+          }
+        });
+      });
+    }
+
     function syncHomeAuthState() {
       let user = null;
+      let avatarCustom = null;
       try {
-        user = JSON.parse(localStorage.getItem("oops_session") || "null");
+        user = JSON.parse(localStorage.getItem("oops_session") || localStorage.getItem("ck_user") || "null");
       } catch (e) {
         user = null;
       }
+      try {
+        avatarCustom = JSON.parse(localStorage.getItem("ck_avatar") || "null");
+      } catch (e) {
+        avatarCustom = null;
+      }
 
-      if (user && (user.username || user.name)) {
-        const displayName = user.name || user.username || "Coder";
-        const handle = user.username || (user.email ? user.email.split("@")[0] : "coder");
+      if ((user && (user.username || user.name || user.email)) || (avatarCustom && avatarCustom.displayName)) {
+        const displayName =
+          (avatarCustom && avatarCustom.displayName) ||
+          (user && (user.name || user.username || (user.email ? user.email.split("@")[0] : ""))) ||
+          "Coder";
+        const handle =
+          (user && (user.username || (user.email ? user.email.split("@")[0] : ""))) ||
+          displayName.toLowerCase().replace(/[^a-z0-9_]/g, "") ||
+          "coder";
         const initial = (displayName.charAt(0) || "U").toUpperCase();
-        const avatarSrc = user.picture || user.avatar || "";
+        const avatarSrc =
+          (avatarCustom && avatarCustom.avatar) ||
+          (user && (user.picture || user.avatar)) ||
+          "";
 
         authButton.setAttribute("aria-label", `Account: ${displayName}`);
         authButton.title = `Signed in as @${handle}`;
         if (avatarSrc) {
-          authButton.innerHTML = `<img src="${avatarSrc}" alt="${displayName}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;">`;
+          authButton.innerHTML = `<img src="${avatarSrc}" alt="${displayName}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;display:block;pointer-events:none;">`;
         } else {
-          authButton.innerHTML = `<span style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#784bff,#26d7f4);color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;">${initial}</span>`;
+          authButton.innerHTML = `<span style="width:28px;height:28px;border-radius:50%;background:#27272a;color:#fff;font-size:12px;font-weight:700;display:grid;place-items:center;pointer-events:none;">${initial}</span>`;
         }
 
         if (authPanel) {
@@ -65,20 +94,24 @@
                 <span class="home-auth__user-handle">@${handle}</span>
               </div>
             </div>
-            <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:6px">
+            <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px">
+              <a class="home-auth__link" href="${url('/dashboard#profile')}">Profile &amp; Stats</a>
               <a class="home-auth__link" href="${url('/practice')}">Practice IDE</a>
-              <a class="home-auth__link" href="${url('/profile')}">Profile &amp; Stats</a>
               <button class="home-auth__link home-auth__link--logout" type="button" id="home-logout-btn">Log out</button>
             </div>
           `;
 
+          bindPanelLinks();
+
           const logoutBtn = authPanel.querySelector("#home-logout-btn");
           if (logoutBtn) {
-            logoutBtn.addEventListener("click", () => {
+            logoutBtn.addEventListener("click", e => {
+              e.stopPropagation();
               try {
                 localStorage.removeItem("oops_session");
                 localStorage.removeItem("ck_user");
-              } catch (e) {}
+                localStorage.removeItem("ck_avatar");
+              } catch (err) {}
               syncHomeAuthState();
             });
           }
@@ -94,12 +127,17 @@
         `;
         if (authPanel) {
           authPanel.innerHTML = `
-            <p class="home-auth__prompt">Join Code-Karo</p>
-            <div class="home-auth__actions">
-              <a class="home-auth__link" href="${url('/auth?auth=signup')}">Sign up</a>
-              <a class="home-auth__link" href="${url('/auth')}">Log in</a>
+            <p class="home-auth__prompt">Code-Karo Account</p>
+            <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px;">
+              <a class="home-auth__link" href="${url('/dashboard#profile')}">Profile &amp; Stats</a>
+              <a class="home-auth__link" href="${url('/practice')}">Practice IDE</a>
+              <div style="display:flex;gap:8px;">
+                <a class="home-auth__link" href="${url('/auth?auth=signup')}">Sign up</a>
+                <a class="home-auth__link" href="${url('/auth')}">Log in</a>
+              </div>
             </div>
           `;
+          bindPanelLinks();
         }
       }
     }
@@ -107,17 +145,47 @@
     syncHomeAuthState();
     window.addEventListener("storage", syncHomeAuthState);
 
+    let closeTimer = null;
+    let lockedOpen = false;
     const setAuthMenuOpen = open => {
+      if (closeTimer) {
+        clearTimeout(closeTimer);
+        closeTimer = null;
+      }
       authButton.setAttribute("aria-expanded", String(open));
       authMenu.dataset.open = String(open);
     };
-    authMenu.addEventListener("pointerenter", () => setAuthMenuOpen(true));
-    authMenu.addEventListener("pointerleave", () => {
-      if (!authMenu.contains(document.activeElement)) setAuthMenuOpen(false);
+
+    authMenu.addEventListener("pointerenter", () => {
+      setAuthMenuOpen(true);
     });
-    authMenu.addEventListener("focusin", () => setAuthMenuOpen(true));
-    authMenu.addEventListener("focusout", event => {
-      if (!authMenu.contains(event.relatedTarget)) setAuthMenuOpen(false);
+
+    authMenu.addEventListener("pointerleave", () => {
+      if (lockedOpen) return;
+      closeTimer = setTimeout(() => {
+        setAuthMenuOpen(false);
+      }, 280);
+    });
+
+    authButton.addEventListener("click", e => {
+      e.preventDefault();
+      e.stopPropagation();
+      lockedOpen = !lockedOpen;
+      setAuthMenuOpen(lockedOpen);
+    });
+
+    document.addEventListener("pointerdown", e => {
+      if (!authMenu.contains(e.target)) {
+        lockedOpen = false;
+        setAuthMenuOpen(false);
+      }
+    });
+
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape" && authMenu.dataset.open === "true") {
+        lockedOpen = false;
+        setAuthMenuOpen(false);
+      }
     });
   }
 

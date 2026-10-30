@@ -87,11 +87,7 @@
             <div class="user-menu-sep"></div>
             <a class="user-menu-item" href="/dashboard">
               <span class="item-icon">▦</span>
-              <span>Dashboard</span>
-            </a>
-            <a class="user-menu-item" href="/profile">
-              <span class="item-icon">◷</span>
-              <span>Profile</span>
+              <span>Dashboard &amp; Profile</span>
             </a>
             <div class="user-menu-sep"></div>
             <button id="logout-btn" class="user-menu-item user-logout-btn" type="button">
@@ -179,16 +175,22 @@
         <div id="tab-content-description" class="tab-pane active">
           <!-- Description Skeleton Loading Shimmer -->
           <div id="description-skeleton" class="description-skeleton" hidden>
-            <div class="skeleton-line sk-title"></div>
-            <div class="skeleton-meta-row">
-              <div class="skeleton-pill"></div>
-              <div class="skeleton-chip"></div>
-              <div class="skeleton-chip"></div>
+            <div class="shadow-panel w-full space-y-5 rounded-lg bg-transparent p-4">
+              <div class="heroui-skeleton h-32 rounded-lg"></div>
+              <div class="space-y-3">
+                <div class="heroui-skeleton h-3 w-3/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-4/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-2/5 rounded-lg"></div>
+              </div>
             </div>
-            <div class="skeleton-line sk-p sk-w90"></div>
-            <div class="skeleton-line sk-p sk-w80"></div>
-            <div class="skeleton-line sk-p sk-w60"></div>
-            <div class="skeleton-card"></div>
+            <div class="shadow-panel w-full space-y-5 rounded-lg bg-transparent p-4">
+              <div class="heroui-skeleton h-32 rounded-lg"></div>
+              <div class="space-y-3">
+                <div class="heroui-skeleton h-3 w-3/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-4/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-2/5 rounded-lg"></div>
+              </div>
+            </div>
           </div>
 
           <!-- Description Error State with Retry -->
@@ -301,6 +303,16 @@
           </div>
         </div>
         <div class="code-area" id="editor-container-wrap">
+          <div id="editor-skeleton" class="editor-skeleton-overlay" hidden>
+            <div class="shadow-panel w-full space-y-5 rounded-lg bg-transparent p-4">
+              <div class="heroui-skeleton h-32 rounded-lg"></div>
+              <div class="space-y-3">
+                <div class="heroui-skeleton h-3 w-3/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-4/5 rounded-lg"></div>
+                <div class="heroui-skeleton h-3 w-2/5 rounded-lg"></div>
+              </div>
+            </div>
+          </div>
           <div id="monaco-editor" class="monaco-container"></div>
           <div id="fallback-editor-wrap" class="fallback-wrap" hidden>
             <div id="fallback-banner" class="fallback-banner">

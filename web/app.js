@@ -1088,18 +1088,18 @@ function renderLoadingState(message = "Running…") {
 
   output.innerHTML = `
     <div class="skeleton-container" aria-busy="true" aria-label="Loading test results">
-      <div class="skeleton-status-row">
+      <div class="skeleton-status-row" style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
         <span class="spinner"></span>
         <span>${escapeHtml(message)}</span>
       </div>
-      <div class="skeleton-shimmer-block skeleton-header-shimmer"></div>
-      <div class="skeleton-tabs-row">
-        <div class="skeleton-shimmer-block skeleton-tab-shimmer"></div>
-        <div class="skeleton-shimmer-block skeleton-tab-shimmer"></div>
-        <div class="skeleton-shimmer-block skeleton-tab-shimmer"></div>
+      <div class="shadow-panel w-full space-y-5 rounded-lg bg-transparent p-4">
+        <div class="heroui-skeleton h-32 rounded-lg"></div>
+        <div class="space-y-3">
+          <div class="heroui-skeleton h-3 w-3/5 rounded-lg"></div>
+          <div class="heroui-skeleton h-3 w-4/5 rounded-lg"></div>
+          <div class="heroui-skeleton h-3 w-2/5 rounded-lg"></div>
+        </div>
       </div>
-      <div class="skeleton-shimmer-block skeleton-card-shimmer"></div>
-      <div class="skeleton-shimmer-block skeleton-card-shimmer"></div>
     </div>
   `;
 }
@@ -2006,9 +2006,11 @@ async function selectProblem(problemId, pushState = true) {
   saveButton.disabled = true;
 
   const descSkeleton = document.querySelector("#description-skeleton");
+  const editorSkeleton = document.querySelector("#editor-skeleton");
   const descError = document.querySelector("#description-error");
   const footerBar = document.querySelector("#problem-footer-bar");
   if (descSkeleton) descSkeleton.hidden = false;
+  if (editorSkeleton) editorSkeleton.hidden = false;
   if (descError) descError.hidden = true;
   if (welcomeState) welcomeState.hidden = true;
   if (notFoundState) notFoundState.hidden = true;
@@ -2018,10 +2020,14 @@ async function selectProblem(problemId, pushState = true) {
   if (problemIdTag) problemIdTag.textContent = "";
 
   try {
-    const problem = await requestJson(`/api/problems/${encodeURIComponent(problemId)}`);
+    const [problem] = await Promise.all([
+      requestJson(`/api/problems/${encodeURIComponent(problemId)}`),
+      new Promise(resolve => setTimeout(resolve, 420)),
+    ]);
     if (version !== requestVersion) return;
 
     if (descSkeleton) descSkeleton.hidden = true;
+    if (editorSkeleton) editorSkeleton.hidden = true;
 
     // 1. Problem number + title (e.g. "12. Employee")
     const problemIndex = problems.findIndex(p => p.id === problem.id);
@@ -2111,6 +2117,7 @@ async function selectProblem(problemId, pushState = true) {
   } catch (error) {
     if (version !== requestVersion) return;
     if (descSkeleton) descSkeleton.hidden = true;
+    if (editorSkeleton) editorSkeleton.hidden = true;
     const descError = document.querySelector("#description-error");
     const descErrorMsg = document.querySelector("#description-error-msg");
     const descRetryBtn = document.querySelector("#description-retry-btn");
@@ -2608,12 +2615,13 @@ window.addEventListener("popstate", () => {
 
 async function loadProblems() {
   problemList.innerHTML = `
-    <div class="description-skeleton" style="padding: 10px 8px;">
-      <div class="skeleton-line" style="height: 18px; width: 80%; margin-bottom: 6px;"></div>
-      <div class="skeleton-line" style="height: 18px; width: 65%; margin-bottom: 6px;"></div>
-      <div class="skeleton-line" style="height: 18px; width: 90%; margin-bottom: 6px;"></div>
-      <div class="skeleton-line" style="height: 18px; width: 70%; margin-bottom: 6px;"></div>
-      <div class="skeleton-line" style="height: 18px; width: 85%;"></div>
+    <div class="shadow-panel w-full space-y-5 rounded-lg bg-transparent p-4" style="margin: 8px 0;">
+      <div class="heroui-skeleton h-32 rounded-lg"></div>
+      <div class="space-y-3">
+        <div class="heroui-skeleton h-3 w-3/5 rounded-lg"></div>
+        <div class="heroui-skeleton h-3 w-4/5 rounded-lg"></div>
+        <div class="heroui-skeleton h-3 w-2/5 rounded-lg"></div>
+      </div>
     </div>
   `;
   try {

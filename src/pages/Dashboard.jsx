@@ -5,6 +5,7 @@ import { PerformanceWidget } from "../components/widgets/PerformanceWidget";
 import { OopMasteryWidget } from "../components/widgets/OopMasteryWidget";
 import { RecentSubmissionsWidget } from "../components/widgets/RecentSubmissionsWidget";
 import { RecommendedWidget } from "../components/widgets/RecommendedWidget";
+import ContributionSkyline from "@/components/ui/contribution-skyline";
 import { getDashboardData } from "../data/dashboardData";
 import {
   LayoutDashboard,
@@ -16,6 +17,7 @@ import {
   ChevronRight,
   Code2,
 } from "lucide-react";
+import "../styles/tailwind.css";
 import "../styles/tokens.css";
 import "../styles/dashboard.css";
 
@@ -190,6 +192,16 @@ export function Dashboard() {
           <h1 style={{ display: "none" }}>Dashboard</h1>
 
           <div className="dashboard-grid">
+            {/* Row 0: Interactive 2D/3D Contribution Skyline (12 cols) */}
+            <div style={{ gridColumn: "1 / -1" }}>
+              <ContributionSkyline
+                defaultView="3d"
+                palette="ember"
+                unit="submission"
+                unitPlural="submissions"
+              />
+            </div>
+
             {/* Row 1: Daily Practice Streak (7 cols) + Performance Metrics (5 cols) */}
             <div className="col-streak animate-entrance stagger-1">
               <StreakWidget
