@@ -9,6 +9,7 @@
   const segments = words.map((word, index) => {
     const span = document.createElement("span");
     span.className = "reveal-word";
+    span.style.setProperty("--word-index", String(index));
     span.textContent = word;
     heading.append(span);
     if (index < words.length - 1) heading.append(document.createTextNode(" "));
@@ -16,42 +17,27 @@
   });
 
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-  let visible = false;
-  let frame = 0;
   if (reducedMotion.matches) {
-    segments.forEach(segment => { segment.style.opacity = "1"; });
-  }
-
-  function update() {
-    frame = 0;
-    if (!visible) return;
-    if (reducedMotion.matches) {
-      segments.forEach(segment => { segment.style.opacity = "1"; });
-      return;
-    }
-
-    const bounds = heading.getBoundingClientRect();
-    const start = window.innerHeight * .9;
-    const end = window.innerHeight * .3;
-    const progress = Math.max(0, Math.min(1, (start - bounds.top) / (bounds.height + start - end)));
-    const revealed = progress * segments.length;
-    segments.forEach((segment, index) => {
-      const amount = Math.max(0, Math.min(1, revealed - index));
-      segment.style.opacity = String(.2 + amount * .8);
+    heading.classList.add("is-queued");
+    segments.forEach(segment => {
+      segment.style.opacity = "1";
+      segment.style.transform = "none";
+      segment.style.filter = "none";
     });
-  }
-
-  function scheduleUpdate() {
-    if (!frame) frame = requestAnimationFrame(update);
+    return;
   }
 
   const observer = new IntersectionObserver(entries => {
-    visible = entries.some(entry => entry.isIntersecting);
-    if (visible) scheduleUpdate();
-  }, { rootMargin: "120px 0px" });
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        heading.classList.remove("is-queued");
+        void heading.offsetWidth;
+        heading.classList.add("is-queued");
+      } else {
+        heading.classList.remove("is-queued");
+      }
+    });
+  }, { threshold: 0.15, rootMargin: "40px 0px" });
+
   observer.observe(heading);
-  window.addEventListener("scroll", scheduleUpdate, { passive: true });
-  window.addEventListener("resize", scheduleUpdate);
-  reducedMotion.addEventListener("change", scheduleUpdate);
-  scheduleUpdate();
 })();

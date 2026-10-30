@@ -393,16 +393,36 @@ async function startServer() {
     });
 
     const vite = await createViteServer({
-      server: { middlewareMode: true },
+      server: { middlewareMode: true, hmr: false },
       appType: 'custom',
     });
 
     app.use(vite.middlewares);
   } else {
     const distDir = path.join(__dirname, 'dist');
-    // If production requests /src/auth-client.ts, serve the compiled /assets/auth-client.js
+    // If production requests /src/auth-client.ts or /src/dashboard-skyline.tsx, serve the compiled bundle
     app.get('/src/auth-client.ts', (_req, res) => {
       const builtPath = path.join(distDir, 'assets', 'auth-client.js');
+      if (fs.existsSync(builtPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.sendFile(builtPath);
+        return;
+      }
+      res.status(404).end();
+    });
+
+    app.get('/src/dashboard-skyline.tsx', (_req, res) => {
+      const builtPath = path.join(distDir, 'assets', 'dashboard-skyline.js');
+      if (fs.existsSync(builtPath)) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        res.sendFile(builtPath);
+        return;
+      }
+      res.status(404).end();
+    });
+
+    app.get('/src/testimonials-entry.tsx', (_req, res) => {
+      const builtPath = path.join(distDir, 'assets', 'testimonials-entry.js');
       if (fs.existsSync(builtPath)) {
         res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
         res.sendFile(builtPath);

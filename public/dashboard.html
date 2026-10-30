@@ -50,6 +50,10 @@
       --heat-2: #8a3626;
       --heat-3: #cf5236;
       --heat-4: #ff6b4a;
+      --color-background: #15161b;
+      --color-foreground: #f3f3f7;
+      --color-border: rgba(255, 255, 255, 0.08);
+      --color-muted-foreground: #8d8f9d;
       background: var(--bg-page);
       color: var(--text-main);
     }
@@ -89,6 +93,10 @@
       --heat-2: #f89a84;
       --heat-3: #ef6f50;
       --heat-4: #e55331;
+      --color-background: #ffffff;
+      --color-foreground: #14151a;
+      --color-border: rgba(0, 0, 0, 0.08);
+      --color-muted-foreground: #656775;
     }
 
     * { box-sizing: border-box; }
@@ -1016,6 +1024,7 @@
       }
     }
   </style>
+  <script type="module" src="/src/dashboard-skyline.tsx"></script>
 </head>
 <body>
   <!-- ========================================================
@@ -1130,6 +1139,11 @@
   </header>
 
   <main class="dashboard-container">
+    <!-- Interactive 2D/3D Contribution Skyline (React Component) -->
+    <section class="dash-card" style="margin-bottom: 20px;" aria-label="Contribution Skyline">
+      <div id="dashboard-skyline-root"></div>
+    </section>
+
     <!-- Top Bento Row: Daily Practice Streak & Performance Metrics -->
     <div class="bento-row-top">
       <!-- 1. Daily Practice Streak -->
