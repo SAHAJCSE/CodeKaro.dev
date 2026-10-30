@@ -5,6 +5,8 @@ import {
   googleProvider,
   githubProvider,
   signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
@@ -66,15 +68,24 @@ const CodeKaroAuth: CodeKaroAuthAPI = {
   firebaseConfig,
 
   async signInWithGoogle(): Promise<SyncedUserProfile> {
-    const cred = await signInWithPopup(auth, googleProvider);
-    const profile = await syncUserProfileToFirestore(
-      cred.user,
-      'google',
-      true,
-      cred.user.displayName || undefined,
-      cred.user.email || undefined
-    );
-    return profile;
+    try {
+      const cred = await signInWithPopup(auth, googleProvider);
+      const profile = await syncUserProfileToFirestore(
+        cred.user,
+        'google',
+        true,
+        cred.user.displayName || undefined,
+        cred.user.email || undefined
+      );
+      return profile;
+    } catch (popupErr: any) {
+      const code = popupErr && popupErr.code ? String(popupErr.code) : '';
+      if (code === 'auth/popup-blocked' && window.top === window.self) {
+        await signInWithRedirect(auth, googleProvider);
+        return new Promise(() => {});
+      }
+      throw popupErr;
+    }
   },
 
   async signInWithGitHub(): Promise<SyncedUserProfile> {
@@ -134,5 +145,22 @@ window.dispatchEvent(new CustomEvent('codekaro-firebase-ready', { detail: CodeKa
 onAuthStateChanged(auth, (user) => {
   window.dispatchEvent(new CustomEvent('codekaro-auth-changed', { detail: { user } }));
 });
+
+getRedirectResult(auth)
+  .then(async (cred) => {
+    if (cred && cred.user) {
+      const profile = await syncUserProfileToFirestore(
+        cred.user,
+        'google',
+        true,
+        cred.user.displayName || undefined,
+        cred.user.email || undefined
+      );
+      window.dispatchEvent(new CustomEvent('codekaro-redirect-login', { detail: profile }));
+    }
+  })
+  .catch((err) => {
+    console.warn('Redirect auth check:', err);
+  });
 
 export default CodeKaroAuth;
