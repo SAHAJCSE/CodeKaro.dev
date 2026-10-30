@@ -2119,16 +2119,89 @@ kbd {
 .markdown-body td { color: var(--text-secondary); }
 
 /* Skeleton Shimmer Loading States */
+@keyframes heroui-shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 .description-skeleton {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 16px;
   padding: 8px 0;
 }
-.skeleton-line, .skeleton-pill, .skeleton-chip, .skeleton-card {
-  background: #202127;
-    border-radius: var(--radius-sm);
+
+.editor-skeleton-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  background: var(--bg-panel);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
+
+.shadow-panel {
+  box-shadow: 0 8px 28px -4px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-default);
+}
+html[data-theme="light"] .shadow-panel {
+  box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.07), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid var(--border-default);
+}
+
+.w-\[250px\] { width: 250px; }
+.w-full { width: 100%; }
+.p-4 { padding: 16px; }
+.bg-transparent { background-color: transparent; }
+.rounded-lg { border-radius: 8px; }
+.space-y-5 > * + * { margin-top: 20px; }
+.space-y-3 > * + * { margin-top: 12px; }
+.h-32 { height: 128px; }
+.h-3 { height: 12px; }
+.w-3\/5 { width: 60%; }
+.w-4\/5 { width: 80%; }
+.w-2\/5 { width: 40%; }
+
+.heroui-skeleton,
+.skeleton-line, .skeleton-pill, .skeleton-chip, .skeleton-card, .skeleton-shimmer-block {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 8px;
+}
+html[data-theme="light"] .heroui-skeleton,
+html[data-theme="light"] .skeleton-line,
+html[data-theme="light"] .skeleton-pill,
+html[data-theme="light"] .skeleton-chip,
+html[data-theme="light"] .skeleton-card,
+html[data-theme="light"] .skeleton-shimmer-block {
+  background: rgba(15, 23, 42, 0.08);
+}
+
+.heroui-skeleton::after,
+.skeleton-line::after,
+.skeleton-pill::after,
+.skeleton-chip::after,
+.skeleton-card::after,
+.skeleton-shimmer-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.14) 50%, transparent 100%);
+  animation: heroui-shimmer 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+html[data-theme="light"] .heroui-skeleton::after,
+html[data-theme="light"] .skeleton-line::after,
+html[data-theme="light"] .skeleton-pill::after,
+html[data-theme="light"] .skeleton-chip::after,
+html[data-theme="light"] .skeleton-card::after,
+html[data-theme="light"] .skeleton-shimmer-block::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.65) 50%, transparent 100%);
+}
+
 .sk-title { height: 26px; width: 60%; border-radius: var(--radius-md); }
 .skeleton-meta-row { display: flex; gap: 8px; margin-bottom: 6px; }
 .skeleton-pill { height: 22px; width: 55px; border-radius: var(--radius-sm); }

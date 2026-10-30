@@ -21,6 +21,7 @@ export default defineConfig({
         "auth-client": "src/auth-client.ts",
         "dashboard-skyline": "src/dashboard-skyline.tsx",
         "testimonials-entry": "src/testimonials-entry.tsx",
+        "not-found-entry": "src/not-found-entry.tsx",
       },
       output: {
         entryFileNames: "assets/[name].js",

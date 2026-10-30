@@ -216,7 +216,7 @@
 
     .navbar {
       position: absolute;
-      z-index: 3;
+      z-index: 50;
       inset: 0 0 auto;
       display: flex;
       align-items: center;
@@ -233,7 +233,7 @@
 
     .home-auth {
       position: absolute;
-      z-index: 6;
+      z-index: 60;
       right: calc(clamp(22px, 6vw, 88px) + 48px);
     }
 
@@ -242,45 +242,52 @@
       width: 38px;
       height: 38px;
       place-items: center;
-      border: 1px solid rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .2);
       border-radius: 50%;
-      background: rgba(17, 17, 20, .64);
-      color: #f4f4f5;
+      background: rgba(15, 15, 18, .85);
+      color: #fafafa;
       cursor: pointer;
-      transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
     }
 
-    .home-auth__button svg { width: 19px; height: 19px; }
+    .home-auth__button svg { width: 19px; height: 19px; pointer-events: none; }
+    .home-auth__button img { pointer-events: none; }
 
     .home-auth:hover .home-auth__button,
     .home-auth:focus-within .home-auth__button,
     .home-auth[data-open="true"] .home-auth__button {
-      border-color: rgba(180, 155, 255, .72);
-      background: rgba(31, 24, 48, .94);
-      box-shadow: 0 0 18px rgba(147, 98, 255, .36);
+      border-color: #ffffff;
+      background: #18181b;
     }
 
     .home-auth__panel {
       position: absolute;
+      z-index: 70;
       top: calc(100% + 10px);
-      right: -48px;
-      width: 190px;
+      right: -24px;
+      width: 224px;
       padding: 14px;
-      border: 1px solid rgba(255, 255, 255, .12);
+      border: 1px solid rgba(255, 255, 255, .16);
       border-radius: 16px;
-      background: rgba(17, 17, 20, .94);
-      box-shadow: 0 16px 36px rgba(0, 0, 0, .32);
+      background: #0a0a0c;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .55);
       opacity: 0;
       pointer-events: none;
-      transform: translateY(-5px);
+      transform: translateY(-4px);
       visibility: hidden;
-      transition: opacity .18s ease, transform .18s ease, visibility .18s ease;
-      -webkit-backdrop-filter: blur(18px);
-      backdrop-filter: blur(18px);
+      transition: opacity .16s ease, transform .16s ease, visibility .16s ease;
+    }
+
+    .home-auth__panel::before {
+      content: "";
+      position: absolute;
+      top: -18px;
+      left: -16px;
+      right: -16px;
+      height: 22px;
     }
 
     .home-auth:hover .home-auth__panel,
-    .home-auth:focus-within .home-auth__panel,
     .home-auth[data-open="true"] .home-auth__panel {
       opacity: 1;
       pointer-events: auto;
@@ -289,9 +296,10 @@
     }
 
     .home-auth__prompt {
-      margin: 0 0 11px;
-      color: rgba(245, 244, 248, .72);
-      font-size: 12px;
+      margin: 0 0 10px;
+      color: #a1a1aa;
+      font-size: 13px;
+      font-weight: 500;
     }
 
     .home-auth__actions {
@@ -301,67 +309,83 @@
 
     .home-auth__link {
       display: inline-flex;
-      min-height: 34px;
+      min-height: 36px;
       flex: 1;
       align-items: center;
       justify-content: center;
-      border: 1px solid rgba(255, 255, 255, .14);
+      border: 1px solid rgba(255, 255, 255, .18);
       border-radius: 9px;
-      color: #f7f5fb;
-      font-size: 12px;
+      background: #141417;
+      color: #fafafa;
+      font-size: 13px;
       font-weight: 600;
       text-decoration: none;
-      transition: background .18s ease, border-color .18s ease;
+      cursor: pointer;
+      transition: background .16s ease, color .16s ease, border-color .16s ease;
     }
 
     .home-auth__link:first-child {
-      --auth-cta-fill: rgba(24, 22, 30, .98);
-      position: relative;
-      border: 1px solid transparent;
-      background:
-        linear-gradient(var(--auth-cta-fill), var(--auth-cta-fill)) padding-box,
-        conic-gradient(from var(--auth-border-angle), #ff3cac, #784bff, #26d7f4, #c4ff4d, #ffb43b, #ff3cac) border-box;
-      color: #fff;
-      animation: auth-border-flow 4s linear infinite;
-    }
-
-    @property --auth-border-angle {
-      syntax: "<angle>";
-      inherits: false;
-      initial-value: 0deg;
-    }
-
-    @keyframes auth-border-flow {
-      to { --auth-border-angle: 360deg; }
+      background: #fafafa;
+      border-color: #fafafa;
+      color: #09090b;
     }
 
     .home-auth__link:hover,
     .home-auth__link:focus-visible {
-      border-color: rgba(255, 255, 255, .44);
-      background-color: rgba(255, 255, 255, .12);
+      border-color: #ffffff;
+      background-color: #27272a;
+      color: #ffffff;
       outline: none;
     }
 
+    .home-auth__link:first-child:hover,
+    .home-auth__link:first-child:focus-visible {
+      background-color: #e4e4e7;
+      border-color: #e4e4e7;
+      color: #09090b;
+    }
+
     :root[data-theme="light"] .home-auth__button {
-      border-color: rgba(32, 33, 38, .14);
-      background: rgba(255, 255, 255, .82);
-      color: #202126;
+      border-color: rgba(0, 0, 0, .18);
+      background: #ffffff;
+      color: #09090b;
+    }
+
+    :root[data-theme="light"] .home-auth:hover .home-auth__button,
+    :root[data-theme="light"] .home-auth:focus-within .home-auth__button,
+    :root[data-theme="light"] .home-auth[data-open="true"] .home-auth__button {
+      border-color: #09090b;
+      background: #f4f4f5;
     }
 
     :root[data-theme="light"] .home-auth__panel {
-      border-color: rgba(32, 33, 38, .14);
-      background: rgba(250, 250, 251, .96);
-      box-shadow: 0 16px 36px rgba(24, 24, 27, .16);
+      border-color: rgba(0, 0, 0, .14);
+      background: #ffffff;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, .14);
     }
 
-    :root[data-theme="light"] .home-auth__prompt { color: #696b74; }
-    :root[data-theme="light"] .home-auth__link:not(:first-child) {
-      border-color: rgba(32, 33, 38, .16);
-      color: #202126;
+    :root[data-theme="light"] .home-auth__prompt { color: #52525b; }
+    :root[data-theme="light"] .home-auth__link {
+      border-color: rgba(0, 0, 0, .16);
+      background: #f4f4f5;
+      color: #09090b;
     }
     :root[data-theme="light"] .home-auth__link:first-child {
-      --auth-cta-fill: #fff;
-      color: #202126;
+      background: #09090b;
+      border-color: #09090b;
+      color: #ffffff;
+    }
+    :root[data-theme="light"] .home-auth__link:hover,
+    :root[data-theme="light"] .home-auth__link:focus-visible {
+      background: #e4e4e7;
+      border-color: #09090b;
+      color: #09090b;
+    }
+    :root[data-theme="light"] .home-auth__link:first-child:hover,
+    :root[data-theme="light"] .home-auth__link:first-child:focus-visible {
+      background: #27272a;
+      border-color: #27272a;
+      color: #ffffff;
     }
 
     .home-auth__user-pill {
@@ -380,7 +404,7 @@
       width: 32px;
       height: 32px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #784bff, #26d7f4);
+      background: #27272a;
       color: #fff;
       display: grid;
       place-items: center;
@@ -963,10 +987,10 @@
       justify-content: center;
       min-height: 150px;
       padding: 26px 24px;
-      background: #101014;
+      background: #09090b;
     }
 
-    :root[data-theme="light"] .community-avatars { background: #f0f0f2; }
+    :root[data-theme="light"] .community-avatars { background: #ffffff; }
 
     .community-avatars__list {
       display: flex;
@@ -982,7 +1006,7 @@
       flex-shrink: 0;
       overflow: hidden;
       place-items: center;
-      border: 2px solid #101014;
+      border: 2px solid #09090b;
       border-radius: 50%;
       background: linear-gradient(145deg, #1e3a8a, #2563eb);
       color: #ffffff;
@@ -991,7 +1015,7 @@
     }
 
     :root[data-theme="light"] .community-avatar {
-      border-color: #f0f0f2;
+      border-color: #ffffff;
     }
 
     .community-avatar:not(:first-child) {
@@ -1300,10 +1324,14 @@
           </svg>
         </button>
         <div class="home-auth__panel">
-          <p class="home-auth__prompt">Join Code-Karo</p>
-          <div class="home-auth__actions">
-            <a class="home-auth__link" href="/auth?auth=signup">Sign up</a>
-            <a class="home-auth__link" href="/auth">Log in</a>
+          <p class="home-auth__prompt">Code-Karo Account</p>
+          <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px;">
+            <a class="home-auth__link" href="/dashboard#profile">Profile &amp; Stats</a>
+            <a class="home-auth__link" href="/practice">Practice IDE</a>
+            <div style="display:flex;gap:8px;">
+              <a class="home-auth__link" href="/auth?auth=signup">Sign up</a>
+              <a class="home-auth__link" href="/auth">Log in</a>
+            </div>
           </div>
         </div>
       </div>
@@ -1325,7 +1353,6 @@
         <div class="nav-island__links">
           <a class="nav-island__link" href="/" data-nav-link aria-current="page">Home</a>
           <a class="nav-island__link" href="/dashboard" data-nav-link>Dashboard</a>
-          <a class="nav-island__link" href="/profile" data-nav-link>Profile</a>
           <a class="nav-island__link" href="/practice" data-nav-link>Practice</a>
           <a class="nav-island__link" href="/about" data-nav-link>About</a>
         </div>
@@ -1338,14 +1365,7 @@
       <a class="hero-cta" href="/practice">Let’s Code</a>
     </div>
   </main>
-  <section class="intro-section" aria-labelledby="intro-title">
-    <div class="intro-section__content">
-      <p class="intro-section__eyebrow">A place to practice with purpose</p>
-      <h2 class="intro-section__title" id="intro-title" data-scroll-reveal>
-        Learn Java by writing it. Solve focused programming challenges, run your code against real tests, and turn each problem into progress.
-      </h2>
-    </div>
-  </section>
+  <div id="features-bento-root"></div>
   <section class="community-avatars" aria-label="Code-Karo.dev team">
     <div class="community-avatars__list" id="community-avatars-list">
       <!-- Fallback avatars in team order: Rajeev, Shubham, Duwarka, Sahaj -->
@@ -1427,6 +1447,7 @@
     })();
   </script>
   <section id="stagger-testimonials-root" aria-label="Developer testimonials"></section>
+  <div id="faqs-root"></div>
   <footer class="site-footer" aria-label="Code-Karo.dev footer">
     <img class="site-footer__art" src="/footer-gradient.jpg" alt="" aria-hidden="true">
     <div class="footer-jobs">
