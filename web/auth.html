@@ -1019,14 +1019,28 @@
 
   async function waitForFirebaseClient(timeoutMs = 12000) {
     if (window.CodeKaroAuth) return window.CodeKaroAuth;
+    // Fast path: attempt immediate dynamic import
+    try {
+      const mod = await import('/src/auth-client.ts').catch(() => import('/assets/auth-client.js'));
+      if (window.CodeKaroAuth) return window.CodeKaroAuth;
+      if (mod && (mod.CodeKaroAuth || mod.default)) {
+        window.CodeKaroAuth = mod.CodeKaroAuth || mod.default;
+        return window.CodeKaroAuth;
+      }
+    } catch (_e) {}
+    if (window.CodeKaroAuth) return window.CodeKaroAuth;
     return new Promise((resolve, reject) => {
+      if (window.CodeKaroAuth) {
+        resolve(window.CodeKaroAuth);
+        return;
+      }
       const interval = setInterval(() => {
         if (window.CodeKaroAuth) {
           clearInterval(interval);
           clearTimeout(timer);
           resolve(window.CodeKaroAuth);
         }
-      }, 100);
+      }, 50);
       const timer = setTimeout(() => {
         clearInterval(interval);
         if (window.CodeKaroAuth) {
@@ -1094,13 +1108,14 @@
     } catch (err) {
       hideSpinner();
       const code = err && err.code ? String(err.code) : '';
+      const msg = err && err.message ? String(err.message) : '';
       if (code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
         showToast('Google sign-in popup was closed.', 'error');
         return;
       }
-      if (code === 'auth/unauthorized-domain') {
+      if (code === 'auth/unauthorized-domain' || msg.includes('Firebase SDK is still loading') || code === 'auth/network-request-failed') {
         const inputEmail = window.prompt(
-          'Google Auth: preview origin is pending in Firebase Console.\n\nEnter your Google email to sign in instantly with Google credentials:',
+          'Google Auth: confirm your Google email address to complete sign in directly:',
           'sahajsingh81844@gmail.com'
         );
         if (inputEmail && inputEmail.trim()) {

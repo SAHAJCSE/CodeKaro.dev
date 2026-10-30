@@ -1366,7 +1366,161 @@
       <a class="hero-cta" href="/practice">Let’s Code</a>
     </div>
   </main>
-  <div id="features-bento-root"></div>
+  <div id="features-bento-root">
+    <section aria-label="Platform features" class="w-full bg-[#09090b] px-6 py-20 text-[#fafafa] transition-colors [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] sm:px-10 lg:px-20">
+      <div class="mx-auto flex max-w-6xl flex-col items-center">
+        <div class="mb-14 flex max-w-4xl flex-col items-center text-center">
+          <span class="mb-4 inline-flex items-center gap-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 [[data-theme=light]_&]:text-zinc-600">
+            <span class="h-px w-5 bg-current"></span>
+            Practice Java
+            <span class="h-px w-5 bg-current"></span>
+          </span>
+          <h2 class="text-center text-2xl font-bold leading-snug tracking-tight text-current sm:text-4xl md:text-[2.5rem] md:leading-[1.22]">
+            Learn Java by writing it. Solve focused programming challenges, run your code against real tests, and turn each problem into progress.
+          </h2>
+        </div>
+
+        <div class="grid w-full auto-rows-[20rem] grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Card 1: Write Real Java Code (col-span-2) -->
+          <div class="group relative col-span-3 md:col-span-2 flex flex-col justify-between overflow-hidden rounded-2xl bg-[#0a0a0c] text-[#fafafa] border border-white/15 shadow-sm [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] [[data-theme=light]_&]:border-black/12 transform-gpu transition-all duration-300 hover:border-white/35 [[data-theme=light]_&]:hover:border-black/35">
+            <div>
+              <div class="pointer-events-none absolute inset-x-5 top-5 rounded-xl border border-white/15 bg-[#121215] p-4 font-mono text-xs text-zinc-300 shadow-sm transition-all duration-300 group-hover:border-white/30 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50 [[data-theme=light]_&]:text-zinc-800 [[data-theme=light]_&]:group-hover:border-black/25">
+                <div class="mb-2 flex items-center gap-1.5">
+                  <span class="h-2.5 w-2.5 rounded-full bg-zinc-600 [[data-theme=light]_&]:bg-zinc-300"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-zinc-500 [[data-theme=light]_&]:bg-zinc-400"></span>
+                  <span class="h-2.5 w-2.5 rounded-full bg-zinc-400 [[data-theme=light]_&]:bg-zinc-500"></span>
+                  <span class="ml-2 text-[11px] text-zinc-400 [[data-theme=light]_&]:text-zinc-500">Solution.java</span>
+                </div>
+                <pre class="overflow-hidden leading-relaxed"><span class="font-semibold text-white [[data-theme=light]_&]:text-black">public class</span> <span class="underline decoration-zinc-500/50 underline-offset-2">BankAccount</span> {
+  <span class="font-semibold text-white [[data-theme=light]_&]:text-black">private double</span> balance;
+  <span class="font-semibold text-white [[data-theme=light]_&]:text-black">public void</span> <span class="font-medium">deposit</span>(double amt) {
+    if (amt &gt; 0) balance += amt;
+  }
+}</pre>
+              </div>
+            </div>
+            <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-2 p-6 transition-all duration-300 group-hover:-translate-y-8">
+              <h3 class="text-lg font-semibold text-current tracking-tight">Write Real Java Code</h3>
+              <p class="max-w-lg text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:text-zinc-600">Practice object-oriented Java in a distraction-free browser IDE with syntax highlighting and starter templates.</p>
+            </div>
+            <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-8 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              <a href="/practice" class="pointer-events-auto inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 text-current hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/5">
+                Open Editor
+                <svg class="ms-2 h-4 w-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+            <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-white/[.02] [[data-theme=light]_&]:group-hover:bg-black/[.02]"></div>
+          </div>
+
+          <!-- Card 2: Instant Test Suites (col-span-1) -->
+          <div class="group relative col-span-3 md:col-span-1 flex flex-col justify-between overflow-hidden rounded-2xl bg-[#0a0a0c] text-[#fafafa] border border-white/15 shadow-sm [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] [[data-theme=light]_&]:border-black/12 transform-gpu transition-all duration-300 hover:border-white/35 [[data-theme=light]_&]:hover:border-black/35">
+            <div>
+              <div class="pointer-events-none absolute inset-x-5 top-5 flex flex-col gap-2.5">
+                <div class="flex items-center justify-between rounded-lg border border-white/15 bg-[#121215] px-3.5 py-2.5 text-xs transition-all duration-300 group-hover:translate-x-1 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50">
+                  <span class="flex items-center gap-2 font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900"><span class="h-2 w-2 rounded-full bg-white [[data-theme=light]_&]:bg-black"></span>Test 01 · Inheritance Hierarchy</span>
+                  <span class="font-mono text-[11px] text-zinc-400 [[data-theme=light]_&]:text-zinc-600">12 ms</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg border border-white/15 bg-[#121215] px-3.5 py-2.5 text-xs transition-all duration-300 group-hover:translate-x-1 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50">
+                  <span class="flex items-center gap-2 font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900"><span class="h-2 w-2 rounded-full bg-white [[data-theme=light]_&]:bg-black"></span>Test 02 · Polymorphic Dispatch</span>
+                  <span class="font-mono text-[11px] text-zinc-400 [[data-theme=light]_&]:text-zinc-600">18 ms</span>
+                </div>
+                <div class="flex items-center justify-between rounded-lg border border-white/15 bg-[#121215] px-3.5 py-2.5 text-xs transition-all duration-300 group-hover:translate-x-1 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50">
+                  <span class="flex items-center gap-2 font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900"><span class="h-2 w-2 rounded-full bg-white [[data-theme=light]_&]:bg-black"></span>Test 03 · Encapsulation Guards</span>
+                  <span class="font-mono text-[11px] text-zinc-400 [[data-theme=light]_&]:text-zinc-600">9 ms</span>
+                </div>
+              </div>
+            </div>
+            <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-2 p-6 transition-all duration-300 group-hover:-translate-y-8">
+              <h3 class="text-lg font-semibold text-current tracking-tight">Instant Test Suites</h3>
+              <p class="max-w-lg text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:text-zinc-600">Execute your solution against real unit tests with millisecond runtime feedback and clear diffs.</p>
+            </div>
+            <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-8 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              <a href="/practice" class="pointer-events-auto inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 text-current hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/5">
+                Run Tests
+                <svg class="ms-2 h-4 w-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+            <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-white/[.02] [[data-theme=light]_&]:group-hover:bg-black/[.02]"></div>
+          </div>
+
+          <!-- Card 3: Contribution Skyline (col-span-1) -->
+          <div class="group relative col-span-3 md:col-span-1 flex flex-col justify-between overflow-hidden rounded-2xl bg-[#0a0a0c] text-[#fafafa] border border-white/15 shadow-sm [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] [[data-theme=light]_&]:border-black/12 transform-gpu transition-all duration-300 hover:border-white/35 [[data-theme=light]_&]:hover:border-black/35">
+            <div>
+              <div class="pointer-events-none absolute inset-x-5 top-6 flex h-32 items-end justify-between gap-2 rounded-xl border border-white/15 bg-[#121215] p-4 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50">
+                <div style="height:35%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:60%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:45%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:85%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:55%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:95%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:70%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:40%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:80%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+                <div style="height:100%" class="w-full rounded-t-sm bg-white/80 transition-all duration-300 group-hover:bg-white [[data-theme=light]_&]:bg-black/75 [[data-theme=light]_&]:group-hover:bg-black"></div>
+              </div>
+            </div>
+            <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-2 p-6 transition-all duration-300 group-hover:-translate-y-8">
+              <h3 class="text-lg font-semibold text-current tracking-tight">Contribution Skyline</h3>
+              <p class="max-w-lg text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:text-zinc-600">Visualize your daily coding streak in an interactive 2D heatmap or 3D isometric skyline.</p>
+            </div>
+            <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-8 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              <a href="/dashboard" class="pointer-events-auto inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 text-current hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/5">
+                View Dashboard
+                <svg class="ms-2 h-4 w-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+            <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-white/[.02] [[data-theme=light]_&]:group-hover:bg-black/[.02]"></div>
+          </div>
+
+          <!-- Card 4: Structured OOP Mastery (col-span-2) -->
+          <div class="group relative col-span-3 md:col-span-2 flex flex-col justify-between overflow-hidden rounded-2xl bg-[#0a0a0c] text-[#fafafa] border border-white/15 shadow-sm [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] [[data-theme=light]_&]:border-black/12 transform-gpu transition-all duration-300 hover:border-white/35 [[data-theme=light]_&]:hover:border-black/35">
+            <div>
+              <div class="pointer-events-none absolute inset-x-5 top-5 flex flex-col gap-3 rounded-xl border border-white/15 bg-[#121215] p-4 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-zinc-50">
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900">Classes &amp; Objects</span>
+                    <span class="font-mono text-zinc-400 [[data-theme=light]_&]:text-zinc-600">92%</span>
+                  </div>
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/15 [[data-theme=light]_&]:bg-black/10">
+                    <div style="width:92%" class="h-full rounded-full bg-white transition-all duration-500 [[data-theme=light]_&]:bg-black"></div>
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900">Inheritance &amp; Interfaces</span>
+                    <span class="font-mono text-zinc-400 [[data-theme=light]_&]:text-zinc-600">78%</span>
+                  </div>
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/15 [[data-theme=light]_&]:bg-black/10">
+                    <div style="width:78%" class="h-full rounded-full bg-white transition-all duration-500 [[data-theme=light]_&]:bg-black"></div>
+                  </div>
+                </div>
+                <div class="space-y-1.5">
+                  <div class="flex justify-between text-xs">
+                    <span class="font-medium text-zinc-100 [[data-theme=light]_&]:text-zinc-900">Collections &amp; Generics</span>
+                    <span class="font-mono text-zinc-400 [[data-theme=light]_&]:text-zinc-600">64%</span>
+                  </div>
+                  <div class="h-1.5 w-full overflow-hidden rounded-full bg-white/15 [[data-theme=light]_&]:bg-black/10">
+                    <div style="width:64%" class="h-full rounded-full bg-white transition-all duration-500 [[data-theme=light]_&]:bg-black"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="pointer-events-none z-10 flex transform-gpu flex-col gap-2 p-6 transition-all duration-300 group-hover:-translate-y-8">
+              <h3 class="text-lg font-semibold text-current tracking-tight">Structured OOP Mastery</h3>
+              <p class="max-w-lg text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:text-zinc-600">Turn every solved challenge into measurable progress across encapsulation, inheritance, polymorphism, and abstraction.</p>
+            </div>
+            <div class="pointer-events-none absolute bottom-0 flex w-full translate-y-8 transform-gpu flex-row items-center p-4 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
+              <a href="/dashboard" class="pointer-events-auto inline-flex items-center justify-center rounded-md text-sm font-medium h-9 px-3 text-current hover:bg-white/10 [[data-theme=light]_&]:hover:bg-black/5">
+                Track Progress
+                <svg class="ms-2 h-4 w-4 rtl:rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </a>
+            </div>
+            <div class="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-white/[.02] [[data-theme=light]_&]:group-hover:bg-black/[.02]"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
   <section class="community-avatars" aria-label="Code-Karo.dev team">
     <div class="community-avatars__list" id="community-avatars-list">
       <!-- Fallback avatars in team order: Rajeev, Shubham, Duwarka, Sahaj -->
@@ -1448,7 +1602,108 @@
     })();
   </script>
   <section id="stagger-testimonials-root" aria-label="Developer testimonials"></section>
-  <div id="faqs-root"></div>
+  <div id="faqs-root">
+    <section aria-label="Frequently Asked Questions" class="w-full bg-[#09090b] px-6 py-20 text-[#fafafa] transition-colors [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b] sm:px-10 lg:px-20">
+      <div class="mx-auto flex max-w-4xl flex-col items-center">
+        <div class="mb-10 flex max-w-2xl flex-col items-center text-center">
+          <span class="mb-3 inline-flex items-center gap-2.5 font-mono text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-400 [[data-theme=light]_&]:text-zinc-600">
+            <span class="h-px w-5 bg-current"></span>
+            FAQ
+            <span class="h-px w-5 bg-current"></span>
+          </span>
+          <h2 class="text-center text-2xl font-bold tracking-tight text-current sm:text-4xl">
+            Frequently Asked Questions
+          </h2>
+        </div>
+        <div class="w-full max-w-3xl flex flex-col gap-3" id="native-faq-accordion">
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="true">
+              <span class="flex items-center text-base font-medium leading-snug">How do I start solving Java problems on CodeKaro?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200 rotate-180" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600">
+              Open the Practice Editor, select any object-oriented Java challenge from the problem list, write your solution in the browser IDE, and click Run Code to test against real unit test cases immediately.
+            </div>
+          </div>
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="false">
+              <span class="flex items-center text-base font-medium leading-snug">How does the automated Java judge evaluate my code?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600" style="display:none;">
+              Every submission is compiled and executed against structured unit and edge-case test suites. You receive instant verdict badges, execution runtime in milliseconds, and detailed expected-vs-actual diffs.
+            </div>
+          </div>
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="false">
+              <span class="flex items-center text-base font-medium leading-snug">Is CodeKaro completely free for students and developers?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600" style="display:none;">
+              Yes. All Java OOP tracks, interactive test suites, the 3D Contribution Skyline, and progress analytics are completely free and open-source.
+            </div>
+          </div>
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="false">
+              <span class="flex items-center text-base font-medium leading-snug">What Java OOP topics and challenges are included?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600" style="display:none;">
+              Challenges cover classes and objects, encapsulation, inheritance hierarchies, polymorphism, abstract classes and interfaces, matrix transformations, and thread-safe concurrency patterns.
+            </div>
+          </div>
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="false">
+              <span class="flex items-center text-base font-medium leading-snug">Can I access my coding streak and progress from any device?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600" style="display:none;">
+              Yes. Sign in with Google, GitHub, or Email OTP to sync your solved problems, daily practice streak, and submission history across browsers.
+            </div>
+          </div>
+          <div class="faq-item overflow-hidden rounded-xl border border-white/15 bg-[#0a0a0c] text-[#fafafa] transition-all duration-200 [[data-theme=light]_&]:border-black/12 [[data-theme=light]_&]:bg-white [[data-theme=light]_&]:text-[#09090b]">
+            <button type="button" class="faq-btn flex w-full cursor-pointer items-center justify-between gap-4 px-5 py-4 text-left text-base font-semibold text-current" aria-expanded="false">
+              <span class="flex items-center text-base font-medium leading-snug">Can I reset my starter code or retry a solved challenge?</span>
+              <svg class="faq-icon size-4 shrink-0 transition-transform duration-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="faq-body border-t border-white/10 px-5 pb-4 pt-3 text-[15px] leading-relaxed text-zinc-400 [[data-theme=light]_&]:border-black/10 [[data-theme=light]_&]:text-zinc-600" style="display:none;">
+              You can reset the editor back to the clean Java starter template at any time and submit multiple solutions to compare runtime efficiency.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+    (() => {
+      const container = document.getElementById('native-faq-accordion');
+      if (!container) return;
+      container.addEventListener('click', (e) => {
+        const btn = e.target.closest('.faq-btn');
+        if (!btn) return;
+        const item = btn.closest('.faq-item');
+        if (!item) return;
+        const body = item.querySelector('.faq-body');
+        const icon = item.querySelector('.faq-icon');
+        const isOpen = btn.getAttribute('aria-expanded') === 'true';
+        container.querySelectorAll('.faq-item').forEach(it => {
+          const b = it.querySelector('.faq-btn');
+          const bd = it.querySelector('.faq-body');
+          const ic = it.querySelector('.faq-icon');
+          if (b && bd && ic) {
+            b.setAttribute('aria-expanded', 'false');
+            bd.style.display = 'none';
+            ic.classList.remove('rotate-180');
+          }
+        });
+        if (!isOpen) {
+          btn.setAttribute('aria-expanded', 'true');
+          body.style.display = 'block';
+          icon.classList.add('rotate-180');
+        }
+      });
+    })();
+  </script>
   <footer class="site-footer" aria-label="Code-Karo.dev footer">
     <img class="site-footer__art" src="/footer-gradient.jpg" alt="" aria-hidden="true">
     <div class="footer-jobs">

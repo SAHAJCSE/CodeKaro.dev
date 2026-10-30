@@ -2218,7 +2218,11 @@ async function executeCode(mode = "run") {
     const response = await fetch(`${runnerUrl}/problems/${encodeURIComponent(problemId)}/run`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ code: source, mode: mode }),
+      body: JSON.stringify({
+        code: source,
+        mode: mode,
+        userId: currentUser ? (currentUser.uid || currentUser.id) : null,
+      }),
       signal: controller.signal,
     });
 
@@ -2248,7 +2252,7 @@ async function executeCode(mode = "run") {
       const totalCount = result.totalTests ?? (result.testCases ? result.testCases.length : 0);
 
       const subRecord = {
-        id: "sub_" + Date.now(),
+        id: result.submissionId || ("sub_" + Date.now()),
         problemId,
         code: source,
         status: result.status,

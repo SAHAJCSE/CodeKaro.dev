@@ -1,4 +1,5 @@
 import {
+  app,
   auth,
   db,
   firebaseConfig,
@@ -18,6 +19,7 @@ import {
 } from './firebase';
 
 export interface CodeKaroAuthAPI {
+  app: typeof app;
   auth: typeof auth;
   db: typeof db;
   firebaseConfig: typeof firebaseConfig;
@@ -63,6 +65,7 @@ async function registerEmailUser(
 }
 
 const CodeKaroAuth: CodeKaroAuthAPI = {
+  app,
   auth,
   db,
   firebaseConfig,
@@ -164,3 +167,4 @@ getRedirectResult(auth)
   });
 
 export default CodeKaroAuth;
+export { CodeKaroAuth };

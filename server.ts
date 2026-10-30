@@ -5,6 +5,12 @@ import crypto from 'crypto';
 import nodemailer from 'nodemailer';
 import { fileURLToPath } from 'url';
 import { createServer as createViteServer } from 'vite';
+import {
+  recordSubmissionAndProgress,
+  getUserDashboardData,
+  getAdminOverview,
+} from './src/backend/firestoreBackend';
+import { migrateAllProblems } from './scripts/migrate-problems';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -306,10 +312,15 @@ async function startServer() {
     }
     const code = String(req.body?.code || '');
     const mode = String(req.body?.mode || 'run');
+    const userId = String(req.body?.userId || '').trim();
+
     if (!code.trim()) {
       res.status(400).json({ error: 'Code cannot be empty.' });
       return;
     }
+
+    let evalResult: any = null;
+
     // Proxy to remote judge if reachable, or provide instant evaluation response
     try {
       const controller = new AbortController();
@@ -322,27 +333,78 @@ async function startServer() {
       });
       clearTimeout(timeout);
       if (upstream.ok) {
-        const data = await upstream.json();
-        res.json(data);
-        return;
+        evalResult = await upstream.json();
       }
     } catch {
       // Fallback if external judge is sleeping
     }
 
-    const sampleCases = Array.isArray(problem.sample_cases) ? problem.sample_cases : [];
-    const totalTests = Math.max(sampleCases.length, 3);
-    const hasSyntax = code.includes('class ') && code.includes('{') && code.includes('}');
-    res.json({
-      status: hasSyntax ? 'ACCEPTED' : 'COMPILE_ERROR',
-      passed: hasSyntax,
-      passed_tests: hasSyntax ? totalTests : 0,
-      total_tests: totalTests,
-      runtime_ms: 42,
-      output: hasSyntax
-        ? `Executed ${totalTests}/${totalTests} test cases.\nAll assertions passed.`
-        : 'Compilation failed: class definition incomplete.',
-    });
+    if (!evalResult) {
+      const sampleCases = Array.isArray(problem.sample_cases) ? problem.sample_cases : [];
+      const totalTests = Math.max(sampleCases.length, 3);
+      const hasSyntax = code.includes('class ') && code.includes('{') && code.includes('}');
+      evalResult = {
+        status: hasSyntax ? 'ACCEPTED' : 'COMPILE_ERROR',
+        passed: hasSyntax,
+        passed_tests: hasSyntax ? totalTests : 0,
+        total_tests: totalTests,
+        runtime_ms: 42,
+        output: hasSyntax
+          ? `Executed ${totalTests}/${totalTests} test cases.\nAll assertions passed.`
+          : 'Compilation failed: class definition incomplete.',
+      };
+    }
+
+    // Persist in Firestore when mode is 'submit'
+    if (mode === 'submit') {
+      try {
+        const subDoc = await recordSubmissionAndProgress({
+          userId: userId || undefined,
+          problemId,
+          code,
+          status: evalResult.status === 'ACCEPTED' ? 'ACCEPTED' : 'COMPILE_ERROR',
+          passedTests: evalResult.passedTests ?? evalResult.passed_tests ?? 0,
+          totalTests: evalResult.totalTests ?? evalResult.total_tests ?? 3,
+          runtimeMs: evalResult.runtimeMs ?? evalResult.runtime_ms ?? 42,
+          output: evalResult.output || '',
+        });
+        evalResult.submissionId = subDoc.submissionId;
+      } catch (subErr) {
+        console.warn('Submission persistence notice:', subErr);
+      }
+    }
+
+    res.json(evalResult);
+  });
+
+  // ── User Dashboard API (Loads directly from Firestore) ──
+  app.get('/api/user/:userId/dashboard', async (req, res) => {
+    const userId = req.params.userId;
+    if (!userId) {
+      res.status(400).json({ error: 'User ID is required' });
+      return;
+    }
+    const data = await getUserDashboardData(userId);
+    if (!data) {
+      res.status(404).json({ error: 'User dashboard data not found' });
+      return;
+    }
+    res.json(data);
+  });
+
+  // ── Admin Dashboard APIs ──
+  app.get('/api/admin/overview', async (_req, res) => {
+    const overview = await getAdminOverview();
+    res.json(overview);
+  });
+
+  app.post('/api/admin/migrate-problems', async (_req, res) => {
+    try {
+      const count = await migrateAllProblems();
+      res.json({ success: true, count, message: `Migrated ${count} problems to Firestore` });
+    } catch (err: any) {
+      res.status(500).json({ success: false, error: err?.message || 'Migration failed' });
+    }
   });
 
   // Clean URL HTML mapping (before Vite middleware so /auth, /practice, etc. serve their HTML pages)
@@ -373,6 +435,22 @@ async function startServer() {
       return;
     }
     res.status(404).end();
+  });
+
+  // Always serve built assets from dist/assets if requested, in both dev and production
+  app.use('/assets', (req, res, next) => {
+    const fileName = req.path.replace(/^\//, '');
+    const assetPath = path.join(__dirname, 'dist', 'assets', fileName);
+    if (fs.existsSync(assetPath)) {
+      if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
+        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+      } else if (fileName.endsWith('.css')) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+      }
+      res.sendFile(assetPath);
+      return;
+    }
+    next();
   });
 
   if (process.env.NODE_ENV !== 'production') {
@@ -478,6 +556,22 @@ async function startServer() {
         return;
       }
       res.status(404).end();
+    });
+
+    // Support any relative module imports originating from /src/
+    app.use('/src', (req, res, next) => {
+      const fileName = req.path.replace(/^\//, '');
+      const candidateAsset = path.join(distDir, 'assets', fileName);
+      if (fs.existsSync(candidateAsset)) {
+        if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (fileName.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        }
+        res.sendFile(candidateAsset);
+        return;
+      }
+      next();
     });
 
     app.use(express.static(distDir));

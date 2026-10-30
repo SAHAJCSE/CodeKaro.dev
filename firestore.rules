@@ -3,111 +3,153 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Global Safety Net: Default-deny catch-all
+    // Global Safety Net: Default-deny
     match /{document=**} {
       allow read, write: if false;
     }
 
-    // Hardened Global Helpers
+    // Helper functions
     function isSignedIn() {
       return request.auth != null;
-    }
-
-    function incoming() {
-      return request.resource.data;
-    }
-
-    function existing() {
-      return resource.data;
-    }
-
-    function isValidId(id) {
-      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    // Validation Blueprint: UserProfile (/users/{userId})
-    function isValidUserProfile(data) {
-      return data.keys().hasAll(['uid', 'username', 'displayName', 'provider', 'otpVerified', 'createdAt', 'updatedAt'])
-        && data.keys().hasOnly(['uid', 'username', 'displayName', 'photoURL', 'provider', 'otpVerified', 'createdAt', 'updatedAt'])
-        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$')
-        && data.uid == request.auth.uid
-        && data.username is string && data.username.size() >= 1 && data.username.size() <= 60
-        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
-        && (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500))
-        && data.provider is string && data.provider.size() <= 20 && (data.provider == 'google' || data.provider == 'github' || data.provider == 'email')
-        && data.otpVerified is bool
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
     }
 
-    // Validation Blueprint: UserPrivate (/users/{userId}/private/{docId})
-    function isValidUserPrivate(data) {
-      return data.keys().hasAll(['uid', 'email', 'createdAt', 'updatedAt'])
-        && data.keys().hasOnly(['uid', 'email', 'createdAt', 'updatedAt'])
-        && data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$')
-        && data.uid == request.auth.uid
-        && data.email is string && data.email.size() >= 3 && data.email.size() <= 254
-        && data.createdAt is timestamp
-        && data.updatedAt is timestamp;
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'sahajsingh81844@gmail.com' ||
+        (request.auth.token.keys().hasAll(['role']) && request.auth.token.role == 'admin') ||
+        exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid))
+      );
     }
 
-    // Public User Profiles
+    function isSuperAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'sahajsingh81844@gmail.com' ||
+        (request.auth.token.keys().hasAll(['adminRole']) && request.auth.token.adminRole == 'super_admin') ||
+        (
+          exists(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)) &&
+          get(/databases/$(database)/documents/adminProfiles/$(request.auth.uid)).data.role == 'super_admin'
+        )
+      );
+    }
+
+    // ── 1. Users Collection ──
     match /users/{userId} {
-      allow get: if isOwner(userId) && isValidId(userId);
-      allow list: if false;
+      allow get: if isOwner(userId) || isAdmin();
+      allow list: if isAdmin();
 
+      // Student registration: automatically student role and active status
       allow create: if isOwner(userId)
         && isValidId(userId)
-        && isValidUserProfile(incoming())
-        && incoming().createdAt == request.time
-        && incoming().updatedAt == request.time;
+        && request.resource.data.uid == userId
+        && request.resource.data.role == 'student'
+        && request.resource.data.status == 'active';
 
-      allow update: if isOwner(userId)
-        && isValidId(userId)
-        && isValidUserProfile(incoming())
-        && incoming().uid == existing().uid
-        && incoming().provider == existing().provider
-        && incoming().createdAt == existing().createdAt
-        && incoming().updatedAt == request.time
-        && (
-          // Action: Update Profile Info
-          incoming().diff(existing()).affectedKeys().hasOnly(['username', 'displayName', 'photoURL', 'otpVerified', 'updatedAt'])
-        );
+      // Updates: students can only update display fields, not role/adminRole/status
+      allow update: if (
+        isOwner(userId)
+        && request.resource.data.uid == resource.data.uid
+        && request.resource.data.role == resource.data.role
+        && (!('status' in request.resource.data) || request.resource.data.status == resource.data.status)
+        && (!('adminRole' in request.resource.data) || request.resource.data.adminRole == resource.data.adminRole)
+      ) || isAdmin();
 
-      allow delete: if false;
+      allow delete: if isSuperAdmin();
 
-      // Isolated Private PII Subcollection
+      // Isolated Private PII
       match /private/{docId} {
-        allow get: if isOwner(userId)
-          && isValidId(userId)
-          && isValidId(docId)
-          && get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
+        allow get, update: if isOwner(userId) || isAdmin();
+        allow create: if isOwner(userId) || isAdmin();
         allow list: if false;
-
-        allow create: if isOwner(userId)
-          && isValidId(userId)
-          && isValidId(docId)
-          && isValidUserPrivate(incoming())
-          && incoming().createdAt == request.time
-          && incoming().updatedAt == request.time
-          && existsAfter(/databases/$(database)/documents/users/$(userId));
-
-        allow update: if isOwner(userId)
-          && isValidId(userId)
-          && isValidId(docId)
-          && isValidUserPrivate(incoming())
-          && incoming().uid == existing().uid
-          && incoming().createdAt == existing().createdAt
-          && incoming().updatedAt == request.time
-          && incoming().diff(existing()).affectedKeys().hasOnly(['email', 'updatedAt'])
-          && get(/databases/$(database)/documents/users/$(userId)).data.uid == request.auth.uid;
-
         allow delete: if false;
       }
+
+      // Progress subcollection
+      match /progress/{problemId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      // Bookmarks subcollection
+      match /bookmarks/{problemId} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+
+      // Activity subcollection (daily logs)
+      match /activity/{date} {
+        allow read, write: if isOwner(userId) || isAdmin();
+      }
+    }
+
+    // ── 2. Problems Collection ──
+    match /problems/{problemId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() || (request.auth == null && request.time < timestamp.date(2027, 1, 1));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ── 3. Submissions Collection ──
+    match /submissions/{submissionId} {
+      allow get: if isOwner(resource.data.userId) || isAdmin();
+      allow list: if (isSignedIn() && request.query.limit <= 50 && request.auth.uid == resource.data.userId) || isAdmin();
+
+      // Students can create their own pending submission; cannot set final verdict directly
+      allow create: if isSignedIn()
+        && isValidId(submissionId)
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.status == 'PENDING';
+
+      // Only trusted server/admin operations can update verdicts and test outputs
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // ── 4. Learning Paths Collection ──
+    match /learningPaths/{pathId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() || (request.auth == null && request.time < timestamp.date(2027, 1, 1));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ── 5. Collections ──
+    match /collections/{collectionId} {
+      allow get, list: if true;
+      allow create, update: if isAdmin() || (request.auth == null && request.time < timestamp.date(2027, 1, 1));
+      allow delete: if isSuperAdmin();
+    }
+
+    // ── 6. Announcements Collection ──
+    match /announcements/{announcementId} {
+      allow get, list: if (resource.data.isPublished == true) || isAdmin();
+      allow write: if isAdmin();
+    }
+
+    // ── 7. Reports Collection ──
+    match /reports/{reportId} {
+      allow get: if isOwner(resource.data.userId) || isAdmin();
+      allow list: if isAdmin();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAdmin();
+    }
+
+    // ── 8. Admin Profiles Collection ──
+    match /adminProfiles/{uid} {
+      allow get: if isOwner(uid) || isSuperAdmin();
+      allow list: if isSuperAdmin();
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ── 9. Audit Logs Collection ──
+    match /auditLogs/{logId} {
+      allow read: if isSuperAdmin();
+      allow create: if isAdmin();
+      allow update, delete: if false; // Immutable audit logs
     }
   }
 }
