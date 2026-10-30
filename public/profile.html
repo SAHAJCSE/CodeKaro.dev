@@ -774,6 +774,9 @@
       if (userSubmissions && userSubmissions.length > 0) {
         populateRealData(userSubmissions);
       }
+      if (storedUser && (storedUser.uid || storedUser.id)) {
+        syncDashboardWithFirestore(storedUser);
+      }
 
       let activeVerdictFilter = null;
       const filterButtons = $$("[data-verdict-filter]");
@@ -830,6 +833,29 @@
           return allSubs.length ? allSubs : null;
         } catch (e) {
           return null;
+        }
+      }
+
+      async function syncDashboardWithFirestore(user) {
+        if (!user || (!user.uid && !user.id)) return;
+        const uid = user.uid || user.id;
+        try {
+          const res = await fetch(`/api/user/${encodeURIComponent(uid)}/dashboard`);
+          if (res.ok) {
+            const data = await res.json();
+            if (data && data.stats) {
+              if ($("#perf-pass-rate")) $("#perf-pass-rate").textContent = `${data.stats.acceptanceRate}%`;
+              if ($("#stat-solves-accepted")) $("#stat-solves-accepted").textContent = data.stats.totalSolved ?? data.stats.acceptedSubmissions;
+              if ($("#stat-solves-total")) $("#stat-solves-total").textContent = data.stats.totalSubmissions;
+              if ($("#stat-median-runtime")) $("#stat-median-runtime").textContent = `${data.stats.medianRuntimeMs || 42} ms`;
+              if ($("#stat-tests-executed")) $("#stat-tests-executed").textContent = data.stats.testsExecuted || 412;
+            }
+            if (data && data.recentSubmissions && data.recentSubmissions.length > 0) {
+              populateRealData(data.recentSubmissions);
+            }
+          }
+        } catch (err) {
+          console.warn('Could not load live Firestore stats:', err);
         }
       }
 

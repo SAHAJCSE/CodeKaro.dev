@@ -1,4 +1,4 @@
-import { initializeApp } from 'firebase/app';
+import { initializeApp, getApps, getApp, type FirebaseApp } from 'firebase/app';
 import {
   getAuth,
   GoogleAuthProvider,
@@ -24,7 +24,7 @@ import {
 } from 'firebase/firestore';
 import firebaseConfig from '../firebase-applet-config.json';
 
-const app = initializeApp(firebaseConfig);
+export const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
 export const auth = getAuth(app);
 
@@ -35,16 +35,7 @@ export const githubProvider = new GithubAuthProvider();
 githubProvider.addScope('read:user');
 githubProvider.addScope('user:email');
 
-async function testConnection() {
-  try {
-    await getDocFromServer(doc(db, 'test', 'connection'));
-  } catch (error) {
-    if (error instanceof Error && error.message.includes('the client is offline')) {
-      console.error('Please check your Firebase configuration.');
-    }
-  }
-}
-testConnection();
+
 
 export enum OperationType {
   CREATE = 'create',
@@ -155,8 +146,9 @@ export async function syncUserProfileToFirestore(
   try {
     const snap = await getDoc(userDocRef);
     exists = snap.exists();
-  } catch (error) {
-    handleFirestoreError(error, OperationType.GET, `users/${rawUid}`);
+  } catch (err) {
+    console.warn('Could not read user doc from Firestore (continuing):', err);
+    exists = false;
   }
 
   try {
