@@ -1,30 +1,60 @@
 (() => {
-  function updateNav() {
-    const currentPath = window.location.pathname.replace(/\.html$/, "").replace(/\/+$/, "") || "/";
-    document.querySelectorAll("[data-nav-island]").forEach(nav => {
-      const brand = nav.querySelector(".nav-island__brand");
-      const linksContainer = nav.querySelector(".nav-island__links");
-      const links = nav.querySelectorAll("[data-nav-link]");
-      if (!linksContainer || !brand || !links.length) return;
+  const currentPath = window.location.pathname.replace(/\/+$/, "") || "/";
+  const islands = document.querySelectorAll("[data-nav-island]");
 
-      let matched = false;
-      links.forEach(link => {
-        const targetPath = new URL(link.href, window.location.href).pathname.replace(/\.html$/, "").replace(/\/+$/, "") || "/";
-        const isCurrent = targetPath === currentPath || (targetPath !== "/" && currentPath.startsWith(`${targetPath}/`));
-        if (isCurrent && !matched) {
-          link.setAttribute("aria-current", "page");
-          matched = true;
-        } else {
-          link.removeAttribute("aria-current");
-        }
-      });
+  function updateIslandWidths() {
+    islands.forEach((island) => {
+      const brand = island.querySelector(".nav-island__brand");
+      const links = island.querySelector(".nav-island__links");
+      if (!brand || !links) return;
+
+      const brandW = Math.ceil(brand.getBoundingClientRect().width || brand.offsetWidth || 104);
+      const linksW = Math.ceil(links.scrollWidth || 340);
+
+      // Exact padding (4px left + 4px right + 2px borders = 10px)
+      const collapsedW = brandW + 10;
+      const expandedW = brandW + linksW + 12;
+
+      island.style.setProperty("--island-collapsed-w", `${collapsedW}px`);
+      island.style.setProperty("--island-expanded-w", `${expandedW}px`);
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", updateNav);
-  } else {
-    updateNav();
+  islands.forEach((island) => {
+    island.querySelectorAll("[data-nav-link]").forEach((link) => {
+      const targetPath = new URL(link.href, window.location.href).pathname.replace(/\/+$/, "") || "/";
+      if (targetPath === currentPath || (targetPath !== "/" && currentPath.startsWith(`${targetPath}/`))) {
+        link.setAttribute("aria-current", "page");
+      }
+    });
+
+    // Touch / click support for tablet screens where hover isn't persistent
+    const brand = island.querySelector(".nav-island__brand");
+    if (brand) {
+      brand.addEventListener("click", (e) => {
+        if (window.innerWidth > 720 && window.matchMedia("(hover: none)").matches) {
+          const isExpanded = island.getAttribute("data-expanded") === "true";
+          if (!isExpanded) {
+            e.preventDefault();
+            island.setAttribute("data-expanded", "true");
+          }
+        }
+      });
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    islands.forEach((island) => {
+      if (!island.contains(e.target)) {
+        island.removeAttribute("data-expanded");
+      }
+    });
+  });
+
+  updateIslandWidths();
+  window.addEventListener("load", updateIslandWidths);
+  window.addEventListener("resize", updateIslandWidths);
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(updateIslandWidths).catch(() => {});
   }
 })();
-

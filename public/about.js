@@ -429,9 +429,40 @@
     loadProblems();
   }
 
+  function initAboutAuthDropdown() {
+    const authWrap = document.querySelector(".home-auth");
+    const authBtn = document.querySelector(".home-auth__button");
+    if (!authWrap || !authBtn) return;
+
+    authBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const isOpen = authWrap.getAttribute("data-open") === "true";
+      authWrap.setAttribute("data-open", isOpen ? "false" : "true");
+      authBtn.setAttribute("aria-expanded", isOpen ? "false" : "true");
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!authWrap.contains(e.target)) {
+        authWrap.setAttribute("data-open", "false");
+        authBtn.setAttribute("aria-expanded", "false");
+      }
+    });
+
+    try {
+      const raw = localStorage.getItem("oops_session") || localStorage.getItem("ck_user");
+      const user = raw ? JSON.parse(raw) : null;
+      const uploadedPhoto = localStorage.getItem("ck_profile_photo");
+      const pic = uploadedPhoto || user?.picture || user?.avatar;
+      if (pic && typeof pic === "string") {
+        authBtn.innerHTML = `<img src="${pic.replace(/"/g, "&quot;")}" alt="Account" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" />`;
+      }
+    } catch (e) {}
+  }
+
   function init() {
     loadTeam();
     initWorkspace();
+    initAboutAuthDropdown();
   }
 
   if (document.readyState === "loading") {
