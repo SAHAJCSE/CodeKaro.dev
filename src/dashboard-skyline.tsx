@@ -1,6 +1,6 @@
-import React, { useState, useMemo, useEffect } from "react"
+import React, { useState, useMemo, useEffect, useRef } from "react"
 import ReactDOM from "react-dom/client"
-import { Check } from "lucide-react"
+import { Check, Camera } from "lucide-react"
 import ContributionSkyline, {
   type ContributionDay,
   type PaletteName,
@@ -12,13 +12,42 @@ import AvatarPicker, {
   type AvatarValue,
 } from "@/components/ui/avatar-picker"
 import { Skeleton } from "@/components/ui/skeleton"
+import { auth, onAuthStateChanged } from "./firebase"
 import "./styles/tailwind.css"
+
+/**
+ * Default Gmail / Google Account style circular user silhouette photo (SVG data URI).
+ */
+const DEFAULT_GMAIL_USER_PHOTO =
+  "data:image/svg+xml;utf8," +
+  encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+      <rect width="128" height="128" rx="64" fill="#E8EAED"/>
+      <circle cx="64" cy="48" r="22" fill="#9AA0A6"/>
+      <path d="M20 116C20 92.8 39.7 76 64 76C88.3 76 108 92.8 108 116" fill="#9AA0A6"/>
+    </svg>`
+  )
+
+function isRealPhotoUrl(url?: string | null): url is string {
+  if (!url || typeof url !== "string") return false
+  const trimmed = url.trim()
+  if (!trimmed) return false
+  // Exclude generated MorphingFace SVG data URIs
+  if (trimmed.startsWith("data:image/svg+xml")) return false
+  return (
+    trimmed.startsWith("https://") ||
+    trimmed.startsWith("http://") ||
+    trimmed.startsWith("data:image/")
+  )
+}
 
 interface StoredUserProfile {
   id: string
   username: string
   name: string
   email?: string
+  photoUrl: string
+  avatarMode: "photo" | "custom-avatar"
   variant: number
   seed: string
   totalSubmissions: number
@@ -31,6 +60,7 @@ function readStoredUserProfile(): StoredUserProfile {
     const rawSession = localStorage.getItem("oops_session")
     const rawCkUser = localStorage.getItem("ck_user")
     const rawAvatar = localStorage.getItem("ck_avatar")
+    const uploadedPhoto = localStorage.getItem("ck_profile_photo")
 
     const sessionUser = rawSession ? JSON.parse(rawSession) : null
     const ckUser = rawCkUser ? JSON.parse(rawCkUser) : null
@@ -48,6 +78,24 @@ function readStoredUserProfile(): StoredUserProfile {
     const variant = typeof avatarData?.variant === "number" ? avatarData.variant : 0
     const seed = avatarData?.seed || avatarSeed(displayName, variant)
     const userId = user.id || user.uid || "guest"
+
+    const firebasePhoto =
+      auth.currentUser?.photoURL ||
+      auth.currentUser?.providerData?.find((p) => p?.photoURL)?.photoURL ||
+      null
+
+    const candidatePhoto =
+      (isRealPhotoUrl(uploadedPhoto) && uploadedPhoto) ||
+      (isRealPhotoUrl(firebasePhoto) && firebasePhoto) ||
+      (isRealPhotoUrl(user.googlePhoto) && user.googlePhoto) ||
+      (isRealPhotoUrl(user.photoURL) && user.photoURL) ||
+      (isRealPhotoUrl(user.picture) && user.picture) ||
+      (isRealPhotoUrl(user.avatar) && user.avatar) ||
+      (isRealPhotoUrl(ckUser?.picture) && ckUser.picture) ||
+      DEFAULT_GMAIL_USER_PHOTO
+
+    const avatarMode: "photo" | "custom-avatar" =
+      avatarData?.mode === "custom-avatar" ? "custom-avatar" : "photo"
 
     let totalSubmissions = 0
     let solvedCount = 0
@@ -104,6 +152,8 @@ function readStoredUserProfile(): StoredUserProfile {
       username,
       name: displayName,
       email: user.email,
+      photoUrl: candidatePhoto,
+      avatarMode,
       variant,
       seed,
       totalSubmissions,
@@ -115,6 +165,8 @@ function readStoredUserProfile(): StoredUserProfile {
       id: "guest",
       username: "coder",
       name: "CodeKaro Coder",
+      photoUrl: DEFAULT_GMAIL_USER_PHOTO,
+      avatarMode: "photo",
       variant: 0,
       seed: avatarSeed("CodeKaro Coder", 0),
       totalSubmissions: 77,
@@ -160,9 +212,14 @@ function DashboardProfileSection() {
     displayName: initialProfile.name,
     variant: initialProfile.variant,
   })
+  const [photoUrl, setPhotoUrl] = useState<string>(initialProfile.photoUrl)
+  const [avatarMode, setAvatarMode] = useState<"photo" | "custom-avatar">(
+    initialProfile.avatarMode
+  )
   const [savedNotice, setSavedNotice] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 600)
@@ -171,12 +228,126 @@ function DashboardProfileSection() {
     }
   }, [])
 
+  // Sync Gmail / Google photoURL if Firebase Auth resolves after initial render
+  useEffect(() => {
+    const unsub = onAuthStateChanged(auth, (fbUser) => {
+      if (!fbUser) return
+      const uploaded = localStorage.getItem("ck_profile_photo")
+      if (isRealPhotoUrl(uploaded)) {
+        setPhotoUrl(uploaded)
+        return
+      }
+      const gmailPhoto =
+        fbUser.photoURL ||
+        fbUser.providerData?.find((p) => p?.photoURL)?.photoURL ||
+        null
+      if (isRealPhotoUrl(gmailPhoto)) {
+        setPhotoUrl(gmailPhoto)
+        try {
+          const rawSession = localStorage.getItem("oops_session")
+          if (rawSession) {
+            const sessionObj = JSON.parse(rawSession)
+            sessionObj.googlePhoto = gmailPhoto
+            if (avatarMode === "photo") {
+              sessionObj.picture = gmailPhoto
+              sessionObj.avatar = gmailPhoto
+            }
+            localStorage.setItem("oops_session", JSON.stringify(sessionObj))
+          }
+        } catch {
+          // ignore storage error
+        }
+      }
+    })
+    return () => unsub()
+  }, [avatarMode])
+
   const currentSeed = avatarSeed(avatarVal.displayName || "Coder", avatarVal.variant)
   const handleSlug =
     (avatarVal.displayName || initialProfile.username || "coder")
       .trim()
       .toLowerCase()
       .replace(/[^a-z0-9_]/g, "") || "coder"
+
+  const syncSessionPhoto = (newPictureUri: string, nextDisplayName?: string) => {
+    try {
+      const nameToSave = (nextDisplayName ?? avatarVal.displayName).trim() || "CodeKaro Coder"
+      const rawSession = localStorage.getItem("oops_session")
+      const sessionObj = rawSession
+        ? JSON.parse(rawSession)
+        : { id: initialProfile.id || "local_user" }
+      sessionObj.name = nameToSave
+      sessionObj.username = sessionObj.username || handleSlug
+      sessionObj.avatar = newPictureUri
+      sessionObj.picture = newPictureUri
+      localStorage.setItem("oops_session", JSON.stringify(sessionObj))
+
+      const rawCk = localStorage.getItem("ck_user")
+      if (rawCk) {
+        const ckObj = JSON.parse(rawCk)
+        ckObj.name = nameToSave
+        ckObj.avatar = newPictureUri
+        ckObj.picture = newPictureUri
+        localStorage.setItem("ck_user", JSON.stringify(ckObj))
+      }
+
+      window.dispatchEvent(new Event("storage"))
+    } catch {
+      // ignore storage errors
+    }
+  }
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        const maxDim = 256
+        let w = img.width
+        let h = img.height
+        if (w > h) {
+          if (w > maxDim) {
+            h = Math.round((h * maxDim) / w)
+            w = maxDim
+          }
+        } else {
+          if (h > maxDim) {
+            w = Math.round((w * maxDim) / h)
+            h = maxDim
+          }
+        }
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext("2d")
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, w, h)
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.88)
+          try {
+            localStorage.setItem("ck_profile_photo", dataUrl)
+            const rawAvatar = localStorage.getItem("ck_avatar")
+            const avatarObj = rawAvatar ? JSON.parse(rawAvatar) : {}
+            avatarObj.mode = "photo"
+            localStorage.setItem("ck_avatar", JSON.stringify(avatarObj))
+          } catch {
+            // ignore quota errors
+          }
+          setPhotoUrl(dataUrl)
+          setAvatarMode("photo")
+          syncSessionPhoto(dataUrl)
+          setSavedNotice(true)
+          setTimeout(() => setSavedNotice(false), 2400)
+        }
+      }
+      if (typeof reader.result === "string") {
+        img.src = reader.result
+      }
+    }
+    reader.readAsDataURL(file)
+    e.target.value = ""
+  }
 
   const persistProfile = (next: AvatarValue & { seed: string }) => {
     try {
@@ -188,27 +359,11 @@ function DashboardProfileSection() {
           variant: next.variant,
           seed: next.seed,
           avatar: dataUri,
+          mode: "custom-avatar",
         })
       )
-
-      const rawSession = localStorage.getItem("oops_session")
-      const sessionObj = rawSession ? JSON.parse(rawSession) : { id: initialProfile.id || "local_user" }
-      sessionObj.name = next.displayName
-      sessionObj.username = sessionObj.username || handleSlug
-      sessionObj.avatar = dataUri
-      sessionObj.picture = dataUri
-      localStorage.setItem("oops_session", JSON.stringify(sessionObj))
-
-      const rawCk = localStorage.getItem("ck_user")
-      if (rawCk) {
-        const ckObj = JSON.parse(rawCk)
-        ckObj.name = next.displayName
-        ckObj.avatar = dataUri
-        ckObj.picture = dataUri
-        localStorage.setItem("ck_user", JSON.stringify(ckObj))
-      }
-
-      window.dispatchEvent(new Event("storage"))
+      setAvatarMode("custom-avatar")
+      syncSessionPhoto(dataUri, next.displayName)
       setSavedNotice(true)
       setTimeout(() => setSavedNotice(false), 2400)
     } catch {
@@ -233,6 +388,8 @@ function DashboardProfileSection() {
     )
   }
 
+  const showAnimatedFace = showPicker || avatarMode === "custom-avatar"
+
   return (
     <div className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
       {/* Left: Combined Profile Overview & Key Stats */}
@@ -246,12 +403,46 @@ function DashboardProfileSection() {
           style={{ borderColor: "var(--border-card)" }}
         >
           <div className="flex items-center gap-4">
-            <div
-              className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border shadow-sm"
-              style={{ borderColor: "var(--border-card)" }}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              title="Add or change profile photo"
+              className="group relative h-20 w-20 shrink-0 cursor-pointer overflow-hidden rounded-full border p-0 shadow-sm"
+              style={{
+                borderColor: "var(--border-card)",
+                background: "var(--bg-sunken)",
+              }}
             >
-              <MorphingFace seed={currentSeed} />
-            </div>
+              {showAnimatedFace ? (
+                <MorphingFace seed={currentSeed} />
+              ) : (
+                <img
+                  src={photoUrl || DEFAULT_GMAIL_USER_PHOTO}
+                  alt={avatarVal.displayName || "User profile photo"}
+                  referrerPolicy="no-referrer"
+                  onError={(e) => {
+                    const target = e.currentTarget
+                    if (target.src !== DEFAULT_GMAIL_USER_PHOTO) {
+                      target.src = DEFAULT_GMAIL_USER_PHOTO
+                    }
+                  }}
+                  className="h-full w-full object-cover"
+                />
+              )}
+              <span className=" absolute inset-0 flex items-center justify-center bg-black/45 opacity-0 transition-opacity group-hover:opacity-100">
+                <Camera className="size-5 text-white" />
+              </span>
+            </button>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoUpload}
+              className="hidden"
+              aria-label="Upload profile photo"
+            />
+
             <div>
               <h1
                 className="m-0 text-xl font-bold tracking-tight"
@@ -273,7 +464,20 @@ function DashboardProfileSection() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-4 py-2 text-sm font-semibold transition-opacity hover:opacity-90"
+              style={{
+                background: "var(--bg-sunken)",
+                color: "var(--text-main)",
+                borderColor: "var(--border-card)",
+              }}
+            >
+              <Camera className="size-4" />
+              Add Photo
+            </button>
             <button
               type="button"
               onClick={() => setShowPicker((v) => !v)}
