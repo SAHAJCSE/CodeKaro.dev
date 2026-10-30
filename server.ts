@@ -9,6 +9,15 @@ import {
   recordSubmissionAndProgress,
   getUserDashboardData,
   getAdminOverview,
+  isAuthorizedAdmin,
+  listAllUsersForAdmin,
+  updateUserByAdmin,
+  listSubmissionsForAdmin,
+  listAuditLogsForAdmin,
+  listReportsForAdmin,
+  createAnnouncementByAdmin,
+  updateProblemStatusByAdmin,
+  SUPER_ADMIN_EMAIL,
 } from './src/backend/firestoreBackend';
 import { migrateAllProblems } from './scripts/migrate-problems';
 
@@ -398,6 +407,102 @@ async function startServer() {
     res.json(overview);
   });
 
+  app.get('/api/admin/users', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.query.caller as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const users = await listAllUsersForAdmin();
+    res.json({ users });
+  });
+
+  app.post('/api/admin/users/:targetUid', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.body?.callerUid as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const targetUid = req.params.targetUid;
+    const result = await updateUserByAdmin(callerUid, targetUid, req.body || {});
+    if (!result.success) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json({ success: true });
+  });
+
+  app.get('/api/admin/submissions', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.query.caller as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const submissions = await listSubmissionsForAdmin();
+    res.json({ submissions });
+  });
+
+  app.get('/api/admin/audit-logs', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.query.caller as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const logs = await listAuditLogsForAdmin();
+    res.json({ logs });
+  });
+
+  app.get('/api/admin/reports', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.query.caller as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const reports = await listReportsForAdmin();
+    res.json({ reports });
+  });
+
+  app.post('/api/admin/announcements', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.body?.callerUid as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const { title, content, priority, authorName } = req.body;
+    if (!title || !content) {
+      res.status(400).json({ error: 'Title and content are required' });
+      return;
+    }
+    const ann = await createAnnouncementByAdmin(callerUid, authorName || 'Admin', {
+      title,
+      content,
+      priority,
+    });
+    res.json({ success: true, announcement: ann });
+  });
+
+  app.post('/api/admin/problems/:problemId/status', async (req, res) => {
+    const callerUid = (req.headers['x-admin-uid'] as string) || (req.body?.callerUid as string) || '';
+    const isAuth = await isAuthorizedAdmin(callerUid);
+    if (!isAuth) {
+      res.status(403).json({ error: 'Unauthorized: Admin privileges required' });
+      return;
+    }
+    const problemId = req.params.problemId;
+    const result = await updateProblemStatusByAdmin(callerUid, problemId, req.body || {});
+    if (!result.success) {
+      res.status(400).json({ error: result.error });
+      return;
+    }
+    res.json({ success: true });
+  });
+
   app.post('/api/admin/migrate-problems', async (_req, res) => {
     try {
       const count = await migrateAllProblems();
@@ -415,6 +520,7 @@ async function startServer() {
     '/practice': 'practice.html',
     '/dashboard': 'dashboard.html',
     '/profile': 'profile.html',
+    '/admin': 'admin.html',
     '/about': 'about.html',
     '/problems': 'problems.html',
     '/404': '404.html',

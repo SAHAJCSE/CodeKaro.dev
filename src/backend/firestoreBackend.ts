@@ -305,3 +305,252 @@ export async function getAdminOverview() {
     };
   }
 }
+
+/**
+ * Check if a caller has admin privileges (Super Admin, Content Admin, etc.)
+ */
+export async function isAuthorizedAdmin(callerUidOrEmail: string): Promise<boolean> {
+  if (!callerUidOrEmail) return false;
+  if (callerUidOrEmail.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
+
+  try {
+    const userSnap = await getDoc(doc(db, 'users', callerUidOrEmail)).catch(() => null);
+    if (userSnap && userSnap.exists()) {
+      const data = userSnap.data() as UserProfile;
+      if (data.role === 'admin' || data.adminRole) return true;
+      if (data.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase()) return true;
+    }
+
+    const adminProfileSnap = await getDoc(doc(db, 'adminProfiles', callerUidOrEmail)).catch(() => null);
+    if (adminProfileSnap && adminProfileSnap.exists()) {
+      return !adminProfileSnap.data().isSuspended;
+    }
+  } catch (err) {
+    console.warn('Error checking admin authorization:', err);
+  }
+  return false;
+}
+
+/**
+ * List registered users for admin dashboard
+ */
+export async function listAllUsersForAdmin(limitCount = 100) {
+  try {
+    const usersQ = query(collection(db, 'users'), limit(limitCount));
+    const snap = await getDocs(usersQ);
+    return snap.docs.map((d) => {
+      const data = d.data() as UserProfile;
+      return {
+        uid: data.uid || d.id,
+        displayName: data.displayName || 'Coder',
+        username: data.username || 'user',
+        email: data.email || null,
+        role: data.role || 'student',
+        adminRole: data.adminRole || null,
+        status: data.status || 'active',
+        provider: data.provider || 'email',
+        totalSolved: data.stats?.totalSolved ?? 0,
+        totalSubmissions: data.stats?.totalSubmissions ?? 0,
+        createdAt: data.createdAt || null,
+      };
+    });
+  } catch (err) {
+    console.warn('Error listing users for admin:', err);
+    return [];
+  }
+}
+
+/**
+ * Update user status or role with Super Admin protection
+ */
+export async function updateUserByAdmin(
+  callerUid: string,
+  targetUid: string,
+  updates: {
+    status?: 'active' | 'suspended';
+    role?: 'student' | 'admin';
+    adminRole?: 'super_admin' | 'content_admin' | 'moderator' | 'support_admin';
+  }
+): Promise<{ success: boolean; error?: string }> {
+  // Prevent self-role-manipulation
+  if (callerUid === targetUid) {
+    return { success: false, error: 'Cannot modify your own administrative role or status.' };
+  }
+
+  // Check target user
+  const targetDocRef = doc(db, 'users', targetUid);
+  const targetSnap = await getDoc(targetDocRef);
+  if (!targetSnap.exists()) {
+    return { success: false, error: 'Target user does not exist.' };
+  }
+
+  const targetData = targetSnap.data() as UserProfile;
+
+  // Protect last active super admin
+  if (
+    targetData.email?.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() ||
+    targetData.adminRole === 'super_admin'
+  ) {
+    if (updates.status === 'suspended' || updates.role === 'student') {
+      return {
+        success: false,
+        error: 'Forbidden: Cannot suspend or demote the root Super Admin account.',
+      };
+    }
+  }
+
+  const patch: Record<string, any> = {
+    updatedAt: serverTimestamp(),
+  };
+  if (updates.status) patch.status = updates.status;
+  if (updates.role) patch.role = updates.role;
+  if (updates.adminRole !== undefined) patch.adminRole = updates.adminRole;
+
+  await updateDoc(targetDocRef, patch);
+
+  // Write audit log
+  try {
+    const logId = 'log_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    await setDoc(doc(db, 'auditLogs', logId), {
+      id: logId,
+      adminUid: callerUid,
+      adminEmail: callerUid.includes('@') ? callerUid : 'admin@codekaro.dev',
+      action: 'UPDATE_USER_ROLE_STATUS',
+      targetType: 'user',
+      targetId: targetUid,
+      details: updates,
+      timestamp: serverTimestamp(),
+    });
+  } catch (logErr) {
+    console.warn('Could not write audit log:', logErr);
+  }
+
+  return { success: true };
+}
+
+/**
+ * List recent submissions for admin dashboard
+ */
+export async function listSubmissionsForAdmin(limitCount = 50) {
+  try {
+    const q = query(collection(db, 'submissions'), orderBy('submittedAt', 'desc'), limit(limitCount));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as SubmissionDoc);
+  } catch (err) {
+    // If order by index is building, fallback to basic limit query
+    const fallbackSnap = await getDocs(query(collection(db, 'submissions'), limit(limitCount)));
+    return fallbackSnap.docs.map((d) => d.data() as SubmissionDoc);
+  }
+}
+
+/**
+ * List audit logs
+ */
+export async function listAuditLogsForAdmin(limitCount = 50) {
+  try {
+    const q = query(collection(db, 'auditLogs'), orderBy('timestamp', 'desc'), limit(limitCount));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as AuditLogDoc);
+  } catch (err) {
+    const fallbackSnap = await getDocs(query(collection(db, 'auditLogs'), limit(limitCount)));
+    return fallbackSnap.docs.map((d) => d.data() as AuditLogDoc);
+  }
+}
+
+/**
+ * List problem reports
+ */
+export async function listReportsForAdmin(limitCount = 50) {
+  try {
+    const q = query(collection(db, 'reports'), orderBy('createdAt', 'desc'), limit(limitCount));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => d.data() as ReportDoc);
+  } catch (err) {
+    const fallbackSnap = await getDocs(query(collection(db, 'reports'), limit(limitCount)));
+    return fallbackSnap.docs.map((d) => d.data() as ReportDoc);
+  }
+}
+
+/**
+ * Create announcement
+ */
+export async function createAnnouncementByAdmin(
+  authorUid: string,
+  authorName: string,
+  data: { title: string; content: string; priority?: 'low' | 'normal' | 'high' }
+): Promise<AnnouncementDoc> {
+  const annId = 'ann_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+  const announcement: AnnouncementDoc = {
+    id: annId,
+    title: data.title,
+    content: data.content,
+    authorId: authorUid,
+    authorName: authorName || 'CodeKaro Team',
+    priority: data.priority || 'normal',
+    isPublished: true,
+    publishedAt: serverTimestamp(),
+  };
+
+  await setDoc(doc(db, 'announcements', annId), announcement);
+
+  // Write audit log
+  try {
+    const logId = 'log_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    await setDoc(doc(db, 'auditLogs', logId), {
+      id: logId,
+      adminUid: authorUid,
+      adminEmail: authorName,
+      action: 'CREATE_ANNOUNCEMENT',
+      targetType: 'announcement',
+      targetId: annId,
+      details: { title: data.title },
+      timestamp: serverTimestamp(),
+    });
+  } catch (logErr) {
+    console.warn('Could not write audit log:', logErr);
+  }
+
+  return announcement;
+}
+
+/**
+ * Toggle problem published/archived status
+ */
+export async function updateProblemStatusByAdmin(
+  callerUid: string,
+  problemId: string,
+  updates: { published?: boolean; isArchived?: boolean }
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const probRef = doc(db, 'problems', problemId);
+    const snap = await getDoc(probRef);
+    if (!snap.exists()) {
+      return { success: false, error: 'Problem not found.' };
+    }
+
+    const patch: Record<string, any> = {
+      updatedAt: serverTimestamp(),
+    };
+    if (updates.published !== undefined) patch.published = updates.published;
+    if (updates.isArchived !== undefined) patch.isArchived = updates.isArchived;
+
+    await updateDoc(probRef, patch);
+
+    // Audit log
+    const logId = 'log_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 6);
+    await setDoc(doc(db, 'auditLogs', logId), {
+      id: logId,
+      adminUid: callerUid,
+      adminEmail: 'admin@codekaro.dev',
+      action: 'UPDATE_PROBLEM_STATUS',
+      targetType: 'problem',
+      targetId: problemId,
+      details: updates,
+      timestamp: serverTimestamp(),
+    });
+
+    return { success: true };
+  } catch (err: any) {
+    return { success: false, error: err?.message || 'Update failed' };
+  }
+}
