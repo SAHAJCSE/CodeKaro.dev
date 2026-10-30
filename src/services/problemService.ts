@@ -23,13 +23,28 @@ export async function getPublishedProblems(): Promise<ProblemDoc[]> {
       where('isArchived', '==', false)
     );
     const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ProblemDoc, 'id'>) }));
+    if (!snap.empty) {
+      return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<ProblemDoc, 'id'>) }));
+    }
   } catch (err) {
-    console.warn('Could not query Firestore problems, falling back to local API:', err);
-    const res = await fetch('/api/problems');
-    const data = await res.json();
-    return data.problems || [];
+    console.warn('Could not query Firestore problems:', err);
   }
+
+  // Fallback to local API
+  try {
+    const res = await fetch('/api/problems');
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
+      const data = await res.json();
+      if (data && Array.isArray(data.problems)) {
+        return data.problems;
+      }
+    }
+  } catch (err) {
+    console.warn('Fallback api/problems fetch failed:', err);
+  }
+
+  return [];
 }
 
 export async function getProblemById(problemId: string): Promise<ProblemDoc | null> {
@@ -47,7 +62,8 @@ export async function getProblemById(problemId: string): Promise<ProblemDoc | nu
   // Fallback to local endpoint
   try {
     const res = await fetch(`/api/problems/${problemId}`);
-    if (res.ok) {
+    const contentType = res.headers.get('content-type') || '';
+    if (res.ok && contentType.includes('application/json')) {
       return await res.json();
     }
   } catch {

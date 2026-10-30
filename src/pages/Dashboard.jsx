@@ -7,6 +7,7 @@ import { RecentSubmissionsWidget } from "../components/widgets/RecentSubmissions
 import { RecommendedWidget } from "../components/widgets/RecommendedWidget";
 import ContributionSkyline from "@/components/ui/contribution-skyline";
 import { getDashboardData } from "../data/dashboardData";
+import { auth, onAuthStateChanged } from "../firebase";
 import {
   LayoutDashboard,
   Terminal,
@@ -33,6 +34,7 @@ export function Dashboard() {
   const [activeItem, setActiveItem] = useState("dashboard");
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef(null);
+  const [currentUser, setCurrentUser] = useState(null);
 
   // Dev state switcher supporting URL param ?state=loading|empty|error|populated
   const [previewState, setPreviewState] = useState(() => {
@@ -43,12 +45,22 @@ export function Dashboard() {
         return s;
       }
     }
-    return "populated";
+    return "empty";
   });
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+      if (!window.location.search.includes("state=")) {
+        setPreviewState(user ? "populated" : "empty");
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const fetchData = async (stateToFetch) => {
     setLoading(true);
