@@ -472,7 +472,7 @@
       align-self: center;
       justify-self: center;
       margin: 0;
-      padding: 76px 20px 0;
+      padding: 0;
       color: #f4f4f6;
       font-size: clamp(48px, 10vw, 112px);
       font-family: var(--home-display-font);
@@ -481,6 +481,10 @@
       line-height: 1.05;
       text-align: center;
       text-shadow: 0 2px 28px rgba(5, 10, 20, .5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     }
 
     .hero-title__text {
@@ -505,13 +509,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 32px;
       width: 100%;
-      padding: 76px 20px 0;
-    }
-
-    .hero-title {
-      padding: 0;
+      min-height: 100svh;
+      padding: 20px;
+      box-sizing: border-box;
+      text-align: center;
     }
 
     @property --hero-cta-angle {
@@ -1155,7 +1159,7 @@
 
     @media (max-width: 560px) {
       .navbar { min-height: 64px; }
-      .hero-content { padding-top: 64px; gap: 26px; }
+      .hero-content { padding: 20px; gap: 26px; min-height: 100svh; }
       .hero-title { font-size: clamp(44px, 13vw, 72px); }
       .hero-cta { min-height: 48px; padding: 0 22px; font-size: 11px; }
     }
