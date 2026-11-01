@@ -175,20 +175,33 @@ const animationVariants: Record<
   },
 };
 
+const motionElements: Record<string, React.ComponentType<any>> = {
+  p: motion.p,
+  h1: motion.h1,
+  h2: motion.h2,
+  h3: motion.h3,
+  h4: motion.h4,
+  span: motion.span,
+  div: motion.div,
+};
+
 export function TextAnimate({
   children,
   delay = 0,
-  duration = 0.85,
+  duration = 0.65,
   variants,
   className,
   segmentClassName,
   as: Component = "p",
-  startOnView = true,
-  once = false,
+  startOnView = false,
+  once = true,
   by = "word",
   animation = "blurInUp",
 }: TextAnimateProps) {
-  const MotionComponent = motion.create(Component);
+  const MotionComponent =
+    typeof Component === "string" && motionElements[Component]
+      ? motionElements[Component]
+      : motion.div;
 
   let segments: string[] = [];
   switch (by) {
@@ -210,7 +223,7 @@ export function TextAnimate({
   const finalVariants = variants
     ? {
         container: {
-          hidden: { opacity: 0 },
+          hidden: { opacity: 1 },
           show: {
             opacity: 1,
             transition: {
@@ -240,12 +253,12 @@ export function TextAnimate({
     <AnimatePresence mode="popLayout">
       <MotionComponent
         variants={finalVariants.container}
-        initial="hidden"
+        initial="show"
         whileInView={startOnView ? "show" : undefined}
-        animate={startOnView ? undefined : "show"}
+        animate="show"
         exit="exit"
         className={cn("whitespace-pre-wrap", className)}
-        viewport={{ once, amount: 0.2 }}
+        viewport={{ once, amount: 0.15 }}
       >
         {segments.map((segment, i) =>
           /^\s+$/.test(segment) ? (

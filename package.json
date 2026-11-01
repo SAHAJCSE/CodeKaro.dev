@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build",
+    "bundle:entries": "npx esbuild src/testimonials-entry.tsx --bundle --format=iife --platform=browser --jsx=automatic --define:process.env.NODE_ENV='\"production\"' --loader:.css=empty --alias:@=./src --minify --outfile=public/assets/testimonials-entry.js && npx esbuild src/dashboard-skyline.tsx --bundle --format=iife --platform=browser --jsx=automatic --define:process.env.NODE_ENV='\"production\"' --loader:.css=empty --alias:@=./src --minify --outfile=public/assets/dashboard-skyline.js && npx esbuild src/not-found-entry.tsx --bundle --format=iife --platform=browser --jsx=automatic --define:process.env.NODE_ENV='\"production\"' --loader:.css=empty --alias:@=./src --minify --outfile=public/assets/not-found-entry.js && npx esbuild src/auth-client.ts --bundle --format=iife --platform=browser --define:process.env.NODE_ENV='\"production\"' --alias:@=./src --minify --outfile=public/assets/auth-client.js",
+    "build": "npm run bundle:entries && vite build",
     "start": "NODE_ENV=production tsx server.ts",
     "preview": "vite preview",
     "lint": "eslint firestore.rules",

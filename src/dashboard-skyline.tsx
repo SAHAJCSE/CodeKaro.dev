@@ -218,15 +218,8 @@ function DashboardProfileSection() {
   )
   const [savedNotice, setSavedNotice] = useState(false)
   const [showPicker, setShowPicker] = useState(false)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement | null>(null)
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 600)
-    return () => {
-      clearTimeout(timer)
-    }
-  }, [])
 
   // Sync Gmail / Google photoURL if Firebase Auth resolves after initial render
   useEffect(() => {
@@ -615,11 +608,10 @@ const PALETTE_OPTIONS: { id: PaletteName; label: string }[] = [
 
 function DashboardSkylineSection() {
   const [palette, setPalette] = useState<PaletteName>("mono")
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const userData = useMemo(() => loadUserContributionDays(), [])
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 750)
     const onStateChange = (e: Event) => {
       const custom = e as CustomEvent<{ state?: string }>
       if (custom.detail?.state === "loading") {
@@ -630,7 +622,6 @@ function DashboardSkylineSection() {
     }
     window.addEventListener("ck-dashboard-state", onStateChange)
     return () => {
-      clearTimeout(timer)
       window.removeEventListener("ck-dashboard-state", onStateChange)
     }
   }, [])
@@ -697,20 +688,30 @@ function DashboardSkylineSection() {
   )
 }
 
-const profileMountEl = document.getElementById("dashboard-profile-root")
-if (profileMountEl) {
-  ReactDOM.createRoot(profileMountEl).render(
-    <React.StrictMode>
-      <DashboardProfileSection />
-    </React.StrictMode>
-  )
+function mountDashboardComponents() {
+  const profileMountEl = document.getElementById("dashboard-profile-root")
+  if (profileMountEl && !profileMountEl.dataset.mounted) {
+    profileMountEl.dataset.mounted = "true"
+    ReactDOM.createRoot(profileMountEl).render(
+      <React.StrictMode>
+        <DashboardProfileSection />
+      </React.StrictMode>
+    )
+  }
+
+  const mountEl = document.getElementById("dashboard-skyline-root")
+  if (mountEl && !mountEl.dataset.mounted) {
+    mountEl.dataset.mounted = "true"
+    ReactDOM.createRoot(mountEl).render(
+      <React.StrictMode>
+        <DashboardSkylineSection />
+      </React.StrictMode>
+    )
+  }
 }
 
-const mountEl = document.getElementById("dashboard-skyline-root")
-if (mountEl) {
-  ReactDOM.createRoot(mountEl).render(
-    <React.StrictMode>
-      <DashboardSkylineSection />
-    </React.StrictMode>
-  )
+mountDashboardComponents()
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", mountDashboardComponents)
 }
+

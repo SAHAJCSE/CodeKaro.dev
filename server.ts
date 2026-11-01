@@ -569,33 +569,39 @@ async function startServer() {
 
   // Always support Tailwind CSS stylesheet request in both dev & production
   app.get(['/assets/tailwind.css', '/assets/index.css'], (_req, res) => {
-    const builtTailwind = path.join(__dirname, 'dist', 'assets', 'tailwind.css');
-    const builtIndex = path.join(__dirname, 'dist', 'assets', 'index.css');
-    if (fs.existsSync(builtTailwind)) {
-      res.setHeader('Content-Type', 'text/css; charset=utf-8');
-      res.sendFile(builtTailwind);
-      return;
-    }
-    if (fs.existsSync(builtIndex)) {
-      res.setHeader('Content-Type', 'text/css; charset=utf-8');
-      res.sendFile(builtIndex);
-      return;
+    const candidates = [
+      path.join(PUBLIC_DIR, 'assets', 'tailwind.css'),
+      path.join(PUBLIC_DIR, 'assets', 'index.css'),
+      path.join(__dirname, 'dist', 'assets', 'tailwind.css'),
+      path.join(__dirname, 'dist', 'assets', 'index.css'),
+    ];
+    for (const candidate of candidates) {
+      if (fs.existsSync(candidate)) {
+        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        res.sendFile(candidate);
+        return;
+      }
     }
     res.status(404).end();
   });
 
-  // Always serve built assets from dist/assets if requested, in both dev and production
+  // Always serve built assets from public/assets or dist/assets in both dev and production
   app.use('/assets', (req, res, next) => {
     const fileName = req.path.replace(/^\//, '');
-    const assetPath = path.join(__dirname, 'dist', 'assets', fileName);
-    if (fs.existsSync(assetPath)) {
-      if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
-        res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
-      } else if (fileName.endsWith('.css')) {
-        res.setHeader('Content-Type', 'text/css; charset=utf-8');
+    const candidates = [
+      path.join(PUBLIC_DIR, 'assets', fileName),
+      path.join(__dirname, 'dist', 'assets', fileName),
+    ];
+    for (const assetPath of candidates) {
+      if (fs.existsSync(assetPath) && fs.statSync(assetPath).isFile()) {
+        if (fileName.endsWith('.js') || fileName.endsWith('.mjs')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (fileName.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        }
+        res.sendFile(assetPath);
+        return;
       }
-      res.sendFile(assetPath);
-      return;
     }
     next();
   });
@@ -628,12 +634,7 @@ async function startServer() {
 
         if (targetPath) {
           try {
-            let rawHtml = fs.readFileSync(targetPath, 'utf-8');
-            try {
-              rawHtml = await vite.transformIndexHtml(req.originalUrl || req.url, rawHtml);
-            } catch (transformErr) {
-              console.warn('Vite transformIndexHtml skipped:', transformErr);
-            }
+            const rawHtml = fs.readFileSync(targetPath, 'utf-8');
             const status = htmlFile === '404.html' ? 404 : 200;
             res.status(status).set({ 'Content-Type': 'text/html; charset=utf-8' }).end(rawHtml);
             return;

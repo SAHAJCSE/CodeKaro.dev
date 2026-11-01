@@ -129,6 +129,8 @@
           authPanel.innerHTML = `
             <p class="home-auth__prompt">Code-Karo Account</p>
             <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px;">
+              <a class="home-auth__link" href="${url('/profile')}">Profile &amp; Stats</a>
+              <a class="home-auth__link" href="${url('/practice')}">Practice IDE</a>
               <div style="display:flex;gap:8px;">
                 <a class="home-auth__link" href="${url('/auth?auth=signup')}">Sign up</a>
                 <a class="home-auth__link" href="${url('/auth')}">Log in</a>
@@ -136,9 +138,6 @@
             </div>
           `;
           bindPanelLinks();
-        }
-        if (typeof window.syncAuthNavbarState === "function") {
-          window.syncAuthNavbarState();
         }
       }
     }

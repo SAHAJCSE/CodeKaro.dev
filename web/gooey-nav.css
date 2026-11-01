@@ -84,8 +84,9 @@
   --island-ink: #f4f4f5;
   --island-muted: rgba(244, 244, 245, .68);
   position: relative;
+  z-index: 60;
   display: inline-flex;
-  width: var(--island-collapsed-w, 114px);
+  width: var(--island-collapsed-w, 124px);
   max-width: calc(100vw - 24px);
   height: 44px;
   flex: none;
@@ -128,26 +129,28 @@
 
 .nav-island:hover,
 .nav-island:focus-within,
-.nav-island[data-expanded="true"] {
-  width: min(var(--island-expanded-w, 464px), calc(100vw - 24px));
-  border-color: rgba(255, 255, 255, .16);
-  background: rgba(17, 17, 20, .88);
-  box-shadow: 0 12px 36px rgba(0, 0, 0, .28), 0 0 22px rgba(225, 230, 240, .08);
+.nav-island[data-expanded="true"],
+.nav-island.is-open {
+  width: min(var(--island-expanded-w, 560px), calc(100vw - 24px));
+  border-color: rgba(255, 255, 255, .18);
+  background: rgba(17, 17, 20, .92);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, .32), 0 0 22px rgba(225, 230, 240, .1);
 }
 
 .nav-island:hover::before,
 .nav-island:focus-within::before,
-.nav-island[data-expanded="true"]::before { opacity: 1; }
+.nav-island[data-expanded="true"]::before,
+.nav-island.is-open::before { opacity: 1; }
 
 .nav-island__brand {
   z-index: 1;
   display: inline-flex;
-  min-width: 104px;
+  min-width: 108px;
   height: 34px;
   flex: none;
   align-items: center;
   justify-content: center;
-  padding: 0 12px;
+  padding: 0 14px;
   border-radius: 999px;
   color: var(--island-ink);
   font-size: 13px;
@@ -155,6 +158,8 @@
   letter-spacing: -.025em;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
 }
 
 .nav-island__links {
@@ -164,7 +169,7 @@
   flex: 0 0 auto;
   align-items: center;
   gap: 4px;
-  padding-right: 4px;
+  padding-right: 6px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -173,8 +178,9 @@
 
 .nav-island:hover .nav-island__links,
 .nav-island:focus-within .nav-island__links,
-.nav-island[data-expanded="true"] .nav-island__links {
-  max-width: 520px;
+.nav-island[data-expanded="true"] .nav-island__links,
+.nav-island.is-open .nav-island__links {
+  max-width: 640px;
   opacity: 1;
   pointer-events: auto;
 }
@@ -187,7 +193,7 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  padding: 0 11px;
+  padding: 0 12px;
   box-sizing: border-box;
   border-radius: 999px;
   color: var(--island-muted);
@@ -195,12 +201,19 @@
   font-weight: 500;
   text-decoration: none;
   white-space: nowrap;
+  cursor: pointer;
   transition: background-color .18s ease, color .18s ease;
 }
 
 .nav-island__link:hover,
 .nav-island__link[aria-current="page"] {
   color: var(--island-ink);
+  background: rgba(255, 255, 255, .07);
+}
+
+:root[data-theme="light"] .nav-island__link:hover,
+:root[data-theme="light"] .nav-island__link[aria-current="page"] {
+  background: rgba(0, 0, 0, .06);
 }
 
 .nav-island__link[aria-current="page"]::after {
@@ -226,7 +239,7 @@
   --island-ink: #25262b;
   --island-muted: rgba(37, 38, 43, .68);
   border-color: rgba(32, 33, 38, .1);
-  background: rgba(250, 250, 251, .8);
+  background: rgba(250, 250, 251, .84);
   box-shadow: 0 8px 28px rgba(24, 24, 27, .1);
 }
 
@@ -237,9 +250,10 @@
 
 :root[data-theme="light"] .nav-island:hover,
 :root[data-theme="light"] .nav-island:focus-within,
-:root[data-theme="light"] .nav-island[data-expanded="true"] {
+:root[data-theme="light"] .nav-island[data-expanded="true"],
+:root[data-theme="light"] .nav-island.is-open {
   border-color: rgba(32, 33, 38, .18);
-  background: rgba(255, 255, 255, .94);
+  background: rgba(255, 255, 255, .96);
   box-shadow: 0 12px 36px rgba(24, 24, 27, .14), 0 0 22px rgba(24, 24, 27, .06);
 }
 
@@ -252,29 +266,30 @@
   to { offset-distance: 100%; }
 }
 
-/* Responsive Mobile Navbar & Nav Island */
-@media (max-width: 720px) {
+/* Responsive Mobile Navbar (<= 768px) */
+@media (max-width: 768px) {
   .navbar {
     display: flex !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     align-items: center !important;
-    justify-content: space-between !important;
-    row-gap: 8px !important;
-    min-height: auto !important;
-    padding: 10px 14px !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    min-height: 60px !important;
+    padding: 10px 16px !important;
   }
 
   .navbar .repository-link {
     position: static !important;
     order: 1;
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
+    margin-right: auto;
   }
 
   .repository-link--social:hover,
   .repository-link--social:focus-visible,
   .repository-link--social[data-expanded="true"] {
-    width: 34px;
+    width: 36px;
     gap: 0;
   }
 
@@ -286,13 +301,13 @@
     position: relative !important;
     right: auto !important;
     order: 2;
-    margin-left: auto;
-    margin-right: 8px;
+    margin-left: 0;
+    margin-right: 0;
   }
 
   .navbar .home-auth__button {
-    width: 34px;
-    height: 34px;
+    width: 36px;
+    height: 36px;
   }
 
   .navbar .home-auth__panel {
@@ -301,56 +316,20 @@
 
   .navbar .theme-switch {
     position: static !important;
+    right: auto !important;
     order: 3;
+    width: 36px;
+    min-height: 36px;
+  }
+
+  .navbar .navbar-hamburger-wrapper {
+    display: inline-flex !important;
+    position: relative !important;
+    order: 4;
   }
 
   .navbar .nav-island {
-    order: 4;
-    width: fit-content !important;
-    max-width: 100% !important;
-    height: 38px;
-    margin: 0 auto;
-    padding: 3px 6px;
-    justify-content: center;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-
-  .navbar .nav-island::-webkit-scrollbar {
-    display: none;
-  }
-
-  .navbar .nav-island__brand {
-    min-width: auto;
-    height: 30px;
-    padding: 0 8px;
-    font-size: 11.5px;
-  }
-
-  .navbar .nav-island__links {
-    max-width: none !important;
-    opacity: 1 !important;
-    pointer-events: auto !important;
-    gap: 2px;
-    padding-right: 2px;
-    overflow: visible;
-  }
-
-  .navbar .nav-island__link {
-    height: 30px;
-    padding: 0 8px;
-    font-size: 11px;
-  }
-}
-
-@media (max-width: 380px) {
-  .navbar .nav-island__brand {
-    padding: 0 6px;
-    font-size: 10.5px;
-  }
-  .navbar .nav-island__link {
-    padding: 0 6px;
-    font-size: 10px;
+    display: none !important;
   }
 }
 
