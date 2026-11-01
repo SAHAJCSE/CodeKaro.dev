@@ -129,8 +129,6 @@
           authPanel.innerHTML = `
             <p class="home-auth__prompt">Code-Karo Account</p>
             <div class="home-auth__actions" style="display:flex;flex-direction:column;gap:8px;">
-              <a class="home-auth__link" href="${url('/dashboard#profile')}">Profile &amp; Stats</a>
-              <a class="home-auth__link" href="${url('/practice')}">Practice IDE</a>
               <div style="display:flex;gap:8px;">
                 <a class="home-auth__link" href="${url('/auth?auth=signup')}">Sign up</a>
                 <a class="home-auth__link" href="${url('/auth')}">Log in</a>
@@ -138,6 +136,9 @@
             </div>
           `;
           bindPanelLinks();
+        }
+        if (typeof window.syncAuthNavbarState === "function") {
+          window.syncAuthNavbarState();
         }
       }
     }
@@ -255,11 +256,16 @@
     });
 
     if (menu) {
-      fetch("/team.json")
-        .then(res => {
-          if (!res.ok) throw new Error("Failed to load team data");
-          return res.json();
-        })
+      (async () => {
+        for (const tUrl of ["./team.json", "/team.json"]) {
+          try {
+            const res = await fetch(tUrl);
+            if (!res.ok) continue;
+            return JSON.parse(await res.text());
+          } catch (_e) {}
+        }
+        return null;
+      })()
         .then(team => {
           if (!Array.isArray(team) || !team.length) return;
           menu.textContent = "";
@@ -315,13 +321,20 @@
 
   const problemsCountEl = document.querySelector("[data-footer-problems]");
   if (problemsCountEl) {
-    fetch("/api/problems")
-      .then(res => {
-        if (!res.ok) throw new Error("Network error");
-        return res.json();
-      })
+    (async () => {
+      for (const pUrl of ["/api/problems", "./questions.json", "/questions.json"]) {
+        try {
+          const res = await fetch(pUrl);
+          if (!res.ok) continue;
+          const data = JSON.parse(await res.text());
+          if (data && Array.isArray(data.problems || data.questions)) return data;
+        } catch (_e) {}
+      }
+      return null;
+    })()
       .then(data => {
-        const count = Array.isArray(data?.problems) ? data.problems.length : null;
+        const list = data?.problems || data?.questions;
+        const count = Array.isArray(list) ? list.length : null;
         if (typeof count === "number" && count > 0) {
           problemsCountEl.textContent = `${count} Java problems`;
           problemsCountEl.hidden = false;

@@ -139,4 +139,102 @@
     window.addEventListener("resize", scheduleRender);
     render();
   });
+
+  // Global Auth Sync for Navbar Across Pages
+  function syncAuthNavbarState() {
+    let currentUser = null;
+    try {
+      const session = localStorage.getItem("oops_session");
+      if (session) currentUser = JSON.parse(session);
+    } catch (e) {}
+
+    const isLoggedIn = Boolean(currentUser);
+
+    // 1. Show or hide links that require auth (e.g. Dashboard, Profile)
+    document.querySelectorAll("[data-auth-only]").forEach(el => {
+      if (isLoggedIn) {
+        el.style.display = "";
+        el.removeAttribute("hidden");
+      } else {
+        el.style.display = "none";
+        el.setAttribute("hidden", "true");
+      }
+    });
+
+    // 2. Hide or show guest-only links
+    document.querySelectorAll("[data-guest-only]").forEach(el => {
+      if (isLoggedIn) {
+        el.style.display = "none";
+        el.setAttribute("hidden", "true");
+      } else {
+        el.style.display = "";
+        el.removeAttribute("hidden");
+      }
+    });
+
+    // 3. Home Auth account hover panel
+    const homeAuth = document.querySelector(".home-auth");
+    if (homeAuth) {
+      const authPanel = homeAuth.querySelector(".home-auth__panel");
+      const authBtn = homeAuth.querySelector(".home-auth__button");
+
+      if (!isLoggedIn) {
+        if (authPanel) {
+          authPanel.style.display = "none";
+        }
+        if (authBtn) {
+          authBtn.onclick = (e) => {
+            e.preventDefault();
+            window.location.href = "/auth";
+          };
+        }
+      } else {
+        if (authPanel) {
+          authPanel.style.display = "";
+          let userPill = authPanel.querySelector(".home-auth__user-pill");
+          if (!userPill) {
+            userPill = document.createElement("div");
+            userPill.className = "home-auth__user-pill";
+            authPanel.insertBefore(userPill, authPanel.firstChild);
+          }
+          const name = currentUser.username || "User";
+          const handle = "@" + name;
+          userPill.innerHTML = `
+            <div class="home-auth__avatar">${name.slice(0, 2).toUpperCase()}</div>
+            <div class="home-auth__user-meta">
+              <span class="home-auth__user-name">${name}</span>
+              <span class="home-auth__user-handle">${handle}</span>
+            </div>
+          `;
+        }
+        if (authBtn) {
+          authBtn.onclick = null;
+        }
+      }
+    }
+
+    // 4. Update hamburger dropdown menu links
+    const hamDropdown = document.querySelector(".hamburger-dropdown");
+    if (hamDropdown) {
+      hamDropdown.querySelectorAll("a").forEach(a => {
+        const href = a.getAttribute("href") || "";
+        if (href.includes("/dashboard") || href.includes("/profile")) {
+          if (isLoggedIn) {
+            a.style.display = "";
+          } else {
+            a.style.display = "none";
+          }
+        }
+      });
+    }
+
+    // Recalculate island widths after hiding/showing links
+    if (typeof window.updateIslandWidths === "function") {
+      window.updateIslandWidths();
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", syncAuthNavbarState);
+  window.addEventListener("codekaro-auth-changed", syncAuthNavbarState);
+  window.addEventListener("storage", syncAuthNavbarState);
 })();

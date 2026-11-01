@@ -1398,30 +1398,35 @@
     attachEventListeners();
 
     try {
-      const resp = await fetch("/api/problems");
-      const contentType = resp.headers.get("content-type") || "";
-      const text = await resp.text();
-
-      console.log("[CodeKaro Problems API] Response status:", resp.status, "content-type:", contentType);
-
-      if (!contentType.includes("application/json")) {
-        console.warn("[CodeKaro Problems API] Non-JSON response received (likely HTML 404 or middleware fallback):", text.slice(0, 150));
-        throw new Error(`Server returned non-JSON content-type (${contentType}). Response preview: ${text.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim().slice(0, 80)}`);
+      const candidateUrls = [
+        "/api/problems",
+        "./questions.json",
+        "/questions.json",
+        "./problems.json",
+        "/problems.json",
+      ];
+      let data = null;
+      for (const url of candidateUrls) {
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) continue;
+          const text = await resp.text();
+          const parsed = JSON.parse(text);
+          const list = parsed && (parsed.problems || parsed.questions);
+          if (Array.isArray(list) && list.length > 0) {
+            data = parsed;
+            break;
+          }
+        } catch (_e) {
+          // Try next URL
+        }
       }
 
-      let data;
-      try {
-        data = JSON.parse(text);
-      } catch (parseErr) {
-        console.error("[CodeKaro Problems API] JSON parse failure:", parseErr, "Raw text:", text.slice(0, 200));
-        throw new Error(`Unexpected token or invalid JSON response from server. Raw preview: ${text.slice(0, 80)}`);
+      if (!data) {
+        throw new Error("Could not load problems from any JSON endpoint.");
       }
 
-      if (!resp.ok) {
-        throw new Error(data.error || `HTTP error ${resp.status}`);
-      }
-
-      allProblems = data.problems || [];
+      allProblems = data.problems || data.questions || [];
       serverPaths = data.paths || [];
       serverCollections = data.collections || [];
 

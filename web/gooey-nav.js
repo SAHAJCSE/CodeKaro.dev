@@ -51,6 +51,7 @@
     });
   });
 
+  window.updateIslandWidths = updateIslandWidths;
   updateIslandWidths();
   window.addEventListener("load", updateIslandWidths);
   window.addEventListener("resize", updateIslandWidths);

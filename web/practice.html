@@ -23,6 +23,32 @@
         <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
         <span>Code-Karo<span class="brand-muted">.dev</span></span>
       </a>
+
+      <!-- Small color palette icon on left side of topbar -->
+      <div class="theme-palette-wrapper" data-theme-palette-wrapper style="margin-left: 6px;">
+        <button type="button" class="theme-palette-btn" data-theme-palette-toggle aria-label="Theme Palette" title="Choose color theme">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 21a9 9 0 1 1 0-18 9 9 0 0 1 6.36 15.36L16 16a2 2 0 0 0-2 2v1a2 2 0 0 1-2 2z"/>
+            <circle cx="7.5" cy="10.5" r="1.5" fill="currentColor"/>
+            <circle cx="12" cy="7.5" r="1.5" fill="currentColor"/>
+            <circle cx="16.5" cy="10.5" r="1.5" fill="currentColor"/>
+          </svg>
+        </button>
+        <div class="theme-palette-dropdown" data-theme-palette-dropdown style="left: 0; top: calc(100% + 8px);">
+          <div class="theme-palette-header">Select Theme</div>
+          <div class="theme-palette-grid">
+            <button type="button" class="theme-circle-btn" data-theme-val="black-purple" title="Black Purple"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="white-purple" title="White Purple"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="mono" title="Mono"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="github" title="GitHub"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="ocean" title="Ocean"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="ember" title="Ember"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="dark" title="Dark"></button>
+            <button type="button" class="theme-circle-btn" data-theme-val="light" title="Light"></button>
+          </div>
+        </div>
+      </div>
+
       <button id="problem-list-btn" class="topbar-btn problem-list-toggle" title="Browse problems (/)">
         <span class="btn-icon">☰</span>
         <span>Problem List</span>
@@ -32,7 +58,6 @@
         <button id="next-problem-btn" class="topbar-icon-btn" title="Next problem" disabled aria-label="Next problem">›</button>
         <button id="random-problem-btn" class="topbar-icon-btn" title="Pick random problem" aria-label="Pick random problem">🔀</button>
       </div>
-      <div class="topbar-credits">Made By Shubham and  Rajeev</div>
     </div>
 
     <div class="topbar-center">
@@ -47,10 +72,6 @@
     </div>
 
     <div class="topbar-right">
-      <div class="runner-indicator-wrap" title="Runner connection status">
-        <span id="runner-status-dot" class="status-dot"></span>
-        <span id="runner-status-text">Connecting…</span>
-      </div>
       <button class="theme-switch theme-switch--compact" data-theme-switch type="button" aria-label="Switch theme" aria-pressed="false">
         <svg class="theme-switch__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <g class="theme-switch__sun-rays" stroke="currentColor" stroke-linecap="round" stroke-width="1.7">
@@ -64,7 +85,6 @@
         </svg>
         <span class="theme-switch__label" data-theme-label>Dark</span>
       </button>
-      <button id="settings-btn" class="topbar-icon-btn" title="Settings (Java Compiler & Environment)" aria-label="Settings">⚙</button>
       <button id="fullscreen-app-btn" class="topbar-icon-btn" title="Toggle app fullscreen" aria-label="Toggle fullscreen">⛶</button>
 
       <!-- Auth Controls (Guest vs Signed-in) -->
@@ -463,13 +483,28 @@
           </div>
 
           <div id="auth-demo-note" class="auth-demo-note">
-            <span class="note-icon">ℹ</span>
-            <span>Accounts are stored only in this browser (demo).</span>
+            <span class="note-icon">🔐</span>
+            <span>Sign in with Username/Password or use Firebase Google &amp; GitHub Auth.</span>
           </div>
 
           <button type="submit" id="auth-submit-btn" class="button button-primary auth-submit-btn">
             Sign In
           </button>
+
+          <div style="display:flex;gap:8px;margin-top:10px;">
+            <button type="button" id="modal-google-auth-btn" class="button button-secondary" style="flex:1;justify-content:center;display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                <path d="M12.24 10.285V14.4h6.806c-.275 1.765-2.056 5.174-6.806 5.174-4.095 0-7.439-3.389-7.439-7.574s3.345-7.574 7.439-7.574c2.33 0 3.891.989 4.785 1.849l3.254-3.138C18.189 1.186 15.479 0 12.24 0c-6.635 0-12 5.365-12 12s5.365 12 12 12c6.926 0 11.52-4.869 11.52-11.726 0-.788-.085-1.39-.189-1.989H12.24z"/>
+              </svg>
+              <span>Google Auth</span>
+            </button>
+            <button type="button" id="modal-github-auth-btn" class="button button-secondary" style="flex:1;justify-content:center;display:inline-flex;align-items:center;gap:6px;cursor:pointer;">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+                <path d="M12 .9a11.1 11.1 0 0 0-3.51 21.63c.55.1.76-.24.76-.53v-2.08c-3.1.67-3.75-1.32-3.75-1.32-.5-1.28-1.24-1.62-1.24-1.62-1.01-.69.08-.68.08-.68 1.12.08 1.71 1.15 1.71 1.15 1 1.7 2.62 1.21 3.26.93.1-.72.39-1.21.7-1.49-2.48-.28-5.09-1.24-5.09-5.52 0-1.22.44-2.21 1.15-2.99-.12-.28-.5-1.42.11-2.96 0 0 .94-.3 3.05 1.14a10.6 10.6 0 0 1 5.55 0c2.11-1.44 3.05-1.14 3.05-1.14.61 1.54.23 2.68.11 2.96.72.78 1.15 1.77 1.15 2.99 0 4.29-2.61 5.24-5.1 5.51.4.35.75 1.02.75 2.06V22c0 .29.2.63.76.53A11.1 11.1 0 0 0 12 .9Z"/>
+              </svg>
+              <span>GitHub Auth</span>
+            </button>
+          </div>
         </form>
       </div>
     </div>

@@ -1,17 +1,15 @@
 // Code-Karo.dev Configuration
-// Automatically detects environment (local development vs production Render URL),
+// Automatically detects environment, uses local/current origin by default,
 // supports localStorage override ('oops_runner_url'), and allows URL parameter (?runner_url=https://...).
 
 (function () {
-  const isLocal =
-    window.location.hostname === "localhost" ||
-    window.location.hostname === "127.0.0.1";
+  const originUrl =
+    window.location.origin && window.location.origin !== "null"
+      ? window.location.origin.replace(/\/+$/, "")
+      : `${window.location.protocol}//${window.location.hostname}${window.location.port ? ":" + window.location.port : ""}`;
 
-  // Production Render runner URL (matches live Render service)
-  const PROD_RUNNER_URL = "https://oops-judge.onrender.com";
-  const LOCAL_RUNNER_URL = window.location.port
-    ? `${window.location.protocol}//${window.location.hostname}:${window.location.port}`
-    : `${window.location.protocol}//${window.location.hostname}:8000`;
+  const PROD_RUNNER_URL = originUrl;
+  const LOCAL_RUNNER_URL = originUrl;
 
   let customUrl = null;
   try {
@@ -21,12 +19,16 @@
       localStorage.setItem("oops_runner_url", customUrl);
     } else {
       const stored = localStorage.getItem("oops_runner_url");
-      if (stored) customUrl = stored.replace(/\/+$/, "");
+      if (stored && !stored.includes("oops-judge.onrender.com")) {
+        customUrl = stored.replace(/\/+$/, "");
+      } else if (stored && stored.includes("oops-judge.onrender.com")) {
+        localStorage.removeItem("oops_runner_url");
+      }
     }
   } catch (e) {}
 
   window.CONFIG = {
-    RUNNER_URL: customUrl || (isLocal ? LOCAL_RUNNER_URL : PROD_RUNNER_URL),
+    RUNNER_URL: customUrl || originUrl,
     PROD_RUNNER_URL: PROD_RUNNER_URL,
     LOCAL_RUNNER_URL: LOCAL_RUNNER_URL,
   };

@@ -139,9 +139,18 @@
     if (!grid) return;
 
     try {
-      const res = await fetch("/team.json");
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const members = await res.json();
+      let members = null;
+      for (const url of ["./team.json", "/team.json"]) {
+        try {
+          const res = await fetch(url);
+          if (!res.ok) continue;
+          const parsed = JSON.parse(await res.text());
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            members = parsed;
+            break;
+          }
+        } catch (_e) {}
+      }
       if (Array.isArray(members) && members.length > 0) {
         grid.replaceChildren();
         members.forEach(member => {
@@ -376,10 +385,20 @@
 
     async function loadProblems() {
       try {
-        const res = await fetch("/api/problems");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
-        problemsData = Array.isArray(data.problems) ? data.problems : [];
+        let data = null;
+        for (const url of ["/api/problems", "./questions.json", "/questions.json", "./problems.json", "/problems.json"]) {
+          try {
+            const res = await fetch(url);
+            if (!res.ok) continue;
+            const parsed = JSON.parse(await res.text());
+            if (parsed && Array.isArray(parsed.problems || parsed.questions)) {
+              data = parsed;
+              break;
+            }
+          } catch (_e) {}
+        }
+        if (!data) throw new Error("Problems unavailable");
+        problemsData = Array.isArray(data.problems) ? data.problems : (Array.isArray(data.questions) ? data.questions : []);
 
         if (problemsCount) {
           problemsCount.textContent = `${problemsData.length} Java problems`;
